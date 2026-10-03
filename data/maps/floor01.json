@@ -1,28 +1,111 @@
 {
-  "name": "1층 시작의 초원",
-  "tile": [88, 96],
-  "cols": 34,
-  "rows": 26,
-  "seed": 20240,
-  "ledgeRow": 3,
-  "stairCol": 17,
-  "spawn": [17, 12],
-  "bg": "#4cb82c",
-  "flowerRate": 0.14,
-  "paths": [[6, 13], [20, 8], [24, 18]],
-  "props": [
-    { "kind": "tree", "set": "pine", "count": 16, "col": 30, "minDist": 110 },
-    { "kind": "tree", "set": "pine2", "count": 5, "col": 30, "minDist": 120 },
-    { "kind": "tree", "set": "tree", "count": 14, "col": 30, "minDist": 110 },
-    { "kind": "bush", "set": "bush", "count": 24, "col": 24, "minDist": 80 },
-    { "kind": "deco", "set": "small", "count": 46, "col": 0, "minDist": 40 },
-    { "kind": "deco", "set": "grass", "count": 26, "col": 0, "minDist": 40 }
+ "name": "1층 시작의 초원",
+ "tile": [
+  88,
+  96
+ ],
+ "cols": 56,
+ "rows": 38,
+ "seed": 20240,
+ "ledgeRow": 3,
+ "stairCol": 28,
+ "spawn": [
+  28,
+  14
+ ],
+ "bg": "#4cb82c",
+ "flowerRate": 0.14,
+ "paths": [
+  [
+   6,
+   13
   ],
-  "ledgeTrees": 10,
-  "spawns": [
-    { "type": "slime_green", "count": 3 },
-    { "type": "slime_blue", "count": 3 },
-    { "type": "slime_purple", "count": 2 },
-    { "type": "wolf", "count": 3 }
+  [
+   20,
+   8
+  ],
+  [
+   24,
+   18
+  ],
+  [
+   40,
+   26
+  ],
+  [
+   12,
+   30
+  ],
+  [
+   46,
+   12
+  ],
+  [
+   30,
+   32
   ]
+ ],
+ "props": [
+  {
+   "kind": "tree",
+   "set": "pine",
+   "count": 36,
+   "col": 30,
+   "minDist": 110
+  },
+  {
+   "kind": "tree",
+   "set": "pine2",
+   "count": 11,
+   "col": 30,
+   "minDist": 120
+  },
+  {
+   "kind": "tree",
+   "set": "tree",
+   "count": 32,
+   "col": 30,
+   "minDist": 110
+  },
+  {
+   "kind": "bush",
+   "set": "bush",
+   "count": 55,
+   "col": 24,
+   "minDist": 80
+  },
+  {
+   "kind": "deco",
+   "set": "small",
+   "count": 105,
+   "col": 0,
+   "minDist": 40
+  },
+  {
+   "kind": "deco",
+   "set": "grass",
+   "count": 59,
+   "col": 0,
+   "minDist": 40
+  }
+ ],
+ "ledgeTrees": 18,
+ "spawns": [
+  {
+   "type": "slime_green",
+   "count": 3
+  },
+  {
+   "type": "slime_blue",
+   "count": 3
+  },
+  {
+   "type": "slime_purple",
+   "count": 2
+  },
+  {
+   "type": "wolf",
+   "count": 3
+  }
+ ]
 }

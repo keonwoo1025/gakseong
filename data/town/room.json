@@ -1,0 +1,73 @@
+{
+ "id": "room",
+ "name": "원룸",
+ "theme": "room",
+ "legend": {
+  "w": "wood",
+  "S": "shelf",
+  "B": "bed",
+  "F": "fridge",
+  "D": "door",
+  "#": "wall",
+  "d": "desk",
+  "W": "window",
+  "R": "rug",
+  "c": "chair"
+ },
+ "rows": [
+  "#WW##W##",
+  "#wwwwwFw",
+  "#BwwwwwS",
+  "#Bwwwwww",
+  "#wwRRwdw",
+  "#wwRRwcw",
+  "###D####"
+ ],
+ "spawn": [
+  3,
+  5
+ ],
+ "music": "story",
+ "doors": [
+  {
+   "at": [
+    3,
+    6
+   ],
+   "to": "alley",
+   "spawn": [
+    5,
+    3
+   ],
+   "dir": "D"
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    1,
+    2
+   ],
+   "label": "잠자기",
+   "act": "sleep"
+  },
+  {
+   "at": [
+    6,
+    4
+   ],
+   "label": "조사",
+   "act": "text",
+   "text": "오래된 노트북. 바탕화면에 회사 단체 사진이 그대로다."
+  },
+  {
+   "at": [
+    6,
+    1
+   ],
+   "label": "조사",
+   "act": "text",
+   "text": "냉장고에는 생수 두 병과 김치뿐이다."
+  }
+ ]
+}

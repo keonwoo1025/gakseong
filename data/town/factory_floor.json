@@ -1,0 +1,98 @@
+{
+ "id": "factory_floor",
+ "name": "공장 생산동",
+ "theme": "factory",
+ "legend": {
+  "E": "exit",
+  "x": "crate",
+  "D": "door",
+  "#": "wall",
+  "W": "window",
+  "t": "tile",
+  "M": "machine",
+  "=": "belt"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWWWWWWWW",
+  "#ttttttttttttttttttE",
+  "#tMMtt=====ttMMtttt#",
+  "#tttttttttttttttttt#",
+  "#tt==========tttxxt#",
+  "#tttttttttttttttttt#",
+  "#tMMtttxxtttMMtt####",
+  "#tttttttttttttttDtt#",
+  "#ttxxtttMMtttttt#tt#",
+  "#tttttttttttttttttt#",
+  "Etttttttttttttttttt#",
+  "####################"
+ ],
+ "spawn": [
+  2,
+  10
+ ],
+ "music": "boss",
+ "doors": [
+  {
+   "at": [
+    19,
+    1
+   ],
+   "to": "roof",
+   "spawn": [
+    2,
+    5
+   ],
+   "dir": "R",
+   "if": {
+    "flag": "prologueExit"
+   }
+  }
+ ],
+ "npcs": [
+  {
+   "id": "coworker_b",
+   "at": [
+    13,
+    9
+   ],
+   "dir": "D",
+   "talk": "line",
+   "text": "…윽.",
+   "if": {
+    "noflag": "savedCoworker"
+   }
+  }
+ ],
+ "triggers": [
+  {
+   "id": "injured",
+   "rect": [
+    11,
+    8,
+    5,
+    3
+   ],
+   "scene": "prologue_injured"
+  },
+  {
+   "id": "locked",
+   "rect": [
+    15,
+    6,
+    3,
+    3
+   ],
+   "scene": "prologue_locked"
+  },
+  {
+   "id": "exit",
+   "rect": [
+    16,
+    1,
+    4,
+    2
+   ],
+   "scene": "prologue_exit"
+  }
+ ]
+}

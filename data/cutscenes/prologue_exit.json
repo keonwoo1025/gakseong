@@ -1,0 +1,208 @@
+{
+ "id": "prologue_exit",
+ "steps": [
+  {
+   "clearMobs": true
+  },
+  {
+   "spawn": {
+    "id": "minjae",
+    "at": [
+     15,
+     3
+    ],
+    "dir": "U"
+   }
+  },
+  {
+   "face": "player",
+   "dir": "D"
+  },
+  {
+   "say": "minjae",
+   "text": "먼저 가. 나는 각성자잖아. 금방 따라갈게."
+  },
+  {
+   "say": "player",
+   "text": "민재야…!"
+  },
+  {
+   "move": "minjae",
+   "to": [
+    12,
+    3
+   ]
+  },
+  {
+   "face": "minjae",
+   "dir": "L"
+  },
+  {
+   "shake": 10
+  },
+  {
+   "sfx": "heavy"
+  },
+  {
+   "fade": "out"
+  },
+  {
+   "stop": true
+  },
+  {
+   "card": "민재는 돌아오지 않았다.",
+   "dur": 3
+  },
+  {
+   "card": "늦게 도착한 헌터들이 포탈을 닫았을 때\n{이름:은} 닫힌 문 앞에 주저앉아 있었다.",
+   "dur": 4
+  },
+  {
+   "card": "아무것도 못 했다.\n살려달라는 말조차.",
+   "dur": 3.5
+  },
+  {
+   "portal": null
+  },
+  {
+   "remove": "minjae"
+  },
+  {
+   "card": "그날 저녁, 30층 돌파 소식이 전해졌다.\n31층의 1년 기한이 시작됐다.",
+   "dur": 4
+  },
+  {
+   "card": "몇 주 뒤.",
+   "dur": 2
+  },
+  {
+   "flag": "prologueExit"
+  },
+  {
+   "map": "roof",
+   "at": [
+    3,
+    5
+   ],
+   "dir": "R",
+   "keepDark": true
+  },
+  {
+   "music": "story"
+  },
+  {
+   "spawn": {
+    "id": "seoyun",
+    "at": [
+     8,
+     4
+    ],
+    "dir": "L"
+   }
+  },
+  {
+   "fade": "in"
+  },
+  {
+   "move": "player",
+   "to": [
+    6,
+    5
+   ]
+  },
+  {
+   "face": "player",
+   "dir": "R"
+  },
+  {
+   "say": "seoyun",
+   "text": "진짜 그만둬?"
+  },
+  {
+   "say": "seoyun",
+   "text": "지훈 선배랑 하린이는 길드에서 스카우트 왔대. 그날 일로."
+  },
+  {
+   "say": "seoyun",
+   "text": "…나는 그냥 여기 있을래. 능력이 있어도, 그런 날은 다시 겪기 싫어."
+  },
+  {
+   "text": "왜 그만두냐는 눈빛이다.",
+   "choices": [
+    {
+     "text": "강해지고 싶어서",
+     "aff": {
+      "seoyun": 1
+     }
+    },
+    {
+     "text": "민재 때문에",
+     "aff": {
+      "seoyun": 1
+     }
+    },
+    {
+     "text": "…그냥"
+    }
+   ]
+  },
+  {
+   "say": "seoyun",
+   "text": "그래. 연락은 해. 꼭."
+  },
+  {
+   "fade": "out"
+  },
+  {
+   "card": "오경수 짐꾼 사무소.\n비각성자를 받아주는 몇 안 되는 곳.",
+   "dur": 3.5
+  },
+  {
+   "map": "office",
+   "at": [
+    5,
+    5
+   ],
+   "dir": "U",
+   "keepDark": true
+  },
+  {
+   "music": "hub"
+  },
+  {
+   "fade": "in"
+  },
+  {
+   "move": "player",
+   "to": [
+    2,
+    3
+   ]
+  },
+  {
+   "face": "player",
+   "dir": "U"
+  },
+  {
+   "say": "oh",
+   "text": "짐꾼은 싸우는 사람 아니다. 살아서 돌아오는 사람이지."
+  },
+  {
+   "say": "oh",
+   "text": "의뢰는 나한테 받고, 파티는 탑 입구 광장에서 만나. 장비는 빌려준다."
+  },
+  {
+   "say": "oh",
+   "text": "구급상자는 편의점에서 알아서 챙겨. 그거 하나로 사람 산다."
+  },
+  {
+   "flag": "prologueDone"
+  },
+  {
+   "flag": "introDone"
+  },
+  {
+   "call": "startPorterLife"
+  }
+ ]
+}

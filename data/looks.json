@@ -1,0 +1,214 @@
+{
+ "player_m": {
+  "skin": "#f2cfb1",
+  "hair": "#22202a",
+  "hairStyle": "short",
+  "top": "#2b2b33",
+  "bottom": "#5a5e6b"
+ },
+ "player_f": {
+  "skin": "#f6dcc8",
+  "hair": "#22202a",
+  "hairStyle": "bun",
+  "top": "#2b2b33",
+  "bottom": "#5a5e6b"
+ },
+ "seoyun_f": {
+  "skin": "#f8e1d1",
+  "hair": "#5a3a28",
+  "hairStyle": "long",
+  "top": "#f4f1ea",
+  "bottom": "#3a4a6a",
+  "accent": "#d8a0a8"
+ },
+ "seoyun_m": {
+  "skin": "#f4d8c4",
+  "hair": "#4a3426",
+  "hairStyle": "short",
+  "top": "#f4f1ea",
+  "bottom": "#3a4a6a",
+  "accent": "#8ab0d8"
+ },
+ "minjae": {
+  "skin": "#e8c4a4",
+  "hair": "#6a4a30",
+  "hairStyle": "short",
+  "top": "#4a7ab0",
+  "bottom": "#3a3f4a"
+ },
+ "coworker_a": {
+  "skin": "#ecc8a8",
+  "hair": "#2a2a2a",
+  "hairStyle": "short",
+  "top": "#8a8a8a",
+  "bottom": "#3a3f4a"
+ },
+ "coworker_b": {
+  "skin": "#f0d0b8",
+  "hair": "#3a2a20",
+  "hairStyle": "bob",
+  "top": "#b0a070",
+  "bottom": "#4a4a4a"
+ },
+ "jihoon": {
+  "skin": "#ecc8a8",
+  "hair": "#1a1a20",
+  "hairStyle": "short",
+  "top": "#5a5a6a",
+  "bottom": "#2a2a30"
+ },
+ "harin": {
+  "skin": "#f6dcc8",
+  "hair": "#b0705a",
+  "hairStyle": "bob",
+  "top": "#e8d8b8",
+  "bottom": "#6a5a4a"
+ },
+ "oh": {
+  "skin": "#d8b090",
+  "hair": "#8a8a8a",
+  "hairStyle": "bald",
+  "top": "#6a5038",
+  "bottom": "#3a3a3a"
+ },
+ "wooseok": {
+  "skin": "#e0b898",
+  "hair": "#2a2a2a",
+  "hairStyle": "short",
+  "top": "#4a6a4a",
+  "bottom": "#4a4a3a"
+ },
+ "jiho": {
+  "skin": "#f0cfb0",
+  "hair": "#4a3a2a",
+  "hairStyle": "short",
+  "top": "#a05a3a",
+  "bottom": "#3a3a4a"
+ },
+ "somi": {
+  "skin": "#f6dcc8",
+  "hair": "#2a2030",
+  "hairStyle": "long",
+  "top": "#7a6a9a",
+  "bottom": "#3a3a4a"
+ },
+ "haerin": {
+  "skin": "#f4d8c4",
+  "hair": "#6a3a2a",
+  "hairStyle": "bun",
+  "top": "#c8a050",
+  "bottom": "#4a4038"
+ },
+ "taesung": {
+  "skin": "#e0b090",
+  "hair": "#2a1a10",
+  "hairStyle": "short",
+  "top": "#a83a3a",
+  "bottom": "#4a3a30",
+  "accent": "#c9a24a"
+ },
+ "yuna": {
+  "skin": "#f8e4d4",
+  "hair": "#e8c870",
+  "hairStyle": "long",
+  "top": "#f4f4f4",
+  "bottom": "#d8d0c0",
+  "accent": "#6aa0d8"
+ },
+ "hyun": {
+  "skin": "#e8c4a4",
+  "hair": "#3a4a2a",
+  "hairStyle": "short",
+  "top": "#4a7a3a",
+  "bottom": "#5a4a3a"
+ },
+ "eunji": {
+  "skin": "#f6dcc8",
+  "hair": "#5a2a6a",
+  "hairStyle": "bun",
+  "top": "#6a3a8a",
+  "bottom": "#3a2a4a",
+  "accent": "#e8b0ff"
+ },
+ "clerk": {
+  "skin": "#f0d0b8",
+  "hair": "#2a2a2a",
+  "hairStyle": "short",
+  "top": "#3f8f5a",
+  "bottom": "#3a3a3a"
+ },
+ "merchant": {
+  "skin": "#d8b090",
+  "hair": "#3a2a1a",
+  "hairStyle": "short",
+  "top": "#3a3f5a",
+  "bottom": "#2a2a30",
+  "accent": "#c9a24a"
+ },
+ "guard": {
+  "skin": "#e0b898",
+  "hair": "#1a1a1a",
+  "hairStyle": "short",
+  "top": "#2a3a5a",
+  "bottom": "#1a2030",
+  "accent": "#d8d8d8"
+ },
+ "passerby_a": {
+  "skin": "#ecc8a8",
+  "hair": "#3a2a20",
+  "hairStyle": "short",
+  "top": "#8a6a4a",
+  "bottom": "#3a3a4a"
+ },
+ "passerby_b": {
+  "skin": "#f4d8c4",
+  "hair": "#5a4a3a",
+  "hairStyle": "bob",
+  "top": "#b06a8a",
+  "bottom": "#4a4a5a"
+ },
+ "neighbor": {
+  "skin": "#e0b898",
+  "hair": "#9a9a9a",
+  "hairStyle": "bob",
+  "top": "#8a6a8a",
+  "bottom": "#4a4a4a"
+ },
+ "vendor": {
+  "skin": "#d8b090",
+  "hair": "#2a2a2a",
+  "hairStyle": "short",
+  "top": "#d8d8d0",
+  "bottom": "#3a3a3a",
+  "accent": "#d84a4a"
+ },
+ "jogger": {
+  "skin": "#f4d8c4",
+  "hair": "#3a2a1a",
+  "hairStyle": "long",
+  "top": "#4ab0d0",
+  "bottom": "#2a2a2a"
+ },
+ "fan": {
+  "skin": "#f6dcc8",
+  "hair": "#d87a8a",
+  "hairStyle": "bob",
+  "top": "#f4c0d0",
+  "bottom": "#6a6a8a"
+ },
+ "office_worker": {
+  "skin": "#ecc8a8",
+  "hair": "#1a1a1a",
+  "hairStyle": "short",
+  "top": "#2a3a5a",
+  "bottom": "#2a2a30"
+ },
+ "receptionist": {
+  "skin": "#f6dcc8",
+  "hair": "#2a2030",
+  "hairStyle": "bun",
+  "top": "#2a3a5a",
+  "bottom": "#2a2a30",
+  "accent": "#c9a24a"
+ }
+}

@@ -1,0 +1,102 @@
+{
+ "id": "factory_office",
+ "name": "공장 사무동",
+ "theme": "office",
+ "legend": {
+  "p": "plant",
+  "E": "exit",
+  "D": "door",
+  "#": "wall",
+  "d": "desk",
+  "W": "window",
+  "t": "tile",
+  "c": "chair"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWW",
+  "#ttttttttttttp",
+  "#tddttddttddt#",
+  "#tcctcctcctct#",
+  "#tttttttttttt#",
+  "#tddttddttddt#",
+  "#tcctcctcctct#",
+  "#tttttttttttt#",
+  "#ptttttttttttE",
+  "######D#######"
+ ],
+ "spawn": [
+  6,
+  8
+ ],
+ "music": "hub",
+ "doors": [
+  {
+   "at": [
+    6,
+    9
+   ],
+   "to": "commute",
+   "spawn": [
+    14,
+    2
+   ],
+   "dir": "D"
+  },
+  {
+   "at": [
+    13,
+    8
+   ],
+   "to": "factory_floor",
+   "spawn": [
+    2,
+    10
+   ],
+   "dir": "R",
+   "if": {
+    "flag": "prologueFloor"
+   }
+  }
+ ],
+ "npcs": [
+  {
+   "id": "minjae",
+   "at": [
+    3,
+    4
+   ],
+   "dir": "D",
+   "talk": "line",
+   "text": "오늘 점심 뭐 먹냐.",
+   "if": {
+    "noflag": "prologueDone"
+   }
+  },
+  {
+   "id": "seoyun",
+   "at": [
+    7,
+    4
+   ],
+   "dir": "D",
+   "talk": "line",
+   "text": "오늘따라 공장이 조용하네.",
+   "if": {
+    "noflag": "prologueDone"
+   }
+  },
+  {
+   "id": "coworker_a",
+   "at": [
+    10,
+    7
+   ],
+   "dir": "L",
+   "talk": "line",
+   "text": "비각성자랑 같은 층 쓰는 것도 좀 그렇지 않냐.",
+   "if": {
+    "noflag": "prologueDone"
+   }
+  }
+ ]
+}

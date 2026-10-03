@@ -68,5 +68,28 @@
   "slot": "material",
   "sell": 2000,
   "rarity": "일반"
+ },
+ "ramen": {
+  "name": "컵라면",
+  "slot": "use",
+  "heal": 15,
+  "price": 1500,
+  "rarity": "일반",
+  "desc": "싸고 따뜻하다"
+ },
+ "painkiller": {
+  "name": "진통제",
+  "slot": "use",
+  "heal": 30,
+  "price": 3000,
+  "rarity": "일반"
+ },
+ "first_aid": {
+  "name": "구급상자",
+  "slot": "use",
+  "heal": 50,
+  "price": 8000,
+  "rarity": "일반",
+  "desc": "원정 중 다친 파티원에게 건넬 수 있다"
  }
 }

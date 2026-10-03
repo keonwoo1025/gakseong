@@ -1,0 +1,57 @@
+{
+ "id": "river",
+ "name": "강변 공원",
+ "theme": "street",
+ "legend": {
+  "s": "walk",
+  "g": "grass",
+  "T": "tree",
+  "~": "water",
+  "a": "sand",
+  "h": "bench"
+ },
+ "rows": [
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+  "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "gggggghggggggghgggggsssggggghggggggghggggggg",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "gggTggggggTggggggTggsssggTggggggTgggggggTggg",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "TTTTTTTTTTTTTTTTTTTTsssTTTTTTTTTTTTTTTTTTTTT"
+ ],
+ "music": "story",
+ "edges": {
+  "S": {
+   "to": "market",
+   "dc": 0
+  }
+ },
+ "npcs": [
+  {
+   "id": "jogger",
+   "at": [
+    30,
+    6
+   ],
+   "dir": "L",
+   "talk": "line",
+   "text": "저 탑, 밤에 보면 꼭 숨 쉬는 것 같지 않아요?"
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    14,
+    4
+   ],
+   "label": "앉기",
+   "act": "text",
+   "text": "강 건너로 탑이 보인다. 꼭대기는 구름에 가려 있다."
+  }
+ ]
+}

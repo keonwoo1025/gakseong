@@ -25,6 +25,8 @@ export function josa(word, p) {
 // {이름} 이름만, {성} 성만, {성이름} 성과 이름, {직업} 전설 직업, 뒤에 :조사
 export function fmt(text, who) {
   if (!text) return '';
+  // 실수로 조사를 고정해서 쓴 경우({이름}은)도 자동으로 고친다
+  text = text.replace(/\{(이름|성이름|성)\}(은|는|이|가|을|를|과|와|아|야)(?![가-힣])/g, '{$1:$2}');
   return text.replace(/\{(이름|성이름|성|직업)(?::([^}]+))?\}/g, (m, key, p) => {
     const w = key === '이름' ? who.given : key === '성' ? who.family : key === '직업' ? (who.job || '') : who.family + who.given;
     return p ? josa(w, p) : w;

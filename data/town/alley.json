@@ -1,0 +1,158 @@
+{
+ "id": "alley",
+ "name": "원룸촌 골목",
+ "theme": "street",
+ "legend": {
+  "#": "wall",
+  "x": "crate",
+  "W": "window",
+  "s": "walk",
+  "V": "screen",
+  "n": "sign",
+  "D": "door",
+  "T": "tree",
+  "i": "lamp"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "########################################",
+  "#####D########V#######D########D########",
+  "sssissssssisssssssisssssnssisssssssissss",
+  "ssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssss",
+  "sssssssxssssssssTsssxssssssssTsssxssssss",
+  "############D#############D#############",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "music": "hub",
+ "edges": {
+  "E": {
+   "to": "market",
+   "dc": 0
+  },
+  "W": {
+   "to": "factory_district",
+   "dc": 0
+  }
+ },
+ "doors": [
+  {
+   "at": [
+    5,
+    2
+   ],
+   "to": "room",
+   "spawn": [
+    3,
+    5
+   ],
+   "dir": "U"
+  },
+  {
+   "at": [
+    12,
+    11
+   ],
+   "to": "store",
+   "spawn": [
+    4,
+    6
+   ],
+   "dir": "U"
+  },
+  {
+   "at": [
+    22,
+    2
+   ],
+   "to": "alley",
+   "spawn": [
+    22,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "남의 집이다."
+  },
+  {
+   "at": [
+    31,
+    2
+   ],
+   "to": "alley",
+   "spawn": [
+    31,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "문이 잠겨 있다."
+  },
+  {
+   "at": [
+    26,
+    11
+   ],
+   "to": "alley",
+   "spawn": [
+    26,
+    10
+   ],
+   "dir": "U",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "세탁소. 오늘은 휴무다."
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    14,
+    2
+   ],
+   "label": "전광판 보기",
+   "act": "news"
+  },
+  {
+   "at": [
+    24,
+    3
+   ],
+   "label": "조사",
+   "act": "text",
+   "text": "← 공장 지대 · 상가 거리 →"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "passerby_b",
+   "at": [
+    18,
+    6
+   ],
+   "dir": "L",
+   "talk": "line",
+   "text": "우리 애가 내년에 열여덟인데, 각성 못 하면 어쩌나 싶어요."
+  },
+  {
+   "id": "neighbor",
+   "at": [
+    8,
+    8
+   ],
+   "dir": "R",
+   "talk": "line",
+   "text": "짐꾼 일 한다며? 몸조심해. 요즘 탑 사고 많대."
+  }
+ ]
+}

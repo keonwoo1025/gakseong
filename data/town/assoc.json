@@ -1,0 +1,56 @@
+{
+ "id": "assoc",
+ "name": "대한민국 각성자협회 로비",
+ "theme": "office",
+ "legend": {
+  "#": "wall",
+  "W": "window",
+  "p": "plant",
+  "R": "rug",
+  "D": "door",
+  "o": "sofa",
+  "C": "counter",
+  "t": "tile"
+ },
+ "rows": [
+  "WWWWWWWWWWWW",
+  "#ttCCCCCCttp",
+  "#tttttttttt#",
+  "#oottttttoo#",
+  "#tttRRRRttt#",
+  "#tttRRRRttt#",
+  "#ttttttttttp",
+  "#####D######"
+ ],
+ "spawn": [
+  5,
+  6
+ ],
+ "music": "hub",
+ "doors": [
+  {
+   "at": [
+    5,
+    7
+   ],
+   "to": "avenue",
+   "spawn": [
+    6,
+    3
+   ],
+   "dir": "D"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "receptionist",
+   "at": [
+    6,
+    2
+   ],
+   "dir": "D",
+   "talk": "line",
+   "text": "등록, 갱신, 재측정 업무는 번호표를 뽑고 기다려 주세요. 비각성자 지원 상담은… 이번 달 마감되었습니다."
+  }
+ ]
+}

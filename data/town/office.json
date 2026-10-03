@@ -1,0 +1,104 @@
+{
+ "id": "office",
+ "name": "오경수 짐꾼 사무소",
+ "theme": "porter",
+ "legend": {
+  "R": "rug",
+  "w": "wood",
+  "x": "crate",
+  "D": "door",
+  "#": "wall",
+  "b": "board",
+  "W": "window",
+  "o": "sofa",
+  "C": "counter"
+ },
+ "rows": [
+  "##b#WW#W####",
+  "#wwwwwwwwwww",
+  "#CCCwwwwwoow",
+  "#wwwwwwwwwww",
+  "#wwwwwRRwwxw",
+  "#oowwwRRwwxw",
+  "#wwwwwwwwwww",
+  "#####D######"
+ ],
+ "spawn": [
+  5,
+  6
+ ],
+ "music": "hub",
+ "doors": [
+  {
+   "at": [
+    5,
+    7
+   ],
+   "to": "market",
+   "spawn": [
+    8,
+    3
+   ],
+   "dir": "D"
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    2,
+    0
+   ],
+   "label": "의뢰판 보기",
+   "act": "text",
+   "text": "[짐꾼 모집] 들꽃 파티(D급) 동행. 일당 4만 원 + 회수 수당.\n[짐꾼 모집] 3층 채집조. 마감."
+  }
+ ],
+ "npcs": [
+  {
+   "id": "oh",
+   "at": [
+    2,
+    1
+   ],
+   "dir": "D",
+   "talk": "job",
+   "label": "말 걸기"
+  },
+  {
+   "id": "wooseok",
+   "at": [
+    1,
+    4
+   ],
+   "dir": "R",
+   "talk": "bark"
+  },
+  {
+   "id": "jiho",
+   "at": [
+    9,
+    3
+   ],
+   "dir": "L",
+   "talk": "bark"
+  },
+  {
+   "id": "somi",
+   "at": [
+    2,
+    6
+   ],
+   "dir": "U",
+   "talk": "bark"
+  },
+  {
+   "id": "haerin",
+   "at": [
+    8,
+    6
+   ],
+   "dir": "L",
+   "talk": "bark"
+  }
+ ]
+}

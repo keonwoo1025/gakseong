@@ -1,4 +1,5 @@
 // 화면: 캔버스 크기, 확대 비율, 카메라, 그리기 도우미.
+import { Settings } from './settings.js';
 
 export class View {
   constructor(canvas) {
@@ -17,8 +18,14 @@ export class View {
     this.H = this.c.clientHeight || window.innerHeight;
     this.c.width = Math.round(this.W * this.DPR);
     this.c.height = Math.round(this.H * this.DPR);
-    // 화면 높이에 타일 약 6.2줄이 보이도록
-    this.G = Math.max(0.42, Math.min(1.25, this.H / (96 * 6.2)));
+    this.applyZoom();
+  }
+
+  // tile: 그 모드의 타일 높이, extra: 모드별 보정
+  setZoom(tile, extra = 1) { this.zTile = tile; this.zExtra = extra; this.applyZoom(); }
+  applyZoom() {
+    const tiles = (Settings.tilesTall ? Settings.tilesTall() : 5.6) * (this.zExtra || 1);
+    this.G = Math.max(0.35, Math.min(2.2, this.H / ((this.zTile || 64) * tiles)));
   }
 
   screen() {

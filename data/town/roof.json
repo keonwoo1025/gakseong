@@ -1,0 +1,27 @@
+{
+ "id": "roof",
+ "name": "공장 옥상",
+ "theme": "roof",
+ "legend": {
+  ".": "floor",
+  "f": "fence",
+  "x": "crate",
+  "E": "exit"
+ },
+ "rows": [
+  "ffffffffffff",
+  "f..........f",
+  "f..........f",
+  "f..........f",
+  "f....x.....f",
+  "E..........f",
+  "f..........f",
+  "ffffffffffff"
+ ],
+ "spawn": [
+  2,
+  5
+ ],
+ "music": "story",
+ "doors": []
+}

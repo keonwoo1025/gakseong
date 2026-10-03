@@ -1,0 +1,23 @@
+{
+ "id": "prologue_locked",
+ "steps": [
+  {
+   "text": "안쪽 통로 문이 잠겨 있다.",
+   "choices": [
+    {
+     "text": "다른 길을 찾는다",
+     "pattern": "탐구",
+     "weight": 2
+    },
+    {
+     "text": "문을 걷어찬다",
+     "pattern": "공격",
+     "weight": 2
+    }
+   ]
+  },
+  {
+   "text": "…위쪽 통로로 돌아가야 한다."
+  }
+ ]
+}

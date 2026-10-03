@@ -6,12 +6,12 @@
   "seed": 20337,
   "hpMul": 1.0,
   "dmgMul": 1.0,
-  "goal": 7,
+  "goal": 10,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
@@ -23,7 +23,7 @@
    },
    {
     "type": "wolf",
-    "count": 1
+    "count": 2
    }
   ]
  },
@@ -34,12 +34,12 @@
   "seed": 20434,
   "hpMul": 1.35,
   "dmgMul": 1.2,
-  "goal": 8,
+  "goal": 12,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
@@ -51,7 +51,7 @@
    },
    {
     "type": "wolf",
-    "count": 1
+    "count": 2
    }
   ]
  },
@@ -62,16 +62,16 @@
   "seed": 20531,
   "hpMul": 1.7,
   "dmgMul": 1.4,
-  "goal": 9,
+  "goal": 14,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
@@ -79,7 +79,7 @@
    },
    {
     "type": "wolf",
-    "count": 2
+    "count": 4
    }
   ]
  },
@@ -90,16 +90,16 @@
   "seed": 20628,
   "hpMul": 2.05,
   "dmgMul": 1.6,
-  "goal": 10,
+  "goal": 16,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
@@ -107,7 +107,7 @@
    },
    {
     "type": "wolf",
-    "count": 2
+    "count": 4
    }
   ]
  },
@@ -118,24 +118,24 @@
   "seed": 20725,
   "hpMul": 2.4,
   "dmgMul": 1.8,
-  "goal": 11,
+  "goal": 18,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 2
+    "count": 4
    },
    {
     "type": "wolf",
-    "count": 2
+    "count": 4
    }
   ]
  },
@@ -146,24 +146,24 @@
   "seed": 20822,
   "hpMul": 2.75,
   "dmgMul": 2.0,
-  "goal": 12,
+  "goal": 20,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 2
+    "count": 4
    },
    {
     "type": "wolf",
-    "count": 3
+    "count": 5
    }
   ]
  },
@@ -174,24 +174,24 @@
   "seed": 20919,
   "hpMul": 3.1,
   "dmgMul": 2.2,
-  "goal": 13,
+  "goal": 22,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 2
+    "count": 4
    },
    {
     "type": "wolf",
-    "count": 3
+    "count": 5
    }
   ]
  },
@@ -202,24 +202,24 @@
   "seed": 21016,
   "hpMul": 3.45,
   "dmgMul": 2.4,
-  "goal": 14,
+  "goal": 24,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 2
+    "count": 4
    },
    {
     "type": "wolf",
-    "count": 3
+    "count": 5
    }
   ]
  },
@@ -230,24 +230,24 @@
   "seed": 21113,
   "hpMul": 3.8,
   "dmgMul": 2.6,
-  "goal": 15,
+  "goal": 26,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 2
+    "count": 4
    },
    {
     "type": "wolf",
-    "count": 4
+    "count": 7
    }
   ]
  },
@@ -258,24 +258,24 @@
   "seed": 21210,
   "hpMul": 4.15,
   "dmgMul": 2.8,
-  "goal": 16,
+  "goal": 28,
   "boss": "wolf_alpha",
   "spawns": [
    {
     "type": "slime_green",
-    "count": 3
+    "count": 5
    },
    {
     "type": "slime_blue",
-    "count": 2
+    "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 2
+    "count": 4
    },
    {
     "type": "wolf",
-    "count": 4
+    "count": 7
    }
   ]
  }

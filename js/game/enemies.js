@@ -28,7 +28,7 @@ export class Enemies {
 
   damage(e, v, kx, ky, big) {
     const g = this.g;
-    e.hp -= v; e.hit = 0.15; e.kx += kx; e.ky += ky;
+    e.hp -= v; e.hit = 0.15; e.kx += kx; e.ky += ky; e.stun = Math.max(e.stun || 0, big === 2 ? 0.9 : big === 1 ? 0.4 : big === 3 ? 0.6 : 0.22);
     g.fx.sfx('imp', e.x, e.y - 28, { s: big === 2 ? 1.3 : big >= 1 ? 0.95 : 0.7, fps: 22, rot: Math.random() * 6.28 });
     g.fx.num(e.x, e.y - 70, v, big === 2 ? 'huge' : big >= 1 ? 'big' : 'normal');
     if (e.hp <= 0 && e.alive) {
@@ -42,6 +42,7 @@ export class Enemies {
     for (const e of this.list) {
       if (!e.alive) { e.dead -= dt; if (e.dead < -3.5 && !e.noRespawn) Object.assign(e, this.make(e.type)); continue; }
       e.t += dt; e.hit = Math.max(0, e.hit - dt); e.cd = Math.max(0, e.cd - dt); e.bite = Math.max(0, e.bite - dt);
+      if (e.stun > 0) { e.stun -= dt; w.moveBody(e, e.kx * dt, e.ky * dt, 18); e.kx *= 0.86; e.ky *= 0.86; continue; }
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
       const alive = p.state !== 'dead';
       if (e.d.kind === 'wolf') {

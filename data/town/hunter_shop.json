@@ -1,0 +1,53 @@
+{
+ "id": "hunter_shop",
+ "name": "헌터 상점",
+ "theme": "office",
+ "legend": {
+  "S": "shelf",
+  "D": "door",
+  "#": "wall",
+  "t": "tile",
+  "C": "counter"
+ },
+ "rows": [
+  "#SSSSSSSS#",
+  "#tttttttt#",
+  "#tSStSSttt",
+  "#tttttttt#",
+  "#CCttttttS",
+  "#tttttttt#",
+  "#tttttttt#",
+  "####D#####"
+ ],
+ "spawn": [
+  4,
+  6
+ ],
+ "music": "hub",
+ "doors": [
+  {
+   "at": [
+    4,
+    7
+   ],
+   "to": "avenue",
+   "spawn": [
+    15,
+    3
+   ],
+   "dir": "D"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "merchant",
+   "at": [
+    1,
+    5
+   ],
+   "dir": "R",
+   "talk": "shop",
+   "label": "거래하기"
+  }
+ ]
+}

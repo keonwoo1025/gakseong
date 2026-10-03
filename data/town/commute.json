@@ -1,0 +1,46 @@
+{
+ "id": "commute",
+ "name": "출근길",
+ "theme": "street",
+ "legend": {
+  "l": "lane",
+  "s": "walk",
+  "f": "fence",
+  "T": "tree",
+  "D": "door",
+  "#": "wall",
+  "V": "screen",
+  "W": "window",
+  "r": "road"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWWWWWW",
+  "####V#########D###",
+  "ssssssssssssssssss",
+  "ssssssssssssssssss",
+  "rrrrrrrrrrrrrrrrrr",
+  "llllllllllllllllll",
+  "rrrrrrrrrrrrrrrrrr",
+  "ssTssssssTssssssTs",
+  "ffffffffffffffffff"
+ ],
+ "spawn": [
+  1,
+  3
+ ],
+ "music": "hub",
+ "doors": [
+  {
+   "at": [
+    14,
+    1
+   ],
+   "to": "factory_office",
+   "spawn": [
+    6,
+    8
+   ],
+   "dir": "U"
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 // 저장: 브라우저 저장소에 한 칸. 하드코어라 죽으면 지워진다.
 
-const KEY = 'gakseong_save_v2';
+const KEY = 'gakseong_save_v3';
 
 export const Save = {
   has() { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } },
@@ -15,8 +15,11 @@ export function newState(family, given, gender) {
     family, given, gender,
     job: '미각성',
     phase: 'porter',
-    money: 50000,
-    inv: { potion: 3, return_stone: 1, mana_shard: 0, dagger_old: 1, cloth_work: 1 },
+    money: 30000,
+    inv: { first_aid: 1, ramen: 2, painkiller: 1, mana_shard: 0, dagger_old: 1, cloth_work: 1 },
+    porterDepth: 0,
+    objective: '',
+    map: 'room',
     equip: { weapon: 'dagger_old', outfit: 'cloth_work' },
     unlocked: 1,
     cleared: {},

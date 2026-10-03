@@ -1,0 +1,363 @@
+{
+ "id": "prologue",
+ "steps": [
+  {
+   "music": "story"
+  },
+  {
+   "card": "한성특별시\n탑이 세워진 지 30년",
+   "dur": 3.2
+  },
+  {
+   "map": "commute",
+   "at": [
+    1,
+    3
+   ],
+   "dir": "R"
+  },
+  {
+   "objective": ""
+  },
+  {
+   "move": "player",
+   "to": [
+    5,
+    3
+   ]
+  },
+  {
+   "face": "player",
+   "dir": "U"
+  },
+  {
+   "wait": 0.4
+  },
+  {
+   "text": "출근길 전광판에 뉴스가 흐른다."
+  },
+  {
+   "say": "뉴스",
+   "text": "30층 돌파 기한 D-1. 최전선 공략대가 오늘 마지막 도전에 나섭니다."
+  },
+  {
+   "text": "사람들은 무심하게 지나간다. 30년째 매년 있는 일이다."
+  },
+  {
+   "spawn": {
+    "id": "minjae",
+    "at": [
+     0,
+     3
+    ],
+    "dir": "R"
+   }
+  },
+  {
+   "move": "minjae",
+   "to": [
+    4,
+    3
+   ]
+  },
+  {
+   "face": "player",
+   "dir": "L"
+  },
+  {
+   "say": "minjae",
+   "text": "{이름:아}, 같이 가. 회의 자료는 다 했냐?"
+  },
+  {
+   "say": "player",
+   "text": "…어젯밤에."
+  },
+  {
+   "say": "minjae",
+   "text": "역시. 가자, 늦겠다."
+  },
+  {
+   "move": "minjae",
+   "to": [
+    14,
+    3
+   ],
+   "nowait": true
+  },
+  {
+   "move": "player",
+   "to": [
+    13,
+    3
+   ]
+  },
+  {
+   "remove": "minjae"
+  },
+  {
+   "move": "player",
+   "to": [
+    14,
+    2
+   ]
+  },
+  {
+   "map": "factory_office",
+   "at": [
+    6,
+    8
+   ],
+   "dir": "U"
+  },
+  {
+   "move": "player",
+   "to": [
+    6,
+    6
+   ]
+  },
+  {
+   "wait": 0.3
+  },
+  {
+   "say": "coworker_a",
+   "text": "그 부서에 비각성자 있다며? 월급도 우리랑 똑같나?"
+  },
+  {
+   "face": "minjae",
+   "dir": "R"
+  },
+  {
+   "say": "minjae",
+   "text": "신경 쓰지 마. 각성했다고 다 사람 되는 거 아니더라."
+  },
+  {
+   "emote": "seoyun",
+   "mark": "♪"
+  },
+  {
+   "face": "seoyun",
+   "dir": "D"
+  },
+  {
+   "say": "seoyun",
+   "text": "{이름:아}, 오늘 회의 자료 네가 만든 거지? 깔끔하더라."
+  },
+  {
+   "say": "player",
+   "text": "아, 응. 고마워."
+  },
+  {
+   "text": "점심시간이다.",
+   "choices": [
+    {
+     "text": "민재랑 밥 먹으러 간다",
+     "aff": {
+      "minjae": 1
+     }
+    },
+    {
+     "text": "서윤에게 같이 가자고 한다",
+     "aff": {
+      "seoyun": 1
+     },
+     "if": {
+      "gender": "m"
+     }
+    },
+    {
+     "text": "서준에게 같이 가자고 한다",
+     "aff": {
+      "seoyun": 1
+     },
+     "if": {
+      "gender": "f"
+     }
+    },
+    {
+     "text": "혼자 먹는다"
+    }
+   ]
+  },
+  {
+   "fade": "out"
+  },
+  {
+   "card": "오후 3시",
+   "dur": 2
+  },
+  {
+   "flag": "prologueFloor"
+  },
+  {
+   "map": "factory_floor",
+   "at": [
+    3,
+    9
+   ],
+   "dir": "U"
+  },
+  {
+   "spawn": {
+    "id": "minjae",
+    "at": [
+     5,
+     9
+    ],
+    "dir": "U"
+   }
+  },
+  {
+   "spawn": {
+    "id": "seoyun",
+    "at": [
+     7,
+     7
+    ],
+    "dir": "L"
+   }
+  },
+  {
+   "wait": 0.6
+  },
+  {
+   "stop": true
+  },
+  {
+   "sfx": "hurt"
+  },
+  {
+   "text": "휴대폰이 일제히 울린다. 기한 초과 경보."
+  },
+  {
+   "portal": [
+    9,
+    5
+   ]
+  },
+  {
+   "shake": 12
+  },
+  {
+   "music": "boss"
+  },
+  {
+   "cam": [
+    9,
+    5
+   ]
+  },
+  {
+   "text": "생산동 한가운데에서 공기가 찢어진다."
+  },
+  {
+   "mobs": [
+    {
+     "at": [
+      8,
+      5
+     ],
+     "kind": "slime_green"
+    },
+    {
+     "at": [
+      10,
+      4
+     ],
+     "kind": "slime_purple"
+    },
+    {
+     "at": [
+      11,
+      6
+     ],
+     "kind": "slime_blue"
+    }
+   ]
+  },
+  {
+   "wait": 0.6
+  },
+  {
+   "cam": "player"
+  },
+  {
+   "emote": "seoyun",
+   "mark": "!"
+  },
+  {
+   "text": "몬스터 한 마리가 서윤에게 달려든다.",
+   "if": {
+    "gender": "m"
+   },
+   "choices": [
+    {
+     "text": "앞을 막아선다",
+     "pattern": "수호",
+     "weight": 2
+    },
+    {
+     "text": "소화기를 들고 덤빈다",
+     "pattern": "공격",
+     "weight": 2
+    },
+    {
+     "text": "놈의 움직임을 본다",
+     "pattern": "관찰",
+     "weight": 2
+    }
+   ]
+  },
+  {
+   "text": "몬스터 한 마리가 서준에게 달려든다.",
+   "if": {
+    "gender": "f"
+   },
+   "choices": [
+    {
+     "text": "앞을 막아선다",
+     "pattern": "수호",
+     "weight": 2
+    },
+    {
+     "text": "소화기를 들고 덤빈다",
+     "pattern": "공격",
+     "weight": 2
+    },
+    {
+     "text": "놈의 움직임을 본다",
+     "pattern": "관찰",
+     "weight": 2
+    }
+   ]
+  },
+  {
+   "shake": 6
+  },
+  {
+   "say": "seoyun",
+   "text": "{이름:아}, 뛰어! 넌 능력도 없잖아!"
+  },
+  {
+   "say": "minjae",
+   "text": "비상구로 가! 내가 막을게!"
+  },
+  {
+   "move": "seoyun",
+   "to": [
+    3,
+    10
+   ],
+   "nowait": true
+  },
+  {
+   "remove": "minjae"
+  },
+  {
+   "objective": "오른쪽 위 비상구로 탈출하기"
+  },
+  {
+   "text": "[조작] 왼쪽을 끌어 이동. 몬스터에 닿으면 밀려난다."
+  }
+ ]
+}

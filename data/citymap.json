@@ -1,0 +1,73 @@
+{
+ "nodes": [
+  {
+   "id": "factory_district",
+   "name": "공장 지대",
+   "x": 0,
+   "y": 1
+  },
+  {
+   "id": "alley",
+   "name": "원룸촌 골목",
+   "x": 1,
+   "y": 1,
+   "inside": [
+    "room",
+    "store"
+   ]
+  },
+  {
+   "id": "market",
+   "name": "상가 거리",
+   "x": 2,
+   "y": 1,
+   "inside": [
+    "office"
+   ]
+  },
+  {
+   "id": "river",
+   "name": "강변 공원",
+   "x": 2,
+   "y": 0
+  },
+  {
+   "id": "avenue",
+   "name": "중앙 대로",
+   "x": 3,
+   "y": 1,
+   "inside": [
+    "assoc",
+    "hunter_shop"
+   ]
+  },
+  {
+   "id": "plaza",
+   "name": "탑 광장",
+   "x": 4,
+   "y": 1
+  }
+ ],
+ "links": [
+  [
+   "factory_district",
+   "alley"
+  ],
+  [
+   "alley",
+   "market"
+  ],
+  [
+   "market",
+   "river"
+  ],
+  [
+   "market",
+   "avenue"
+  ],
+  [
+   "avenue",
+   "plaza"
+  ]
+ ]
+}

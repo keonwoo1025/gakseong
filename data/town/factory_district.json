@@ -1,0 +1,68 @@
+{
+ "id": "factory_district",
+ "name": "공장 지대",
+ "theme": "factory",
+ "legend": {
+  "#": "wall",
+  "x": "crate",
+  "W": "window",
+  "s": "walk",
+  "n": "sign",
+  "D": "door",
+  "r": "road",
+  "f": "fence",
+  "l": "lane"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "##############################",
+  "##########D###################",
+  "ssssssssnsssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssss",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "llllllllllllllllllllllllllllll",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "ssssssssssssssssssssssssssssss",
+  "ssxssssxssssxssssxssssxssssxss",
+  "ffffffffffffffffffffffffffffff",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "music": "story",
+ "edges": {
+  "E": {
+   "to": "alley",
+   "dc": 0
+  }
+ },
+ "doors": [
+  {
+   "at": [
+    10,
+    2
+   ],
+   "to": "factory_district",
+   "spawn": [
+    10,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "출입 통제. 포탈 사고 조사 중이라는 안내문이 붙어 있다."
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    8,
+    3
+   ],
+   "label": "조사",
+   "act": "text",
+   "text": "옛 직장. 정문에 국화 몇 송이가 놓여 있다."
+  }
+ ]
+}

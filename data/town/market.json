@@ -1,0 +1,142 @@
+{
+ "id": "market",
+ "name": "구도심 상가 거리",
+ "theme": "street",
+ "legend": {
+  "#": "wall",
+  "W": "window",
+  "s": "walk",
+  "n": "sign",
+  "D": "door",
+  "r": "road",
+  "l": "lane",
+  "k": "stall",
+  "i": "lamp"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWWWWWWWWsssWWWWWWWWWWWWWWWWWWWWW",
+  "####################sss#####################",
+  "########D###########sss#######D#####D#######",
+  "ssssisssssssisssssnsssssssisssssssisssssisss",
+  "ssssssssssssssssssssssssssssssssssssssssssss",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "llllllllllllllllllllllllllllllllllllllllllll",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "ssssssssssssssssssssssssssssssssssssssssssss",
+  "ssssssksssksssksssksssksssksssksssksssksssss",
+  "ssssssssssssssssssssssssssssssssssssssssssss",
+  "###############D############################",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "music": "hub",
+ "edges": {
+  "W": {
+   "to": "alley",
+   "dc": 0
+  },
+  "E": {
+   "to": "avenue",
+   "dc": 0
+  },
+  "N": {
+   "to": "river",
+   "dc": 0
+  }
+ },
+ "doors": [
+  {
+   "at": [
+    8,
+    2
+   ],
+   "to": "office",
+   "spawn": [
+    5,
+    6
+   ],
+   "dir": "U"
+  },
+  {
+   "at": [
+    30,
+    2
+   ],
+   "to": "market",
+   "spawn": [
+    30,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "철물점. 짐꾼 장비는 사무소에서 빌려준다."
+  },
+  {
+   "at": [
+    36,
+    2
+   ],
+   "to": "market",
+   "spawn": [
+    36,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "분식집. 오늘은 돈을 아껴야 한다."
+  },
+  {
+   "at": [
+    15,
+    11
+   ],
+   "to": "market",
+   "spawn": [
+    15,
+    10
+   ],
+   "dir": "U",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "뒷골목으로 이어지는 문. 지금은 볼일이 없다."
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    18,
+    3
+   ],
+   "label": "조사",
+   "act": "text",
+   "text": "↑ 강변 공원 · ← 원룸촌 · 중앙 대로 →"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "vendor",
+   "at": [
+    11,
+    10
+   ],
+   "dir": "U",
+   "talk": "line",
+   "text": "떡볶이 한 접시 3천 원! …안 사? 그럼 구경만 해."
+  },
+  {
+   "id": "passerby_a",
+   "at": [
+    27,
+    4
+   ],
+   "dir": "L",
+   "talk": "line",
+   "text": "31층 또 실패했대. 이러다 진짜 포탈 열리는 거 아냐?"
+  }
+ ]
+}

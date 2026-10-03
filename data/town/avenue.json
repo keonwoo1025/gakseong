@@ -1,0 +1,171 @@
+{
+ "id": "avenue",
+ "name": "중앙 대로",
+ "theme": "street",
+ "legend": {
+  "#": "wall",
+  "W": "window",
+  "s": "walk",
+  "p": "plant",
+  "n": "sign",
+  "D": "door",
+  "r": "road",
+  "T": "tree",
+  "l": "lane",
+  "f": "fence"
+ },
+ "rows": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "##############################################",
+  "######D########D########D#####D#####D####D####",
+  "ssspssssssspsssssssspssssssspssssspsssssssssps",
+  "ssssssssssssssssssssssssssssssssssssssssssssss",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "llllllllllllllllllllllllllllllllllllllllllllll",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "llllllllllllllllllllllllllllllllllllllllllllll",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "ssssssssssssssssssnsssssssssssssssssssssssssss",
+  "sssssTssssssssTssssssssTssssssssTsssssssTsssss",
+  "ffffffffffffffffffffffffffffffffffffffffffffff"
+ ],
+ "music": "hub",
+ "edges": {
+  "W": {
+   "to": "market",
+   "dc": 0
+  },
+  "E": {
+   "to": "plaza",
+   "dc": 3
+  }
+ },
+ "doors": [
+  {
+   "at": [
+    6,
+    2
+   ],
+   "to": "assoc",
+   "spawn": [
+    5,
+    6
+   ],
+   "dir": "U"
+  },
+  {
+   "at": [
+    15,
+    2
+   ],
+   "to": "hunter_shop",
+   "spawn": [
+    4,
+    6
+   ],
+   "dir": "U",
+   "if": {
+    "notPhase": "porter"
+   },
+   "locked": "헌터 전용 상점이다. 각성자 등록증이 없으면 들어갈 수 없다."
+  },
+  {
+   "at": [
+    24,
+    2
+   ],
+   "to": "avenue",
+   "spawn": [
+    24,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "청룡 길드 빌딩. 출입증이 필요하다."
+  },
+  {
+   "at": [
+    30,
+    2
+   ],
+   "to": "avenue",
+   "spawn": [
+    30,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "백호 길드 빌딩. 경비가 막아선다."
+  },
+  {
+   "at": [
+    36,
+    2
+   ],
+   "to": "avenue",
+   "spawn": [
+    36,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "주작 길드 빌딩. 로비에 팬들이 몰려 있다."
+  },
+  {
+   "at": [
+    41,
+    2
+   ],
+   "to": "avenue",
+   "spawn": [
+    41,
+    3
+   ],
+   "dir": "D",
+   "if": {
+    "flag": "never"
+   },
+   "locked": "현무·황룡 합동 빌딩. 출입 통제 중."
+  }
+ ],
+ "objects": [
+  {
+   "at": [
+    18,
+    11
+   ],
+   "label": "조사",
+   "act": "text",
+   "text": "← 상가 거리 · 탑 광장 →  [지하철 중앙역은 공사 중]"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "fan",
+   "at": [
+    33,
+    4
+   ],
+   "dir": "U",
+   "talk": "line",
+   "text": "유하진 길드장 오늘 온대요! 사인 받을 거예요!"
+  },
+  {
+   "id": "office_worker",
+   "at": [
+    12,
+    11
+   ],
+   "dir": "R",
+   "talk": "line",
+   "text": "각성자 협회 앞은 늘 줄이 길어요. 등록 갱신하러 왔다가 반나절이야."
+  }
+ ]
+}

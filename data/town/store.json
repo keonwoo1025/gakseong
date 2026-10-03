@@ -1,0 +1,54 @@
+{
+ "id": "store",
+ "name": "편의점",
+ "theme": "store",
+ "legend": {
+  "S": "shelf",
+  "F": "fridge",
+  "D": "door",
+  "#": "wall",
+  "t": "tile",
+  "C": "counter"
+ },
+ "rows": [
+  "#SSSS#SS#S",
+  "#tttttttt#",
+  "#tSStSStt#",
+  "#tttttttt#",
+  "#CCttttttF",
+  "#tttttttt#",
+  "#tttttttt#",
+  "####D#####"
+ ],
+ "spawn": [
+  4,
+  6
+ ],
+ "music": "hub",
+ "doors": [
+  {
+   "at": [
+    4,
+    7
+   ],
+   "to": "alley",
+   "spawn": [
+    12,
+    10
+   ],
+   "dir": "D"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "clerk",
+   "at": [
+    1,
+    5
+   ],
+   "dir": "R",
+   "talk": "store",
+   "label": "계산하기"
+  }
+ ]
+}

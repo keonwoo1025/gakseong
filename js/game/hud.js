@@ -1,3 +1,4 @@
+import { Settings } from '../engine/settings.js';
 // 화면 정보: 체력·기력·경험치, 기한 시계, 콤보, 대화창.
 
 function frame(ctx, x, y, w, h) {
@@ -67,30 +68,108 @@ export class HUD {
     }
     if (this.hintT > 0) {
       ctx.globalAlpha = Math.min(1, this.hintT); ctx.font = '600 13px system-ui,sans-serif'; ctx.fillStyle = '#f3e3b5';
-      outlined(ctx, '왼쪽을 끌어 이동, 끝까지 밀면 달리기, 오른쪽 탭은 공격, 밀면 회피', W / 2, H - 20); ctx.globalAlpha = 1;
+      outlined(ctx, '조이스틱으로 이동, 끝까지 밀면 달리기 · 달리며 공격하면 돌진 베기', W / 2, H * 0.32); ctx.globalAlpha = 1;
     }
     ctx.textAlign = 'left';
 
-    const j = g.input.joy;
-    if (j.id !== null) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(j.ox, j.oy, 50, 0, Math.PI * 2); ctx.stroke();
-      const dx = j.x - j.ox, dy = j.y - j.oy, l = Math.min(50, Math.hypot(dx, dy)), a = Math.atan2(dy, dx);
-      ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.arc(j.ox + Math.cos(a) * l, j.oy + Math.sin(a) * l, 18, 0, Math.PI * 2); ctx.fill();
+  }
+
+  drawWorld() {
+    const g = this.g, v = g.view, ctx = v.ctx, s = g.state; if (!s) return;
+    const W = v.W;
+    frame(ctx, 12, 12, 196, 50);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#f3e3b5'; ctx.font = '700 13px system-ui,sans-serif';
+    ctx.fillText(s.given + (g.awakened() ? ` · ${s.job} Lv.${s.lv}` : ' · 비각성자'), 24, 32);
+    ctx.fillStyle = '#c9a24a'; ctx.font = '600 12px system-ui,sans-serif';
+    ctx.fillText(Math.round(s.money).toLocaleString('ko-KR') + '원 · 31층 D-' + Math.max(0, 365 - s.day), 24, 51);
+    if (s.objective) {
+      ctx.textAlign = 'left'; ctx.font = '700 13px system-ui,sans-serif'; ctx.fillStyle = '#ffe9a8';
+      wrap(ctx, '▶ ' + s.objective, Math.min(420, W * 0.55)).forEach((l, i) => outlined(ctx, l, 16, 82 + i * 18));
     }
+    this.drawToast();
+  }
+
+  drawPorter() {
+    const g = this.g, v = g.view, ctx = v.ctx, s = g.state, W = v.W;
+    frame(ctx, 12, 12, 196, 50);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#f3e3b5'; ctx.font = '700 13px system-ui,sans-serif';
+    ctx.fillText(s.given + ' · 짐꾼', 24, 32);
+    ctx.fillStyle = '#3a1414'; ctx.fillRect(24, 40, 170, 8); ctx.fillStyle = '#e8433f'; ctx.fillRect(24, 40, 170 * Math.max(0, s.hp / g.maxHp()), 8);
+    ctx.textAlign = 'center'; ctx.font = '700 13px system-ui,sans-serif'; ctx.fillStyle = '#f3e3b5';
+    outlined(ctx, g.porter.floor.name + ' · 들꽃 파티 동행', W / 2, 24);
+    ctx.font = '600 12px system-ui,sans-serif'; outlined(ctx, g.goalText(), W / 2, 42);
+    ctx.textAlign = 'right'; outlined(ctx, '구급상자 ' + (s.inv.first_aid || 0), W - 14, 62);
+    this.drawToast();
+  }
+
+  drawControls() {
+    const g = this.g, ctx = g.view.ctx, inp = g.input, a = Settings.alpha();
+    if (g.talking || g.menuOpen || (g.mode === 'world' && g.ow.cut)) return;
+    // 조이스틱
+    const j = inp.joy, base = inp.joyBase();
+    const fixed = Settings.v.joyMode === 'fixed';
+    if (fixed || j.id !== null) {
+      const ox = j.id !== null ? j.ox : base.x, oy = j.id !== null ? j.oy : base.y, R = base.r;
+      ctx.globalAlpha = a * 0.8;
+      ctx.fillStyle = 'rgba(20,16,12,0.45)'; ctx.beginPath(); ctx.arc(ox, oy, R, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(243,227,181,0.55)'; ctx.lineWidth = 2; ctx.stroke();
+      let kx = ox, ky = oy;
+      if (j.id !== null) { const dx = j.x - ox, dy = j.y - oy, l = Math.hypot(dx, dy), m = Math.min(R, l); if (l > 0) { kx = ox + dx / l * m; ky = oy + dy / l * m; } }
+      ctx.fillStyle = 'rgba(243,227,181,0.75)'; ctx.beginPath(); ctx.arc(kx, ky, R * 0.42, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    // 버튼
+    for (const b of inp.buttons) {
+      const on = inp.pressed[b.id];
+      const dim = b.id === 'skill1' && g.state.sp < (b.cost || 0);
+      ctx.globalAlpha = a * (dim ? 0.5 : 1);
+      ctx.fillStyle = on ? 'rgba(201,162,74,0.85)' : b.id === 'act' ? 'rgba(120,40,40,0.75)' : 'rgba(20,16,12,0.65)';
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (on ? 0.93 : 1), 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#c9a24a'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#f6efe0'; ctx.textAlign = 'center';
+      ctx.font = `800 ${Math.round(Math.max(11, b.r * 0.42))}px system-ui,sans-serif`;
+      ctx.fillText(b.label, b.x, b.y + b.r * 0.15);
+      if (b.sub !== undefined) { ctx.font = '700 10px system-ui'; ctx.fillStyle = '#ffd23f'; ctx.fillText('×' + b.sub, b.x, b.y + b.r * 0.62); }
+      if (b.cost) { ctx.font = '700 10px system-ui'; ctx.fillStyle = '#7fb8ff'; ctx.fillText('기력 ' + b.cost, b.x, b.y + b.r * 0.62); }
+      ctx.globalAlpha = 1; ctx.textAlign = 'left';
+    }
+  }
+
+  drawToast() {
+    const v = this.g.view, ctx = v.ctx;
+    if (!this.toast) return;
+    ctx.textAlign = 'center'; ctx.globalAlpha = Math.min(1, this.toast.t * 2); ctx.font = '800 17px system-ui,sans-serif'; ctx.fillStyle = '#ffd23f';
+    outlined(ctx, this.toast.text, v.W / 2, v.H * 0.24); ctx.globalAlpha = 1; ctx.textAlign = 'left';
+  }
+
+  drawJoy() {
+    const ctx = this.g.view.ctx, j = this.g.input.joy;
+    if (j.id === null) return;
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(j.ox, j.oy, 50, 0, Math.PI * 2); ctx.stroke();
+    const dx = j.x - j.ox, dy = j.y - j.oy, l = Math.min(50, Math.hypot(dx, dy)), a = Math.atan2(dy, dx);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.arc(j.ox + Math.cos(a) * l, j.oy + Math.sin(a) * l, 18, 0, Math.PI * 2); ctx.fill();
   }
 
   drawDialogue(dlg) {
     const cur = dlg.cur; if (!cur) return;
     const v = this.g.view, ctx = v.ctx, W = v.W, H = v.H;
-    ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0, 0, W, H);
     const bh = Math.min(108, H * 0.27), by = H - bh - 10, bx = 10, bw = W - 20;
     frame(ctx, bx, by, bw, bh);
     let tx = bx + 20;
-    const pf = cur.portrait ? this.g.A.portraits[cur.portrait] : null;
+    const pf = cur.portrait ? this.g.portraitOf(cur.portrait) : null;
     if (pf && pf.w) {
-      const crop = 0.6, ph = bh * 1.28, pw = pf.w / (pf.h * crop) * ph;
-      ctx.drawImage(pf.im, 0, 0, pf.w, pf.h * crop, bx + 10, by + bh - 4 - ph, pw, ph);
-      tx = bx + pw + 26;
+      if (cur.portrait.startsWith('gen:')) {
+        const ps = Math.round(bh * 1.15);
+        ctx.imageSmoothingEnabled = false;
+        ctx.fillStyle = 'rgba(201,162,74,0.15)'; ctx.fillRect(bx + 12, by + bh - 8 - ps, ps, ps);
+        ctx.drawImage(pf.im, bx + 12, by + bh - 8 - ps, ps, ps);
+        tx = bx + ps + 28;
+      } else {
+        const crop = 0.6, ph = bh * 1.28, pw = pf.w / (pf.h * crop) * ph;
+        ctx.drawImage(pf.im, 0, 0, pf.w, pf.h * crop, bx + 10, by + bh - 4 - ph, pw, ph);
+        tx = bx + pw + 26;
+      }
     }
     ctx.textAlign = 'left';
     if (cur.speaker) { ctx.fillStyle = '#ffcf5a'; ctx.font = '800 15px system-ui,sans-serif'; ctx.fillText(cur.speaker, tx, by + 28); }

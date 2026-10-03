@@ -3,7 +3,7 @@
 const STG = [
   { fps: 18, hit: 1, d: [10, 14], r: 58, lunge: 12, shake: 0, stop: 0.03, kb: 160, seq: { D: [0, 2], R: [0, 1], U: [0, 0] }, set: 's1', sc: 1.9, sfps: 22, big: 0 },
   { fps: 16, hit: 1, d: [15, 20], r: 70, lunge: 26, shake: 3, stop: 0.05, kb: 240, seq: { D: [2, 3], R: [2, 3], U: [0, 0] }, set: 's2', sc: 2.1, sfps: 20, big: 1 },
-  { fps: 13, hit: 3, d: [30, 40], r: 96, lunge: 70, shake: 9, stop: 0.11, kb: 520, seq: { D: [1, 1, 1, 2, 3, 3], R: [0, 0, 0, 1, 2, 3], U: [0, 0, 0, 0, 0, 0] }, set: 's3', sc: 2.9, sfps: 16, big: 2 },
+  { fps: 15, hit: 3, d: [30, 40], r: 96, lunge: 70, shake: 9, stop: 0.11, kb: 520, seq: { D: [1, 1, 1, 2, 3, 3], R: [0, 0, 0, 1, 2, 3], U: [0, 0, 0, 0, 0, 0] }, set: 's3', sc: 2.9, sfps: 16, big: 2 },
 ];
 const ROT = {
   s1: { D: 0, U: Math.PI, R: -Math.PI / 2, L: Math.PI / 2 },
@@ -49,28 +49,52 @@ export class Player {
   }
 
   attack() {
-    if (['dodge', 'hurt', 'dead'].includes(this.state)) return;
+    if (['dodge', 'hurt', 'dead', 'dash'].includes(this.state)) return;
+    if (this.state === 'walk' && this.running) {
+      this.state = 'dash'; this.t = 0; this.dashHit = new Set(); this.inv = Math.max(this.inv, 0.3);
+      const v = this.g.input.vec(), l = Math.hypot(v[0], v[1]) || 1;
+      this.dx = l > 0.1 ? v[0] / l : DV[this.dir][0]; this.dy = l > 0.1 ? v[1] / l : DV[this.dir][1];
+      this.g.fx.sfx('s2', this.x + this.dx * 60, this.y + this.dy * 40 - 50, { s: 2.2, fps: 22, rot: Math.atan2(this.dy, this.dx) - Math.PI / 2 });
+      this.g.sound.sfx('slash');
+      return;
+    }
     if (this.state === 'attack') { if (this.t > 0.06) this.queued = true; return; }
     this.autoFace();
     this.stage = this.chain > 0 && this.lastStage >= 0 && this.lastStage < 2 ? this.lastStage + 1 : 0;
     this.state = 'attack'; this.t = 0; this.hitDone = false; this.queued = false; this.auraDone = false;
   }
 
+  skill() {
+    const g = this.g, s = this.s;
+    if (this.state === 'dead' || s.sp < 25) { if (s.sp < 25) g.toast('기력이 부족하다'); return; }
+    s.sp -= 25;
+    g.fx.sfx('ring', this.x, this.y, { s: 4.2, fps: 16, ground: true });
+    g.fx.sfx('aura', this.x, this.y - 40, { s: 2, fps: 18, ground: true });
+    g.view.addShake(10); g.hitstop = 0.08; g.sound.sfx('heavy');
+    for (const e of g.enemies.list) {
+      if (!e.alive) continue;
+      const dx = e.x - this.x, dy = e.y - this.y, d = Math.hypot(dx, dy) || 1;
+      if (d < 220) g.enemies.damage(e, Math.round((28 + Math.random() * 10 + g.equipStat('atk')) * this.dmgMult()), dx / d * 520, dy / d * 520, 2);
+    }
+    const b = this.nearest(500); if (b) for (const sw of this.swords) { sw.tg = b; sw.st = 'atk'; }
+  }
+
   dodge(dx, dy) {
     if (this.state === 'dead') return;
     const l = Math.hypot(dx, dy);
-    if (l < 0.01) { [dx, dy] = DV[this.dir]; } else { dx /= l; dy /= l; }
+    if (l < 0.01) { const v = this.g.input.vec(); if (Math.hypot(v[0], v[1]) > 0.1) { const m = Math.hypot(v[0], v[1]); dx = v[0] / m; dy = v[1] / m; } else [dx, dy] = DV[this.dir]; } else { dx /= l; dy /= l; }
     if (Math.abs(dx) > 0.2) this.lastH = dx > 0 ? 1 : -1;
     this.state = 'dodge'; this.t = 0; this.dx = dx; this.dy = dy; this.inv = Math.max(this.inv, 0.4);
   }
 
   hurt(v, fx, fy) {
-    if (this.inv > 0 || this.state === 'dead') return;
+    if (this.inv > 0 || this.state === 'dead' || this.state === 'dash') return;
     const s = this.s;
     s.hp = Math.max(0, s.hp - v);
+    this.g.sound.sfx('hurt');
+    if (this.state === 'attack' && this.stage === 2 && s.hp > 0) { this.inv = 0.4; this.g.fx.num(this.x, this.y - 140, v, 'hurt'); return; }
     this.inv = 0.9;
     this.g.fx.num(this.x, this.y - 140, v, 'hurt');
-    this.g.sound.sfx('hurt');
     if (s.hp <= 0) { this.state = 'dead'; this.t = 0; this.painT = 3; this.g.onPlayerDeath(); return; }
     this.state = 'hurt'; this.t = 0; this.dx = fx; this.dy = fy; this.heavy = v >= 8;
     if (this.heavy || s.hp < this.maxHp * 0.3) this.painT = 1.3;
@@ -84,8 +108,8 @@ export class Player {
 
     if (this.state === 'idle' || this.state === 'walk') {
       if (mag > 0.15) {
-        this.running = mag > 0.82 || g.input.running();
-        const sp = this.running ? 390 : 230 * Math.min(1, mag * 1.25);
+        this.running = g.input.running();
+        const sp = this.running ? 400 : 250 * Math.min(1, 0.45 + mag);
         const ox = this.x, oy = this.y;
         w.moveBody(this, v[0] * sp * dt, v[1] * sp * dt, 26);
         this.dir = this.dirOf(v[0], v[1]);
@@ -133,6 +157,19 @@ export class Player {
         if (this.queued && this.stage < 2) { this.stage++; this.t = 0; this.hitDone = false; this.queued = false; this.auraDone = false; this.autoFace(); }
         else { if (this.stage === 2) this.chain = 0; this.state = 'idle'; }
       }
+    } else if (this.state === 'dash') {
+      this.t += dt; const D = 0.26, k = 1 - this.t / D;
+      w.moveBody(this, this.dx * 820 * k * dt, this.dy * 820 * k * dt, 26);
+      if (Math.random() < 0.8) g.fx.list.push({ ghost: true, x: this.x, y: this.y, f: 1, fl: this.lastH < 0, t: 0, n: 1, fps: 3, set: '_ghost', dash: true });
+      for (const e of g.enemies.list) {
+        if (!e.alive || this.dashHit.has(e)) continue;
+        if (Math.hypot(e.x - this.x, e.y - this.y) < 90) {
+          this.dashHit.add(e);
+          g.enemies.damage(e, Math.round((18 + Math.random() * 8 + g.equipStat('atk')) * this.dmgMult()), this.dx * 420, this.dy * 420, 3);
+          g.hitstop = 0.05; g.combo(); g.sound.sfx('hit'); g.view.addShake(4);
+        }
+      }
+      if (this.t >= D) { this.state = 'idle'; this.running = false; }
     } else if (this.state === 'dodge') {
       this.t += dt; const D = 0.34, k = 1 - this.t / D;
       w.moveBody(this, this.dx * 640 * k * dt, this.dy * 640 * k * dt, 26);
@@ -194,6 +231,7 @@ export class Player {
       const seq = this.heavy ? (side ? [2, 3, 4] : [2, 3, 3]) : [0, 1];
       return [arr[seq[Math.min(seq.length - 1, Math.floor(this.t / (this.heavy ? 0.15 : 0.125)))]], side && this.lastH < 0, 0];
     }
+    if (this.state === 'dash') { const side2 = Math.abs(this.dx) > Math.abs(this.dy); const arr = side2 ? S.atkR : this.dy > 0 ? S.atkD : S.atkU; return [arr[Math.min(arr.length - 1, this.t < 0.1 ? 2 : 3)], side2 && this.dx < 0, 0]; }
     if (this.state === 'dodge') return [S.dodge[Math.min(3, Math.floor(this.t / 0.34 * 4))], this.lastH < 0, 0];
     if (this.state === 'attack') {
       const st = STG[this.stage], key = this.dir === 'L' ? 'R' : this.dir;
