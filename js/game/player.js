@@ -70,6 +70,7 @@ export class Player {
     s.hp = Math.max(0, s.hp - v);
     this.inv = 0.9;
     this.g.fx.num(this.x, this.y - 140, v, 'hurt');
+    this.g.sound.sfx('hurt');
     if (s.hp <= 0) { this.state = 'dead'; this.t = 0; this.painT = 3; this.g.onPlayerDeath(); return; }
     this.state = 'hurt'; this.t = 0; this.dx = fx; this.dy = fy; this.heavy = v >= 8;
     if (this.heavy || s.hp < this.maxHp * 0.3) this.painT = 1.3;
@@ -122,6 +123,7 @@ export class Player {
             g.enemies.damage(e, dmg, vv[0] * st.kb + dx / d * st.kb * 0.3, vv[1] * st.kb + dy / d * st.kb * 0.3, st.big);
           }
         }
+        if (any) { g.sound.sfx(st.big === 2 && !basic ? 'heavy' : 'hit'); } else g.sound.sfx('slash');
         if (any) { g.hitstop = basic ? st.stop * 0.5 : st.stop; g.combo(); g.recordPattern('공격', 0.05); }
         if (st.shake) g.view.addShake(basic ? st.shake * 0.4 : st.shake);
         if (st.big === 2) { const b = this.nearest(500); if (b) for (const sw of this.swords) { sw.tg = b; sw.st = 'atk'; } }

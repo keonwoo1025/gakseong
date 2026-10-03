@@ -10,6 +10,7 @@ import { FX } from './fx.js';
 import { HUD } from './hud.js';
 import { Dialogue } from './dialogue.js';
 import { fmt } from './korean.js';
+import { Sound } from '../engine/audio.js';
 
 const PERSONALITIES = ['열혈형', '냉철한 전략가', '다정한 보호자', '겁 많은 선인', '오만한 천재', '호기심 덩어리', '과묵한 고독자', '계산적 실리주의', '헌신적 신앙형', '자유로운 장난꾸러기'];
 const PATTERN_JOB = { 공격: '천마', 수호: '불락의 성기사', 관찰: '정령왕의 사수', 탐구: '시공의 대현자', 구조: '신의 대행자', 은밀: '명왕' };
@@ -32,6 +33,7 @@ export class Game {
     this.dialogue = new Dialogue(this);
     this.hud = new HUD(this);
     this.hubTab = 'office';
+    this.sound = new Sound();
     this.input.on('attack', () => this.mode === 'field' && this.player.attack());
     this.input.on('dodge', (dx, dy) => this.mode === 'field' && this.player.dodge(dx, dy));
     this.input.on('tap', (x, y) => { if (this.mode === 'dialogue') this.dialogue.tap(x, y); });
@@ -42,11 +44,12 @@ export class Game {
   async boot() {
     this.A = await loadAssets('data/manifest.json', (d, t) => (this.progress = [d, t]));
     this.ver = this.A.version;
-    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'floors', 'barks', 'news'];
+    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'floors', 'barks', 'news', 'music'];
     const data = await Promise.all(names.map((n) => this.getJSON(`data/${n}.json`)));
     names.forEach((n, i) => (this[n] = data[i]));
     this.mapTemplate = await this.getJSON('data/maps/floor01.json');
     this.npcById = Object.fromEntries(this.npcs.map((n) => [n.id, n]));
+    this.sound.setTracks(this.music);
     this.showTitle();
   }
 
@@ -68,13 +71,16 @@ export class Game {
   // ---------- 타이틀과 생성 ----------
   showTitle() {
     this.mode = 'title'; this.input.mode = 'menu'; this.world = null; this.floor = null;
+    this.sound.play('title');
     const has = Save.has();
     this.ov.innerHTML = `<div class="screen"><div class="title">
       <h1>각성</h1><p>AWAKENING</p>
       <div class="stack">
         ${has ? '<button class="primary" id="cont">이어하기</button>' : ''}
         <button id="new">${has ? '새로 시작 (기존 기록 삭제)' : '새로 시작'}</button>
+        <button id="snd">${this.sound.enabled ? '배경음 끄기' : '배경음 켜기'}</button>
       </div></div></div>`;
+    this.ov.querySelector('#snd').onclick = (e) => { const on = this.sound.toggle(); e.target.textContent = on ? '배경음 끄기' : '배경음 켜기'; };
     if (has) this.ov.querySelector('#cont').onclick = () => this.continueGame();
     this.ov.querySelector('#new').onclick = () => this.showCreate();
   }
@@ -125,6 +131,7 @@ export class Game {
   playScene(id, onEnd) {
     this.getJSON(`data/dialogue/${id}.json`).then((scene) => {
       this.prevMode = this.mode;
+      this.sound.play(scene.music || 'story');
       this.mode = 'dialogue'; this.input.mode = 'dialogue'; this.input.reset();
       this.ov.querySelectorAll('.fieldbtn').forEach((b) => (b.style.display = 'none'));
       this.dialogue.start(scene, () => { onEnd && onEnd(); });
@@ -136,6 +143,7 @@ export class Game {
     this.mode = 'hub'; this.input.mode = 'menu'; this.input.reset();
     this.world = null; this.floor = null; this.player = null;
     if (tab) this.hubTab = tab;
+    this.sound.play('hub');
     this.renderHub();
   }
 
@@ -224,6 +232,7 @@ export class Game {
   hubHome() {
     return `<div class="stat"><span>휴식 <small>체력을 회복하고 하루를 보냄</small></span><button data-act="rest">쉬기</button></div>
       <div class="stat"><span>저장</span><button data-act="save">저장</button></div>
+      <div class="stat"><span>배경음과 효과음</span><button data-act="sound">${this.sound.enabled ? '끄기' : '켜기'}</button></div>
       <div class="stat"><span>타이틀로</span><button data-act="title">나가기</button></div>`;
   }
 
@@ -247,6 +256,8 @@ export class Game {
       this.enterFloor(Number(arg)); return;
     } else if (act === 'rest') {
       s.day++; s.dayT = 0; s.hp = this.maxHp(); this.hubMsg = '푹 쉬었어요. 하루가 지났어요.'; this.save();
+    } else if (act === 'sound') {
+      this.sound.toggle();
     } else if (act === 'save') {
       this.save(); this.hubMsg = '저장했어요';
     } else if (act === 'title') {
@@ -267,6 +278,7 @@ export class Game {
     this.enemies = new Enemies(this, this.monsters, f);
     this.view.cam.x = this.player.x; this.view.cam.y = this.player.y;
     this.mode = 'field'; this.input.mode = 'field';
+    this.sound.play('field');
     this.fieldButtons();
     this.hud.hintT = s.cleared[1] ? 0 : 7;
   }
@@ -323,18 +335,20 @@ export class Game {
     while (s.lv < 100 && s.exp >= this.expNeed()) {
       s.exp -= this.expNeed(); s.lv++; s.pts += 5; s.hp = this.maxHp();
       this.hud.say('레벨 업! Lv.' + s.lv + ' · 스탯 포인트 +5');
+      this.sound.sfx('levelup');
     }
     const f = this.floor;
     if (e === this.boss) { this.clearFloor(); return; }
     if (!this.floorDone && !this.boss && this.kills >= f.goal) {
       if (s.phase === 'porter') this.clearFloor();
-      else { this.boss = this.enemies.spawnBoss(f.boss); this.hud.say('강한 기운이 다가온다'); }
+      else { this.boss = this.enemies.spawnBoss(f.boss); this.hud.say('강한 기운이 다가온다'); this.sound.play('boss'); }
     }
   }
 
   clearFloor() {
     const s = this.state, n = this.floor.n;
     this.floorDone = true;
+    this.sound.play('hub');
     const first = !s.cleared[n];
     s.cleared[n] = true;
     s.unlocked = Math.max(s.unlocked, n + 1);
@@ -376,7 +390,7 @@ export class Game {
     });
   }
 
-  onPlayerDeath() { Save.wipe(); setTimeout(() => this.showEnd(), 2600); }
+  onPlayerDeath() { Save.wipe(); this.sound.stopMusic(); this.sound.sfx('death'); setTimeout(() => this.showEnd(), 2600); }
 
   showEnd() {
     this.mode = 'end'; this.input.mode = 'menu';

@@ -52,3 +52,6 @@ button:disabled{opacity:.4}
 .fieldbtn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);pointer-events:auto;padding:6px 12px;font-size:14px;background:var(--panel)}
 #menuBtn{right:calc(env(safe-area-inset-right,0px) + 10px);left:auto}
 #potBtn{right:calc(env(safe-area-inset-right,0px) + 74px)}
+#rotate{display:none;position:fixed;inset:0;z-index:50;background:#14110f;color:var(--ink);align-items:center;justify-content:center;text-align:center;font-size:40px}
+#rotate p{font-size:16px;margin:12px 0 0;color:var(--ink-dim)}
+@media (orientation: portrait) and (pointer: coarse){#rotate{display:flex}}
