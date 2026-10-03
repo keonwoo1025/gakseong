@@ -1,0 +1,55 @@
+{
+ "미각성": {
+  "main": [
+   "str"
+  ],
+  "swords": false,
+  "basicFx": true,
+  "dmgBase": 0.6
+ },
+ "천마": {
+  "main": [
+   "str",
+   "agi"
+  ],
+  "swords": true,
+  "weapon": "sword"
+ },
+ "불락의 성기사": {
+  "main": [
+   "vit",
+   "str"
+  ],
+  "swords": false,
+  "weapon": "shield"
+ },
+ "정령왕의 사수": {
+  "main": [
+   "agi",
+   "spi"
+  ],
+  "swords": false,
+  "weapon": "bow"
+ },
+ "시공의 대현자": {
+  "main": [
+   "int"
+  ],
+  "swords": false,
+  "weapon": "staff"
+ },
+ "신의 대행자": {
+  "main": [
+   "spi"
+  ],
+  "swords": false,
+  "weapon": "staff"
+ },
+ "명왕": {
+  "main": [
+   "agi"
+  ],
+  "swords": false,
+  "weapon": "dagger"
+ }
+}

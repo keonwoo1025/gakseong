@@ -1,0 +1,282 @@
+[
+ {
+  "n": 1,
+  "name": "1층 시작의 초원",
+  "map": "floor01",
+  "seed": 20337,
+  "hpMul": 1.0,
+  "dmgMul": 1.0,
+  "goal": 7,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 0
+   },
+   {
+    "type": "slime_purple",
+    "count": 0
+   },
+   {
+    "type": "wolf",
+    "count": 1
+   }
+  ]
+ },
+ {
+  "n": 2,
+  "name": "2층 버섯 군락",
+  "map": "floor01",
+  "seed": 20434,
+  "hpMul": 1.35,
+  "dmgMul": 1.2,
+  "goal": 8,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 0
+   },
+   {
+    "type": "slime_purple",
+    "count": 0
+   },
+   {
+    "type": "wolf",
+    "count": 1
+   }
+  ]
+ },
+ {
+  "n": 3,
+  "name": "3층 물레방아 폐허",
+  "map": "floor01",
+  "seed": 20531,
+  "hpMul": 1.7,
+  "dmgMul": 1.4,
+  "goal": 9,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 0
+   },
+   {
+    "type": "wolf",
+    "count": 2
+   }
+  ]
+ },
+ {
+  "n": 4,
+  "name": "4층 벌집 숲",
+  "map": "floor01",
+  "seed": 20628,
+  "hpMul": 2.05,
+  "dmgMul": 1.6,
+  "goal": 10,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 0
+   },
+   {
+    "type": "wolf",
+    "count": 2
+   }
+  ]
+ },
+ {
+  "n": 5,
+  "name": "5층 수호목의 숲",
+  "map": "floor01",
+  "seed": 20725,
+  "hpMul": 2.4,
+  "dmgMul": 1.8,
+  "goal": 11,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 2
+   },
+   {
+    "type": "wolf",
+    "count": 2
+   }
+  ]
+ },
+ {
+  "n": 6,
+  "name": "6층 안개 늪",
+  "map": "floor01",
+  "seed": 20822,
+  "hpMul": 2.75,
+  "dmgMul": 2.0,
+  "goal": 12,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 2
+   },
+   {
+    "type": "wolf",
+    "count": 3
+   }
+  ]
+ },
+ {
+  "n": 7,
+  "name": "7층 반딧불 동굴 입구",
+  "map": "floor01",
+  "seed": 20919,
+  "hpMul": 3.1,
+  "dmgMul": 2.2,
+  "goal": 13,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 2
+   },
+   {
+    "type": "wolf",
+    "count": 3
+   }
+  ]
+ },
+ {
+  "n": 8,
+  "name": "8층 거미 숲",
+  "map": "floor01",
+  "seed": 21016,
+  "hpMul": 3.45,
+  "dmgMul": 2.4,
+  "goal": 14,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 2
+   },
+   {
+    "type": "wolf",
+    "count": 3
+   }
+  ]
+ },
+ {
+  "n": 9,
+  "name": "9층 고목의 미로",
+  "map": "floor01",
+  "seed": 21113,
+  "hpMul": 3.8,
+  "dmgMul": 2.6,
+  "goal": 15,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 2
+   },
+   {
+    "type": "wolf",
+    "count": 4
+   }
+  ]
+ },
+ {
+  "n": 10,
+  "name": "10층",
+  "map": "floor01",
+  "seed": 21210,
+  "hpMul": 4.15,
+  "dmgMul": 2.8,
+  "goal": 16,
+  "boss": "wolf_alpha",
+  "spawns": [
+   {
+    "type": "slime_green",
+    "count": 3
+   },
+   {
+    "type": "slime_blue",
+    "count": 2
+   },
+   {
+    "type": "slime_purple",
+    "count": 2
+   },
+   {
+    "type": "wolf",
+    "count": 4
+   }
+  ]
+ }
+]

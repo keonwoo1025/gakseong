@@ -1,0 +1,11 @@
+{
+ "sell": [
+  "potion",
+  "return_stone",
+  "sword_iron",
+  "sword_steel",
+  "sword_ore",
+  "jacket_hunter",
+  "coat_armored"
+ ]
+}

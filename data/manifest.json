@@ -1,0 +1,353 @@
+{
+ "version": "1",
+ "sprites": {
+  "player": {
+   "idleD": [
+    "assets/sprites/player/idleD_0.png",
+    "assets/sprites/player/idleD_1.png"
+   ],
+   "walkD": [
+    "assets/sprites/player/walkD_0.png",
+    "assets/sprites/player/walkD_1.png",
+    "assets/sprites/player/walkD_2.png",
+    "assets/sprites/player/walkD_3.png"
+   ],
+   "walkU": [
+    "assets/sprites/player/walkU_0.png",
+    "assets/sprites/player/walkU_1.png",
+    "assets/sprites/player/walkU_2.png",
+    "assets/sprites/player/walkU_3.png"
+   ],
+   "idleU": [
+    "assets/sprites/player/idleU_0.png"
+   ],
+   "walkR": [
+    "assets/sprites/player/walkR_0.png",
+    "assets/sprites/player/walkR_1.png",
+    "assets/sprites/player/walkR_2.png",
+    "assets/sprites/player/walkR_3.png",
+    "assets/sprites/player/walkR_4.png",
+    "assets/sprites/player/walkR_5.png"
+   ],
+   "idleR": [
+    "assets/sprites/player/idleR_0.png"
+   ],
+   "atkD": [
+    "assets/sprites/player/atkD_0.png",
+    "assets/sprites/player/atkD_1.png",
+    "assets/sprites/player/atkD_2.png",
+    "assets/sprites/player/atkD_3.png"
+   ],
+   "atkR": [
+    "assets/sprites/player/atkR_0.png",
+    "assets/sprites/player/atkR_1.png",
+    "assets/sprites/player/atkR_2.png",
+    "assets/sprites/player/atkR_3.png"
+   ],
+   "atkU": [
+    "assets/sprites/player/atkU_0.png"
+   ],
+   "dodge": [
+    "assets/sprites/player/dodge_0.png",
+    "assets/sprites/player/dodge_1.png",
+    "assets/sprites/player/dodge_2.png",
+    "assets/sprites/player/dodge_3.png"
+   ],
+   "hit": [
+    "assets/sprites/player/hit_0.png"
+   ],
+   "down": [
+    "assets/sprites/player/down_0.png"
+   ],
+   "cast": [
+    "assets/sprites/player/cast_0.png",
+    "assets/sprites/player/cast_1.png",
+    "assets/sprites/player/cast_2.png"
+   ],
+   "win": [
+    "assets/sprites/player/win_0.png",
+    "assets/sprites/player/win_1.png"
+   ],
+   "runR": [
+    "assets/sprites/player/runR_0.png",
+    "assets/sprites/player/runR_1.png",
+    "assets/sprites/player/runR_2.png",
+    "assets/sprites/player/runR_3.png",
+    "assets/sprites/player/runR_4.png",
+    "assets/sprites/player/runR_5.png",
+    "assets/sprites/player/runR_6.png",
+    "assets/sprites/player/runR_7.png",
+    "assets/sprites/player/runR_8.png",
+    "assets/sprites/player/runR_9.png",
+    "assets/sprites/player/runR_10.png",
+    "assets/sprites/player/runR_11.png"
+   ],
+   "runD": [
+    "assets/sprites/player/runD_0.png",
+    "assets/sprites/player/runD_1.png",
+    "assets/sprites/player/runD_2.png",
+    "assets/sprites/player/runD_3.png",
+    "assets/sprites/player/runD_4.png",
+    "assets/sprites/player/runD_5.png"
+   ],
+   "runU": [
+    "assets/sprites/player/runU_0.png",
+    "assets/sprites/player/runU_1.png",
+    "assets/sprites/player/runU_2.png",
+    "assets/sprites/player/runU_3.png",
+    "assets/sprites/player/runU_4.png",
+    "assets/sprites/player/runU_5.png"
+   ],
+   "hurtD": [
+    "assets/sprites/player/hurtD_0.png",
+    "assets/sprites/player/hurtD_1.png",
+    "assets/sprites/player/hurtD_2.png",
+    "assets/sprites/player/hurtD_3.png"
+   ],
+   "hurtR": [
+    "assets/sprites/player/hurtR_0.png",
+    "assets/sprites/player/hurtR_1.png",
+    "assets/sprites/player/hurtR_2.png",
+    "assets/sprites/player/hurtR_3.png",
+    "assets/sprites/player/hurtR_4.png"
+   ],
+   "fall": [
+    "assets/sprites/player/fall_0.png",
+    "assets/sprites/player/fall_1.png",
+    "assets/sprites/player/fall_2.png",
+    "assets/sprites/player/fall_3.png"
+   ],
+   "lie": [
+    "assets/sprites/player/lie_0.png"
+   ],
+   "getup": [
+    "assets/sprites/player/getup_0.png",
+    "assets/sprites/player/getup_1.png",
+    "assets/sprites/player/getup_2.png",
+    "assets/sprites/player/getup_3.png",
+    "assets/sprites/player/getup_4.png"
+   ],
+   "lowD": [
+    "assets/sprites/player/lowD_0.png",
+    "assets/sprites/player/lowD_1.png",
+    "assets/sprites/player/lowD_2.png",
+    "assets/sprites/player/lowD_3.png",
+    "assets/sprites/player/lowD_4.png",
+    "assets/sprites/player/lowD_5.png"
+   ],
+   "lowR": [
+    "assets/sprites/player/lowR_0.png",
+    "assets/sprites/player/lowR_1.png",
+    "assets/sprites/player/lowR_2.png",
+    "assets/sprites/player/lowR_3.png"
+   ]
+  }
+ },
+ "fx": {
+  "s1": [
+   "assets/fx/s1_0.png",
+   "assets/fx/s1_1.png",
+   "assets/fx/s1_2.png",
+   "assets/fx/s1_3.png",
+   "assets/fx/s1_4.png"
+  ],
+  "s2": [
+   "assets/fx/s2_0.png",
+   "assets/fx/s2_1.png",
+   "assets/fx/s2_2.png",
+   "assets/fx/s2_3.png",
+   "assets/fx/s2_4.png",
+   "assets/fx/s2_5.png",
+   "assets/fx/s2_6.png"
+  ],
+  "s3": [
+   "assets/fx/s3_0.png",
+   "assets/fx/s3_1.png",
+   "assets/fx/s3_2.png",
+   "assets/fx/s3_3.png",
+   "assets/fx/s3_4.png",
+   "assets/fx/s3_5.png"
+  ],
+  "imp": [
+   "assets/fx/imp_0.png",
+   "assets/fx/imp_1.png",
+   "assets/fx/imp_2.png",
+   "assets/fx/imp_3.png",
+   "assets/fx/imp_4.png",
+   "assets/fx/imp_5.png",
+   "assets/fx/imp_6.png"
+  ],
+  "ring": [
+   "assets/fx/ring_0.png",
+   "assets/fx/ring_1.png",
+   "assets/fx/ring_2.png",
+   "assets/fx/ring_3.png",
+   "assets/fx/ring_4.png",
+   "assets/fx/ring_5.png"
+  ],
+  "aura": [
+   "assets/fx/aura_0.png",
+   "assets/fx/aura_1.png",
+   "assets/fx/aura_2.png",
+   "assets/fx/aura_3.png",
+   "assets/fx/aura_4.png",
+   "assets/fx/aura_5.png",
+   "assets/fx/aura_6.png"
+  ],
+  "sw": [
+   "assets/fx/sw_0.png",
+   "assets/fx/sw_1.png",
+   "assets/fx/sw_2.png"
+  ],
+  "dust": [
+   "assets/fx/dust_0.png",
+   "assets/fx/dust_1.png",
+   "assets/fx/dust_2.png",
+   "assets/fx/dust_3.png",
+   "assets/fx/dust_4.png",
+   "assets/fx/dust_5.png"
+  ]
+ },
+ "tiles": {
+  "grass": [
+   "assets/tiles/grass_0.png",
+   "assets/tiles/grass_1.png",
+   "assets/tiles/grass_2.png",
+   "assets/tiles/grass_3.png",
+   "assets/tiles/grass_4.png",
+   "assets/tiles/grass_5.png",
+   "assets/tiles/grass_6.png",
+   "assets/tiles/grass_7.png"
+  ],
+  "flower": [
+   "assets/tiles/flower_0.png",
+   "assets/tiles/flower_1.png",
+   "assets/tiles/flower_2.png",
+   "assets/tiles/flower_3.png",
+   "assets/tiles/flower_4.png",
+   "assets/tiles/flower_5.png",
+   "assets/tiles/flower_6.png",
+   "assets/tiles/flower_7.png"
+  ],
+  "ledge": [
+   "assets/tiles/ledge_0.png",
+   "assets/tiles/ledge_1.png"
+  ],
+  "stairs": [
+   "assets/tiles/stairs_0.png"
+  ],
+  "path": [
+   "assets/tiles/path_0.png"
+  ]
+ },
+ "props": {
+  "pine": [
+   "assets/props/pine_0.png",
+   "assets/props/pine_1.png",
+   "assets/props/pine_2.png",
+   "assets/props/pine_3.png"
+  ],
+  "pine2": [
+   "assets/props/pine2_0.png",
+   "assets/props/pine2_1.png"
+  ],
+  "tree": [
+   "assets/props/tree_0.png",
+   "assets/props/tree_1.png",
+   "assets/props/tree_2.png",
+   "assets/props/tree_3.png",
+   "assets/props/tree_4.png",
+   "assets/props/tree_5.png",
+   "assets/props/tree_6.png"
+  ],
+  "bush": [
+   "assets/props/bush_0.png",
+   "assets/props/bush_1.png",
+   "assets/props/bush_2.png",
+   "assets/props/bush_3.png",
+   "assets/props/bush_4.png",
+   "assets/props/bush_5.png",
+   "assets/props/bush_6.png",
+   "assets/props/bush_7.png",
+   "assets/props/bush_8.png"
+  ],
+  "grass": [
+   "assets/props/grass_0.png",
+   "assets/props/grass_1.png"
+  ],
+  "small": [
+   "assets/props/small_0.png",
+   "assets/props/small_1.png",
+   "assets/props/small_2.png",
+   "assets/props/small_3.png",
+   "assets/props/small_4.png",
+   "assets/props/small_5.png",
+   "assets/props/small_6.png",
+   "assets/props/small_7.png",
+   "assets/props/small_8.png"
+  ]
+ },
+ "monsters": {
+  "slime_green": {
+   "idle": [
+    "assets/monsters/slime_green/idle_0.png",
+    "assets/monsters/slime_green/idle_1.png"
+   ],
+   "hop": [
+    "assets/monsters/slime_green/hop_0.png",
+    "assets/monsters/slime_green/hop_1.png"
+   ],
+   "splat": [
+    "assets/monsters/slime_green/splat_0.png"
+   ]
+  },
+  "slime_blue": {
+   "idle": [
+    "assets/monsters/slime_blue/idle_0.png",
+    "assets/monsters/slime_blue/idle_1.png"
+   ],
+   "hop": [
+    "assets/monsters/slime_blue/hop_0.png",
+    "assets/monsters/slime_blue/hop_1.png"
+   ],
+   "splat": [
+    "assets/monsters/slime_blue/splat_0.png"
+   ]
+  },
+  "slime_purple": {
+   "idle": [
+    "assets/monsters/slime_purple/idle_0.png",
+    "assets/monsters/slime_purple/idle_1.png"
+   ],
+   "hop": [
+    "assets/monsters/slime_purple/hop_0.png",
+    "assets/monsters/slime_purple/hop_1.png"
+   ],
+   "splat": [
+    "assets/monsters/slime_purple/splat_0.png"
+   ]
+  },
+  "wolf": {
+   "walk": [
+    "assets/monsters/wolf/walk_0.png",
+    "assets/monsters/wolf/walk_1.png",
+    "assets/monsters/wolf/walk_2.png",
+    "assets/monsters/wolf/walk_3.png",
+    "assets/monsters/wolf/walk_4.png"
+   ],
+   "bite": [
+    "assets/monsters/wolf/bite_0.png"
+   ]
+  }
+ },
+ "portraits": {
+  "hero": "assets/portraits/hero.png",
+  "hero_mask": "assets/portraits/hero_mask.png",
+  "hero_pain": "assets/portraits/hero_pain.png"
+ },
+ "weapons": {
+  "flying_sword": [
+   "assets/weapons/flying_sword_0.png"
+  ]
+ }
+}

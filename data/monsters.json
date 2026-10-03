@@ -1,0 +1,88 @@
+{
+ "slime_green": {
+  "name": "초록 슬라임",
+  "kind": "slime",
+  "sprite": "slime_green",
+  "hp": 30,
+  "speed": 85,
+  "damage": 6,
+  "exp": 8,
+  "scale": 0.46,
+  "money": [
+   300,
+   600
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  }
+ },
+ "slime_blue": {
+  "name": "파랑 슬라임",
+  "kind": "slime",
+  "sprite": "slime_blue",
+  "hp": 36,
+  "speed": 80,
+  "damage": 7,
+  "exp": 10,
+  "scale": 0.46,
+  "money": [
+   400,
+   700
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  }
+ },
+ "slime_purple": {
+  "name": "보라 슬라임",
+  "kind": "slime",
+  "sprite": "slime_purple",
+  "hp": 44,
+  "speed": 75,
+  "damage": 8,
+  "exp": 12,
+  "scale": 0.46,
+  "money": [
+   500,
+   900
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  }
+ },
+ "wolf": {
+  "name": "뿔 늑대",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 60,
+  "speed": 150,
+  "damage": 9,
+  "exp": 20,
+  "scale": 0.55,
+  "money": [
+   1000,
+   2000
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  }
+ },
+ "wolf_alpha": {
+  "name": "뿔 달린 대형 늑대형 개체",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 320,
+  "speed": 165,
+  "damage": 14,
+  "exp": 120,
+  "scale": 0.85,
+  "boss": true,
+  "money": [
+   15000,
+   25000
+  ],
+  "drop": {
+   "mana_shard": 1
+  }
+ }
+}

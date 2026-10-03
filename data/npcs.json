@@ -1,0 +1,15 @@
+[
+  { "id": "seoyun", "name": "한서윤", "nameIfFemalePlayer": "한서준", "role": "그녀", "fixed": "밝고 착한 청순형" },
+  { "id": "minjae", "name": "박민재", "role": "입사 동기" },
+  { "id": "jihoon", "name": "차지훈", "role": "회사 선배, 이후 헌터" },
+  { "id": "harin", "name": "윤하린", "role": "회사 후배, 이후 치유사" },
+  { "id": "oh", "name": "오경수", "role": "짐꾼 사무소 사장" },
+  { "id": "taesung", "name": "강태성", "role": "들꽃 파티 리더" },
+  { "id": "yuna", "name": "오유나", "role": "들꽃 파티 성직자" },
+  { "id": "hyun", "name": "최현", "role": "들꽃 파티 궁수" },
+  { "id": "eunji", "name": "노은지", "role": "들꽃 파티 마법사" },
+  { "id": "wooseok", "name": "정우석", "role": "비각성 짐꾼" },
+  { "id": "jiho", "name": "남지호", "role": "비각성 짐꾼" },
+  { "id": "somi", "name": "이소미", "role": "비각성 짐꾼" },
+  { "id": "haerin", "name": "박해린", "role": "비각성 짐꾼" }
+]

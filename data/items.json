@@ -1,0 +1,72 @@
+{
+ "dagger_old": {
+  "name": "낡은 단검",
+  "slot": "weapon",
+  "atk": 2,
+  "price": 0,
+  "rarity": "일반",
+  "desc": "짐꾼 사무소에서 받은 단검"
+ },
+ "sword_iron": {
+  "name": "철검",
+  "slot": "weapon",
+  "atk": 6,
+  "price": 50000,
+  "rarity": "일반"
+ },
+ "sword_steel": {
+  "name": "강철검",
+  "slot": "weapon",
+  "atk": 12,
+  "price": 180000,
+  "rarity": "고급"
+ },
+ "sword_ore": {
+  "name": "마정석 합금검",
+  "slot": "weapon",
+  "atk": 20,
+  "price": 600000,
+  "rarity": "희귀"
+ },
+ "cloth_work": {
+  "name": "작업복",
+  "slot": "outfit",
+  "hp": 0,
+  "price": 0,
+  "rarity": "일반"
+ },
+ "jacket_hunter": {
+  "name": "헌터 재킷",
+  "slot": "outfit",
+  "hp": 30,
+  "price": 80000,
+  "rarity": "일반"
+ },
+ "coat_armored": {
+  "name": "강화 코트",
+  "slot": "outfit",
+  "hp": 80,
+  "price": 300000,
+  "rarity": "고급"
+ },
+ "potion": {
+  "name": "회복 물약",
+  "slot": "use",
+  "heal": 60,
+  "price": 5000,
+  "rarity": "일반"
+ },
+ "return_stone": {
+  "name": "귀환석",
+  "slot": "use",
+  "price": 30000,
+  "rarity": "일반",
+  "desc": "탑에서 도시로 돌아온다. 보스와 균열 안에서는 쓸 수 없다"
+ },
+ "mana_shard": {
+  "name": "마정석 조각",
+  "slot": "material",
+  "sell": 2000,
+  "rarity": "일반"
+ }
+}
