@@ -3,53 +3,173 @@
   "main": [
    "str"
   ],
-  "swords": false,
-  "basicFx": true,
-  "dmgBase": 0.6
+  "dmgStat": "str",
+  "combo": "base3",
+  "dodge": {
+   "name": "구르기",
+   "dist": 200,
+   "time": 0.3,
+   "inv": 0.3,
+   "cd": 0.9
+  }
  },
  "천마": {
   "main": [
-   "str",
-   "agi"
+   "str"
   ],
-  "swords": true,
-  "weapon": "sword"
+  "dmgStat": "str",
+  "weapon": "sword",
+  "combo": "legend5",
+  "color": "#c0182a",
+  "dodge": {
+   "name": "천마군림보",
+   "dist": 308,
+   "time": 0.25,
+   "inv": 0.35,
+   "cd": 1.5,
+   "dmg": 1.2
+  },
+  "skill1": {
+   "id": "geomgang",
+   "name": "검강",
+   "kind": "line",
+   "range": 440,
+   "width": 70,
+   "dmg": 2.2,
+   "cd": 3,
+   "mp": 10
+  }
  },
- "불락의 성기사": {
+ "폭풍의 사수": {
+  "main": [
+   "dex"
+  ],
+  "dmgStat": "dex",
+  "weapon": "bow",
+  "combo": "legend5",
+  "color": "#7fd8ff",
+  "dodge": {
+   "name": "질풍보",
+   "dist": 352,
+   "time": 0.2,
+   "inv": 0.3,
+   "cd": 1.3
+  },
+  "skill1": {
+   "id": "rapid",
+   "name": "폭풍연사",
+   "kind": "line",
+   "range": 880,
+   "width": 50,
+   "dmg": 2.4,
+   "cd": 5,
+   "mp": 12
+  }
+ },
+ "대지의 군주": {
   "main": [
    "vit",
    "str"
   ],
-  "swords": false,
-  "weapon": "shield"
- },
- "정령왕의 사수": {
-  "main": [
-   "agi",
-   "spi"
-  ],
-  "swords": false,
-  "weapon": "bow"
- },
- "시공의 대현자": {
-  "main": [
-   "int"
-  ],
-  "swords": false,
-  "weapon": "staff"
- },
- "신의 대행자": {
-  "main": [
-   "spi"
-  ],
-  "swords": false,
-  "weapon": "staff"
+  "dmgStat": "vit",
+  "weapon": "shield",
+  "combo": "legend5",
+  "color": "#c8a060",
+  "dodge": {
+   "name": "대지보",
+   "dist": 264,
+   "time": 0.3,
+   "inv": 0.35,
+   "cd": 1.7
+  },
+  "skill1": {
+   "id": "spear",
+   "name": "대지창",
+   "kind": "line",
+   "range": 440,
+   "width": 80,
+   "dmg": 2.0,
+   "cd": 4,
+   "mp": 10
+  }
  },
  "명왕": {
   "main": [
-   "agi"
+   "dex"
   ],
-  "swords": false,
-  "weapon": "dagger"
+  "dmgStat": "dex",
+  "weapon": "dagger",
+  "combo": "legend5",
+  "color": "#8a5ad8",
+  "dodge": {
+   "name": "그림자보",
+   "dist": 352,
+   "time": 0.25,
+   "inv": 0.4,
+   "cd": 1.5
+  },
+  "skill1": {
+   "id": "dance",
+   "name": "그림자난무",
+   "kind": "burst",
+   "range": 200,
+   "dmg": 3.0,
+   "cd": 5,
+   "mp": 12
+  }
+ },
+ "공간의 절대자": {
+  "main": [
+   "int"
+  ],
+  "dmgStat": "int",
+  "weapon": "staff",
+  "combo": "legend5",
+  "color": "#5c7cff",
+  "dodge": {
+   "name": "공간도약",
+   "dist": 352,
+   "time": 0.12,
+   "inv": 0.4,
+   "cd": 1.5
+  },
+  "skill1": {
+   "id": "cut",
+   "name": "공간절단",
+   "kind": "line",
+   "range": 616,
+   "width": 88,
+   "dmg": 3.0,
+   "cd": 4,
+   "mp": 12
+  }
+ },
+ "성휘의 사도": {
+  "main": [
+   "int"
+  ],
+  "dmgStat": "int",
+  "weapon": "staff",
+  "combo": "legend5",
+  "color": "#ffd25a",
+  "dodge": {
+   "name": "섬광보",
+   "dist": 352,
+   "time": 0.22,
+   "inv": 0.35,
+   "cd": 1.5,
+   "dmg": 1.2
+  },
+  "skill1": {
+   "id": "ray",
+   "name": "성광",
+   "kind": "line",
+   "range": 616,
+   "width": 60,
+   "dmg": 3.0,
+   "cd": 4,
+   "mp": 10,
+   "heal": 0.06
+  }
  }
 }

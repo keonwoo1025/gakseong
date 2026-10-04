@@ -9,9 +9,12 @@ export class FX {
     this.list.push(Object.assign({ set, x, y, t: 0, fps: 16, s: 1, rot: 0, flip: false, ground: false, a: 1 }, o, { n: frames.length }));
   }
 
+  beam(x, y, ang, len, w, col) { this.beams = this.beams || []; this.beams.push({ x, y, ang, len, w, col, t: 0 }); }
+
   num(x, y, v, kind = 'normal') { this.nums.push({ x: x + (Math.random() - 0.5) * 24, y, v, t: 0, kind, vx: (Math.random() - 0.5) * 40 }); }
 
   update(dt) {
+    if (this.beams) { for (const b of this.beams) b.t += dt; this.beams = this.beams.filter((b) => b.t < 0.38); }
     for (const f of this.list) f.t += dt;
     this.list = this.list.filter((f) => f.t < f.n / f.fps);
     for (const n of this.nums) n.t += dt;
@@ -20,6 +23,15 @@ export class FX {
 
   draw(ground) {
     const ctx = this.v.ctx;
+    if (!ground && this.beams) for (const b of this.beams) {
+      const k = b.t / 0.38, grow = Math.min(1, b.t / 0.06);
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.ang);
+      ctx.globalAlpha = 1 - k;
+      ctx.fillStyle = b.col; ctx.fillRect(0, -b.w / 2 * (1 - k * 0.5), b.len * grow, b.w * (1 - k * 0.5));
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, -b.w / 8, b.len * grow, b.w / 4);
+      ctx.fillStyle = '#1a0f08'; ctx.fillRect(0, -b.w / 2 * (1 - k * 0.5) - 3, b.len * grow, 3); ctx.fillRect(0, b.w / 2 * (1 - k * 0.5), b.len * grow, 3);
+      ctx.restore();
+    }
     for (const f of this.list) {
       if (f.ghost || !!f.ground !== ground) continue;
       const arr = this.A.fx[f.set];
@@ -39,6 +51,7 @@ export class FX {
     const ctx = this.v.ctx;
     const style = {
       normal: [800, 34, '#ffffff'], big: [900, 42, '#ffd23f'], huge: [900, 56, '#ff9a2e'], hurt: [800, 34, '#ff5a5a'], exp: [700, 26, '#9fe07a'],
+      miss: [800, 28, '#b8c4d0'], parry: [900, 60, '#7fe8ff'], dodge: [700, 22, '#e8f4ff'], skill: [900, 30, '#ffe9a8'],
     };
     for (const n of this.nums) {
       const [w, size, col] = style[n.kind] || style.normal;

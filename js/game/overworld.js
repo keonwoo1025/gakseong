@@ -124,10 +124,10 @@ export class Overworld {
     const v = g.input.vec(), mag = Math.hypot(v[0], v[1]);
     if (p.knock) { this.move(p, p.knock[0] * dt, p.knock[1] * dt); p.knock[0] *= 0.85; p.knock[1] *= 0.85; if (Math.hypot(p.knock[0], p.knock[1]) < 20) p.knock = null; }
     if (mag > 0.15 && !p.path) {
-      const sp = g.input.running() ? 352 : 224 * Math.min(1, 0.45 + mag);
+      const sp = g.input.running() ? 256 : 160 * Math.min(1, 0.45 + mag);
       this.move(p, v[0] * sp * dt, v[1] * sp * dt);
       p.dir = Math.abs(v[0]) > Math.abs(v[1]) * 0.9 ? (v[0] > 0 ? 'R' : 'L') : v[1] > 0 ? 'D' : 'U';
-      p.moving = true; p.t += dt * (sp / 224);
+      p.moving = true; p.t += dt * (sp / 160);
     } else if (!p.path) p.moving = false;
     // 가장자리: 옆 구역으로 이어짐
     const E = this.map.edges;

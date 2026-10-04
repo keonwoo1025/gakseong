@@ -26,10 +26,10 @@ export class Enemies {
     return e;
   }
 
-  damage(e, v, kx, ky, big) {
+  damage(e, v, kx, ky, big, stun = 0.08) {
     const g = this.g;
     g.target = { e, t: 3 };
-    e.hp -= v; e.hit = 0.15; e.kx += kx; e.ky += ky; e.stun = Math.max(e.stun || 0, big === 2 ? 0.9 : big === 1 ? 0.4 : big === 3 ? 0.6 : 0.22);
+    e.hp -= v; e.hit = 0.15; e.kx += kx; e.ky += ky; e.stun = Math.max(e.stun || 0, stun);
     g.fx.sfx('imp', e.x, e.y - 28, { s: big === 2 ? 1.3 : big >= 1 ? 0.95 : 0.7, fps: 22, rot: Math.random() * 6.28 });
     g.fx.num(e.x, e.y - 70, v, big === 2 ? 'huge' : big >= 1 ? 'big' : 'normal');
     if (e.hp <= 0 && e.alive) {
@@ -49,7 +49,7 @@ export class Enemies {
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
       const alive = p.state !== 'dead';
       const wolf = e.d.kind === 'wolf', boss = !!e.d.boss;
-      const range = wolf ? 150 : 110, wind = boss ? 0.75 : wolf ? 0.5 : 0.6;
+      const range = wolf ? 150 : 110, wind = boss ? 0.75 : wolf ? 0.5 : 0.6; e.windT = wind;
       e.st = e.st || 'idle'; e.stt = (e.stt || 0) + dt;
       if (e.st === 'idle') {
         const chase = d < 520 && alive;
@@ -69,11 +69,16 @@ export class Enemies {
           const hx = e.x + e.ax * 20, hy = e.y + e.ay * 20;
           if (Math.hypot(p.x - hx, p.y - hy) < (boss ? 80 : 58) && alive) {
             e.hitDone = true;
-            if (p.inv <= 0 && p.state !== 'dodge' && p.state !== 'dash') {
+            const sinceHit = performance.now() / 1000 - p.lastHitT;
+            const facing = (p.lastHitDir[0] * (e.x - p.x) + p.lastHitDir[1] * (e.y - p.y)) > 0;
+            if (sinceHit < 0.22 && facing) { g.parry(e); }
+            else if (p.inv > 0 || p.state === 'dodge' || p.state === 'dash') { g.recordPattern('관찰', 0.3); g.fx.num(p.x, p.y - 120, '회피', 'exp'); }
+            else if (Math.random() < g.playerEva()) { g.fx.num(p.x, p.y - 120, '회피', 'exp'); g.sound.sfx('dodge'); }
+            else {
               p.hurt(e.d.damage, e.ax, e.ay);
               g.fx.sfx('imp', p.x, p.y - 50, { s: 1.1, fps: 22, rot: Math.random() * 6 });
               g.hitstop = Math.max(g.hitstop, 0.06); g.view.addShake(boss ? 9 : 5); g.flashHurt = 0.25;
-            } else if (p.state === 'dodge') { g.recordPattern('관찰', 0.3); g.fx.num(p.x, p.y - 120, '회피', 'exp'); }
+            }
           }
         }
         if (e.stt >= D) { e.st = 'rec'; e.stt = 0; }

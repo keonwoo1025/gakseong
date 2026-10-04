@@ -18,8 +18,9 @@ import { setSkin } from './hud.js';
 import { Settings } from '../engine/settings.js';
 
 const PERSONALITIES = ['열혈형', '냉철한 전략가', '다정한 보호자', '겁 많은 선인', '오만한 천재', '호기심 덩어리', '과묵한 고독자', '계산적 실리주의', '헌신적 신앙형', '자유로운 장난꾸러기'];
-const PATTERN_JOB = { 공격: '천마', 수호: '불락의 성기사', 관찰: '정령왕의 사수', 탐구: '시공의 대현자', 구조: '신의 대행자', 은밀: '명왕' };
-const STAT_NAMES = { str: '힘', agi: '민첩', int: '지능', spi: '정신', vit: '체력' };
+const PATTERN_JOB = { 공격: '천마', 수호: '대지의 군주', 관찰: '폭풍의 사수', 탐구: '공간의 절대자', 구조: '성휘의 사도', 은밀: '명왕' };
+const STAT_NAMES = { str: 'STR', dex: 'DEX', int: 'INT', vit: 'VIT' };
+const STAT_DESC = { str: '물리 공격력', dex: '공격속도·명중·회피', int: '마법 공격력·MP', vit: 'HP·방어' };
 const DEADLINE = 365;
 const LIVING_COST = 25000;
 const WAGE = 40000, SHARD_BONUS = 1500;
@@ -71,13 +72,14 @@ export class Game {
   async boot() {
     this.A = await loadAssets('data/manifest.json', (d, t) => (this.progress = [d, t]));
     this.ver = this.A.version + '.' + Date.now().toString(36).slice(-3);
-    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'store', 'floors', 'barks', 'news', 'music', 'looks', 'citymap', 'skills'];
+    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'store', 'floors', 'barks', 'news', 'music', 'looks', 'citymap', 'skills', 'combos'];
     const data = await Promise.all(names.map((n) => this.getJSON(`data/${n}.json`)));
     names.forEach((n, i) => (this[n] = data[i]));
     this.mapTemplate = await this.getJSON('data/maps/floor01.json');
     this.npcById = Object.fromEntries(this.npcs.map((n) => [n.id, n]));
     this.sound.setTracks(this.music);
     setSkin((n) => this.A.ui && this.A.ui[n]);
+    this.applyCssSkin();
     this.showTitle();
   }
 
@@ -101,8 +103,39 @@ export class Game {
   recordPattern(k, amt) { this.state.pattern[k] = (this.state.pattern[k] || 0) + amt; }
   combo() { this.comboN++; this.comboT = 1.6; }
   equipStat(k) { const s = this.state; let v = 0; for (const slot in s.equip) { const it = this.items[s.equip[slot]]; if (it && it[k]) v += it[k]; } return v; }
-  expNeed() { return Math.floor(20 * Math.pow(this.state.lv, 1.6)); }
-  maxHp() { const s = this.state; return 100 + s.stats.vit * 10 + (s.lv - 1) * 5 + this.equipStat('hp'); }
+  expNeed() { return Math.floor(50 * Math.pow(this.state.lv, 1.8)); }
+  // ---- 능력치 (STR·DEX·INT·VIT) ----
+  st(k) { return (this.state.stats && this.state.stats[k]) || 5; }
+  maxHp() { const s = this.state; return 100 + this.st('vit') * 12 + (s.lv - 1) * 6 + this.equipStat('hp'); }
+  maxMp() { const s = this.state; return 40 + this.st('int') * 5 + (s.lv - 1) * 2; }
+  atkPower() {
+    const job = this.jobs[this.state.job] || {}, k = job.dmgStat || 'str';
+    const base = this.awakened() ? 12 : 8;
+    return Math.round((base + this.equipStat('atk') + this.st(k) * 2) * (job.dmgBase || 1));
+  }
+  aspd() { return 1 + (this.st('dex') - 5) * 0.006; }
+  moveMult() { return 1 + (this.st('dex') - 5) * 0.002; }
+  playerEva() { return Math.min(0.3, (this.st('dex') - 5) * 0.004 + 0.03); }
+  dmgTaken() { return Math.max(0.5, 1 - (this.st('vit') - 5) * 0.006); }
+  rollHit(e) { const acc = (this.st('dex') - 5) * 0.003; return Math.random() >= Math.max(0, (e.d.eva || 0) - acc); }
+  migrateStats(s) {
+    const o = s.stats || {};
+    if ('agi' in o || 'spi' in o) s.stats = { str: o.str || 5, dex: o.agi || 5, int: Math.max(o.int || 5, o.spi || 5), vit: o.vit || 5 };
+    if (s.mp === undefined) s.mp = 40;
+  }
+  parry(e) {
+    if (e.parried && performance.now() / 1000 - e.parried < 0.3) return;
+    e.parried = performance.now() / 1000;
+    const p = this.player;
+    e.hitDone = true; e.st = 'rec'; e.stt = -0.6; e.stun = 1.1;
+    const dx = e.x - p.x, dy = e.y - p.y, d = Math.hypot(dx, dy) || 1;
+    e.kx += dx / d * 420; e.ky += dy / d * 420;
+    this.fx.sfx('imp', (e.x + p.x) / 2, (e.y + p.y) / 2 - 50, { s: 2.2, fps: 18 });
+    this.fx.sfx('ring', (e.x + p.x) / 2, (e.y + p.y) / 2, { s: 3, fps: 18, ground: true });
+    this.fx.num((e.x + p.x) / 2, (e.y + p.y) / 2 - 110, 'PARRY', 'parry');
+    this.sound.sfx('parry'); this.hitstop = 0.14; this.view.addShake(6); this.flashParry = 0.18;
+    this.recordPattern('관찰', 0.5);
+  }
   awakened() { return this.state.phase !== 'porter'; }
 
   npcName(id) { const n = this.npcById[id]; if (!n) return id; return this.state && this.state.gender === 'f' && n.nameIfFemalePlayer ? n.nameIfFemalePlayer : n.name; }
@@ -189,6 +222,7 @@ export class Game {
     const st = Save.load();
     if (!st) { this.showTitle(); return; }
     this.state = st; this.portraits = {}; this.ow.actors = {};
+    this.migrateStats(st);
     this.enterWorldMode();
     if (!st.flags.introDone) { this.ow.play('prologue'); return; }
     const gone = { street: 'alley' };
@@ -308,9 +342,9 @@ export class Game {
     if (name === 'afterAwaken') {
       s.phase = 'hidden'; s.flags.masked = true;
       s.lv = 1; s.exp = 0; s.pts = 5;
-      for (const k in s.stats) s.stats[k] = 5;
+      s.stats = { str: 5, dex: 5, int: 5, vit: 5 };
       s.unlocked = 1; s.cleared = {};
-      s.hp = this.maxHp();
+      s.hp = this.maxHp(); s.mp = this.maxMp();
       s.flags.jobToday = false; s.flags.workedToday = true;
       s.objective = '상태 창에서 스탯을 분배하고, 탑 광장에서 정체를 숨긴 채 탑에 오르기';
       s.objTarget = { map: 'plaza', at: [16, 2] };
@@ -427,22 +461,21 @@ export class Game {
     const s = this.state, D = Math.max(0, DEADLINE - s.day);
     const pend = this.pend || (this.pend = {});
     const used = Object.values(pend).reduce((a, b) => a + b, 0);
-    const hpK = Math.min(1, s.hp / this.maxHp()), spK = Math.min(1, s.sp / 60), xpK = this.awakened() ? Math.min(1, s.exp / this.expNeed()) : 0;
+    const hpK = Math.min(1, s.hp / this.maxHp()), xpK = this.awakened() ? Math.min(1, s.exp / this.expNeed()) : 0;
     const left = `<div class="stleft"><canvas id="stp" width="34" height="34"></canvas>
       <b>${esc(fmt('{성이름}', s))}</b><span class="dim">${this.awakened() ? esc(s.job) + ' · LV.' + s.lv : '비각성자 · 짐꾼'}</span>
       <div class="bar hp"><i style="width:${hpK * 100}%"></i></div><span class="dim">체력 ${Math.round(s.hp)} / ${this.maxHp()}</span>
-      ${this.awakened() ? `<div class="bar sp"><i style="width:${spK * 100}%"></i></div><div class="bar xp"><i style="width:${xpK * 100}%"></i></div><span class="dim">경험치 ${s.exp} / ${this.expNeed()}</span>` : ''}
+      ${this.awakened() ? `<div class="bar sp"><i style="width:${Math.min(1, s.mp / this.maxMp()) * 100}%"></i></div><span class="dim">MP ${Math.round(s.mp)} / ${this.maxMp()}</span><div class="bar xp"><i style="width:${xpK * 100}%"></i></div><span class="dim">경험치 ${s.exp} / ${this.expNeed()}</span>` : ''}
       <span class="dim">${won(s.money)} · 31층 D-${D}</span></div>`;
     if (!this.awakened()) {
       return `<div class="stwrap">${left}<div class="stright"><div class="big3"><div>동행 최고층<b>${s.porterDepth}층</b></div><div>일한 날<b>${s.day + 1}</b></div><div>회수 수당<b>${SHARD_BONUS}</b></div></div>
         <p class="dim">비각성자는 레벨과 경험치가 없다.</p><p class="dim">행동 하나하나가 어딘가에 기록되고 있다는 걸, 아직 아무도 모른다.</p></div></div>`;
     }
     const main = (this.jobs[s.job] || {}).main || [];
-    const p = new Player(this, 0, 0);
-    const att = Math.round((15 + this.equipStat('atk')) * p.dmgMult()), def = Math.round(s.stats.vit * 1.5 + this.equipStat('hp') / 10);
-    const stats = Object.keys(STAT_NAMES).map((k) => `<div>${STAT_NAMES[k]}${main.includes(k) ? '★' : ''}<b class="${pend[k] ? 'up' : ''}">${s.stats[k] + (pend[k] || 0)}</b><button data-k="${k}" ${s.pts - used > 0 ? '' : 'disabled'}>+</button></div>`).join('');
+    const att = this.atkPower(), def = Math.round((1 - this.dmgTaken()) * 100);
+    const stats = Object.keys(STAT_NAMES).map((k) => `<div>${STAT_NAMES[k]}${main.includes(k) ? '★' : ''}<b class="${pend[k] ? 'up' : ''}">${s.stats[k] + (pend[k] || 0)}</b><small>${STAT_DESC[k]}</small><button data-k="${k}" ${s.pts - used > 0 ? '' : 'disabled'}>+</button></div>`).join('');
     return `<div class="stwrap">${left}<div class="stright">
-      <div class="big3"><div>공격력<b>${att}</b></div><div>방어력<b>${def}</b></div><div>데미지 배율<b>×${p.dmgMult().toFixed(2)}</b></div></div>
+      <div class="big3"><div>공격력<b>${att}</b></div><div>피해 감소<b>${def}%</b></div><div>회피율<b>${Math.round(this.playerEva() * 100)}%</b></div></div>
       <div class="stats5">${stats}</div>
       <div class="strow"><span style="flex:1">남은 포인트 <b>${s.pts - used}</b> · ★ 주 스탯 · 소문 ${s.rumor.toFixed(1)}</span><button id="preset" ${used ? '' : 'disabled'}>되돌리기</button><button class="primary" id="apply" ${used ? '' : 'disabled'}>적용</button></div>
     </div></div>`;
@@ -450,17 +483,16 @@ export class Game {
 
   menuSkill() {
     const s = this.state;
-    const list = this.awakened() ? (this.skills[s.job] || []) : [];
-    if (!this.skillSel || !list.find((k) => k.id === this.skillSel)) this.skillSel = list[0] ? list[0].id : null;
-    const cells = Array.from({ length: 15 }, (_, i) => {
-      const k = list[i];
-      if (!k) return `<div class="slot empty"></div>`;
-      const open = s.lv >= k.lv;
-      return `<button class="slot ${k.id === this.skillSel ? 'on' : ''}" data-sk="${k.id}"><small>${esc(k.type)}</small><span class="ic">${open ? '✦' : '🔒'}</span><span class="nm">${esc(k.name)}</span></button>`;
-    }).join('');
-    const k = list.find((x) => x.id === this.skillSel);
-    const det = k ? `<b>${esc(k.name)}</b><p class="dim">${esc(k.type)} · 습득 LV.${k.lv}${k.sp ? ' · 기력 ' + k.sp : ''}</p><p>${esc(k.desc)}</p><p class="dim">${s.lv >= k.lv ? (k.id === 'burst' ? '기술 버튼에 연결됨' : '추후 개방') : '레벨이 부족하다'}</p>` : '<p class="dim">아직 아무 기술도 없다.</p><p class="dim">각성자들은 저마다의 기술을 가진다. 비각성자에게는 해당되지 않는 이야기다.</p>';
-    return `<div class="detail">${det}</div><div class="skgrid">${cells}</div>`;
+    const J = this.awakened() ? this.skills[s.job] : null;
+    if (!J) return '<div class="detail"><b>스킬</b><p class="dim">아직 아무 기술도 없다.</p><p class="dim">각성자들은 저마다의 기술을 가진다. 비각성자에게는 해당되지 않는 이야기다.</p></div><div class="skgrid">' + Array.from({ length: 10 }, () => '<div class="slot empty"></div>').join('') + '</div>';
+    const items = [{ k: 'd', name: J.dodge.name, type: '전용 회피', desc: J.dodge.desc, open: true }]
+      .concat(J.active.map((a, i) => ({ k: 'a' + i, name: a[0], type: i === 3 ? '액티브 · 궁극' : '액티브', desc: a[1], lv: a[2], open: s.lv >= a[2] })))
+      .concat(J.passive.map((a, i) => ({ k: 'p' + i, name: a[0], type: '패시브', desc: a[1], open: i === 0 })));
+    if (!this.skillSel || !items.find((x) => x.k === this.skillSel)) this.skillSel = 'a0';
+    const cells = items.map((x) => `<button class="slot ${x.k === this.skillSel ? 'on' : ''}" data-sk="${x.k}"><small>${esc(x.type)}</small><span class="ic">${x.open ? '✦' : '🔒'}</span><span class="nm">${esc(x.name)}</span></button>`).join('');
+    const x = items.find((i) => i.k === this.skillSel);
+    const note = x.k === 'a0' ? '기술 버튼에 연결됨' : x.k === 'd' ? '회피 버튼에 연결됨' : x.open ? '스킬 포인트 투자는 다음 단계에서 열린다' : `LV.${x.lv}에 습득 가능`;
+    return `<div class="detail"><b>${esc(x.name)}</b><p class="dim">${esc(x.type)}${x.lv ? ' · 습득 LV.' + x.lv : ''}</p><p>${esc(x.desc)}</p><p class="dim">${esc(note)}</p></div><div class="skgrid">${cells}</div>`;
   }
 
   menuQuest() {
@@ -490,7 +522,7 @@ export class Game {
     const sv = this.ov.querySelector('#sv'); if (sv) sv.onclick = () => { this.save(); this.renderMenu('저장했어요'); };
     const cv = this.ov.querySelector('#stp'); if (cv) { const pf = this.portraitOf('gen:player'); const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(pf.im, 0, 0); }
     this.ov.querySelectorAll('[data-sk]').forEach((b) => (b.onclick = () => { this.skillSel = b.dataset.sk; this.renderMenu(); }));
-    const ap = this.ov.querySelector('#apply'); if (ap) ap.onclick = () => { const pd = this.pend || {}; let n = 0; for (const k in pd) { s.stats[k] += pd[k]; n += pd[k]; if (k === 'vit') s.hp += 10 * pd[k]; } s.pts -= n; this.pend = {}; this.sound.sfx('levelup'); this.renderMenu('적용했습니다'); };
+    const ap = this.ov.querySelector('#apply'); if (ap) ap.onclick = () => { const pd = this.pend || {}; let n = 0; for (const k in pd) { s.stats[k] += pd[k]; n += pd[k]; if (k === 'vit') s.hp += 12 * pd[k]; } s.pts -= n; this.pend = {}; this.sound.sfx('levelup'); this.renderMenu('적용했습니다'); };
     const pr = this.ov.querySelector('#preset'); if (pr) pr.onclick = () => { this.pend = {}; this.renderMenu(); };
     const snd = this.ov.querySelector('#snd'); if (snd) snd.onclick = () => { this.sound.toggle(); this.renderMenu(); };
     const tt = this.ov.querySelector('#tt'); if (tt) tt.onclick = () => { this.save(); this.menuOpen = false; this.showTitle(); };
@@ -661,23 +693,35 @@ export class Game {
     }
     if (this.mode === 'world' && !this.ow.cut) {
       const lab = this.ow.prompt ? this.ow.prompt.label : '조사';
-      B.push({ id: 'act', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab });
+      B.push({ id: 'act', icon: 'talk', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab });
     } else if (this.mode === 'porter' && this.porter) {
       const lab = this.porter.prompt ? (this.porter.prompt.kind === 'drop' ? '줍기' : '건네기') : '줍기';
-      B.push({ id: 'act', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab });
-      B.push({ id: 'dodge', x: X(150 * k), y: H - 38 * k, r: 26 * k, label: '회피' });
-      const hid = this.healItem(); B.push({ id: 'potion', x: X(148 * k), y: H - 112 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
+      B.push({ id: 'act', icon: 'talk', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab });
+      B.push({ id: 'dodge', x: X(150 * k), y: H - 38 * k, r: 26 * k, label: '회피', cd: this.porter.me.cd || 0, cdMax: 0.9 });
+      const hid = this.healItem(); B.push({ id: 'potion', iconItem: hid ? 'item_' + hid : null, x: X(148 * k), y: H - 112 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
     } else if (this.mode === 'field' && this.world) {
-      B.push({ id: 'act', x: X(72 * k), y: H - 72 * k, r: 42 * k, label: '공격' });
-      B.push({ id: 'dodge', x: X(156 * k), y: H - 38 * k, r: 26 * k, label: '회피' });
-      B.push({ id: 'skill1', x: X(150 * k), y: H - 112 * k, r: 24 * k, label: '기술', cost: 25 });
+      B.push({ id: 'act', icon: 'act', x: X(72 * k), y: H - 72 * k, r: 42 * k, label: '공격' });
+      const pl = this.player, jb = this.jobs[s.job] || {}, sk = jb.skill1;
+      B.push({ id: 'dodge', x: X(156 * k), y: H - 38 * k, r: 26 * k, label: '회피', cd: pl.cds.dodge, cdMax: pl.dg.cd });
+      B.push({ id: 'skill1', x: X(150 * k), y: H - 112 * k, r: 24 * k, label: sk ? sk.name : '기술', cost: sk ? sk.mp : 0, cd: pl.cds.skill1, cdMax: sk ? sk.cd : 1, locked: !sk });
       B.push({ id: 'skill2', x: X(104 * k), y: H - 152 * k, r: 22 * k, label: '', locked: true });
       B.push({ id: 'skill3', x: X(44 * k), y: H - 160 * k, r: 22 * k, label: '', locked: true });
-      const hid = this.healItem(); B.push({ id: 'potion', x: X(212 * k), y: H - 92 * k, r: 20 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
+      const hid = this.healItem(); B.push({ id: 'potion', iconItem: hid ? 'item_' + hid : null, x: X(212 * k), y: H - 92 * k, r: 20 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
     }
     const out = this.talking || this.menuOpen ? [] : B;
     if (this.mode === 'world' && this.ow.cut && !this.menuOpen) out.push({ id: 'skip', top: true, always: true, x: W - 40, y: 26, r: 20, label: 'SKIP' });
     this.input.buttons = out;
+  }
+
+  // HTML 창(메뉴, 상점 등)에도 그림 테두리를 입힌다
+  applyCssSkin() {
+    const U = this.A.ui; if (!U) return;
+    const root = document.documentElement.style;
+    let any = false;
+    for (const [n, v] of [['panel', '--skin-plain'], ['panel_sys', '--skin-sys'], ['btn', '--btn-plain'], ['btn_sys', '--btn-sys']]) {
+      const o = U[n]; if (o && o.im && !o.missing) { root.setProperty(v, `url(${o.im.toDataURL()})`); any = true; }
+    }
+    if (any) document.documentElement.classList.add('skinned');
   }
 
   applyTheme() { document.body.className = this.state && this.mode !== 'title' && this.mode !== 'create' && this.awakened() ? 'sys' : 'plain'; }
@@ -707,7 +751,6 @@ export class Game {
   onKill(e) {
     const s = this.state;
     s.kills++; this.kills++;
-    s.sp = Math.min(60, s.sp + 4);
     s.exp += e.d.exp;
     this.fx.num(e.x, e.y - 100, '+' + e.d.exp + ' EXP', 'exp');
     if (e.d.money) s.money += Math.round(e.d.money[0] + Math.random() * (e.d.money[1] - e.d.money[0]));
@@ -769,6 +812,16 @@ export class Game {
     this.input.mode = this.talking ? 'dialogue' : (this.menuOpen || (this.mode === 'world' && this.ow.cut)) ? 'menu' : (['world', 'porter', 'field'].includes(this.mode) ? 'field' : 'menu');
     if (this.talking) this.dialogue.update(dt);
     if (this.flashHurt) this.flashHurt = Math.max(0, this.flashHurt - dt);
+    if (this.flashParry) this.flashParry = Math.max(0, this.flashParry - dt);
+    if (this.state && ['field', 'porter', 'world'].includes(this.mode) && !this.talking && !this.menuOpen) {
+      this.combatT = (this.combatT || 0) + dt;
+      const s0 = this.state;
+      if (s0.mp === undefined) s0.mp = this.maxMp();
+      if (this.combatT > 5 && !(this.player && this.player.state === 'dead')) {
+        s0.hp = Math.min(this.maxHp(), s0.hp + this.maxHp() * 0.01 * dt);
+        s0.mp = Math.min(this.maxMp(), s0.mp + this.maxMp() * 0.02 * dt);
+      }
+    }
     if (this.target) { this.target.t -= dt; if (this.target.t <= 0) this.target = null; }
     if (this.talking && this.mode === 'world' && this.ow.cut && this.ow.cut.ff && this.dialogue.cur && !(this.dialogue.cur.choices && this.dialogue.cur.choices.length)) { this.dialogue.t = 999; this.dialogue.next(); }
     if (this.mode === 'world') { this.ow.update(busy ? 0 : dt); if (busy && this.ow.cut) this.ow.cut.update(0); }
@@ -783,7 +836,7 @@ export class Game {
       this.comboT = Math.max(0, this.comboT - dt); if (this.comboT <= 0) this.comboN = 0;
       this.player.update(dt); this.enemies.update(dt); this.fx.update(dt);
       this.view.follow(this.player.x, this.player.y, dt, { w: this.world.w, h: this.world.h });
-      const s = this.state; s.sp = Math.min(60, s.sp + dt * 0.5);
+
     }
   }
 
@@ -824,6 +877,7 @@ export class Game {
       g.addColorStop(0, '#2a2018'); g.addColorStop(1, '#0d0a08');
       ctx.fillStyle = g; ctx.fillRect(0, 0, v.W, v.H);
     }
+    if (this.flashParry > 0) { ctx.fillStyle = `rgba(200,240,255,${this.flashParry * 2})`; ctx.fillRect(0, 0, v.W, v.H); }
     if (this.flashHurt > 0 && ['field', 'porter'].includes(this.mode)) {
       const gr = ctx.createRadialGradient(v.W / 2, v.H / 2, Math.min(v.W, v.H) * 0.3, v.W / 2, v.H / 2, Math.max(v.W, v.H) * 0.7);
       gr.addColorStop(0, 'rgba(255,0,0,0)'); gr.addColorStop(1, `rgba(220,20,20,${this.flashHurt * 1.6})`);

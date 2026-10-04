@@ -151,6 +151,17 @@ export class Sound {
     } else if (name === 'death') {
       ['E4', 'C4', 'A3', 'E3'].forEach((n, i) => this.blip(freq(n), t + i * 0.25, 0.3, 'triangle', 0.08));
     } else if (name === 'select') this.blip(freq('A5'), t, 0.05, 'square', 0.03);
+    else if (name === 'dodge') {
+      const s2 = this.noiseHit(t, 0.16, 1200, 0.12, bus);
+      this.blip(520, t, 0.08, 'triangle', 0.04);
+    } else if (name === 'parry') {
+      ['E6', 'B6'].forEach((n, i) => this.blip(freq(n), t + i * 0.03, 0.35, 'square', 0.07));
+      this.noiseHit(t, 0.12, 4000, 0.2, bus);
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'triangle'; o.frequency.setValueAtTime(1800, t); o.frequency.exponentialRampToValueAtTime(900, t + 0.4);
+      g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.46);
+    }
   }
 
   blip(f, t, dur, wave, vol) {

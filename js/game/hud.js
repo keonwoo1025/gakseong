@@ -8,6 +8,8 @@ const SYS = { sys: true, bg: 'rgba(6,14,30,0.86)', line: '#5cc8ff', accent: '#7f
 let SKIN = () => null;
 export function setSkin(fn) { SKIN = fn; }
 const skin = (n) => { const o = SKIN(n); return o && o.im && !o.missing ? o : null; };
+// 테마별 아이콘: 시스템창에서는 _sys 버전을 먼저 찾는다
+const icon = (n, T) => (T.sys && skin(n + '_sys')) || skin(n);
 
 // 9칸 분할: 모서리는 그대로, 변과 가운데는 늘려서 어떤 크기의 창에도 맞춘다
 function nine(ctx, o, x, y, w, h, b = 12) {
@@ -21,9 +23,9 @@ function nine(ctx, o, x, y, w, h, b = 12) {
 
 function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 
-export function frame(ctx, x, y, w, h, T) {
-  const sk = skin(T.sys ? 'panel_sys' : 'panel_plain');
-  if (sk) { nine(ctx, sk, x, y, w, h); return; }
+export function frame(ctx, x, y, w, h, T, kind = 'panel') {
+  const sk = skin(kind + (T.sys ? '_sys' : '')) || (kind !== 'panel' && skin('panel' + (T.sys ? '_sys' : '')));
+  if (sk) { nine(ctx, sk, x, y, w, h, kind === 'dialog' ? 18 : 14); return; }
   if (T.sys) {
     ctx.fillStyle = T.bg; ctx.fillRect(x, y, w, h);
     ctx.save(); ctx.shadowColor = T.glow; ctx.shadowBlur = 8; ctx.strokeStyle = T.line; ctx.lineWidth = 1.2; ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1); ctx.restore();
@@ -89,9 +91,11 @@ export class HUD {
     ctx.fillText(awake ? 'LV.' + String(s.lv).padStart(2, '0') : '비각성', x, y + 12);
     const bx = x + lvW, bw = w - lvW;
     ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(bx, y + 1, bw, 7); ctx.fillRect(bx, y + 11, bw, 5);
+    const bsk = skin('bar' + (T.sys ? '_sys' : ''));
     ctx.fillStyle = '#e8433f'; ctx.fillRect(bx, y + 1, bw * hpK, 7);
+    if (bsk) nine(ctx, bsk, bx - 3, y - 2, bw + 6, 13, 8);
     if (awake) {
-      ctx.fillStyle = '#4aa3ff'; ctx.fillRect(bx, y + 11, bw * Math.min(1, s.sp / 60), 5);
+      ctx.fillStyle = '#4aa3ff'; ctx.fillRect(bx, y + 11, bw * Math.min(1, (s.mp || 0) / g.maxMp()), 5);
       ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(x, y + 20, w, 3);
       ctx.fillStyle = '#9fe07a'; ctx.fillRect(x, y + 20, w * Math.min(1, s.exp / g.expNeed()), 3);
     } else {
@@ -172,7 +176,7 @@ export class HUD {
       if (!b.top) continue;
       const on = inp.pressed[b.id];
       ctx.globalAlpha = 0.95;
-      const ic = skin('icon_' + b.id), bs = skin(T.sys ? 'btn_top_sys' : 'btn_top');
+      const ic = icon('icon_' + b.id, T), bs = skin(T.sys ? 'btn_top_sys' : 'btn_top');
       if (bs) { ctx.drawImage(bs.im, b.x - b.r, b.y - b.r, b.r * 2, b.r * 2); if (ic) ctx.drawImage(ic.im, b.x - b.r * 0.6, b.y - b.r * 0.6, b.r * 1.2, b.r * 1.2); else { ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.font = F(800, 12); ctx.fillText(b.label, b.x, b.y + 4); ctx.textAlign = 'left'; } ctx.globalAlpha = 1; continue; }
       ctx.fillStyle = on ? T.act : T.bg; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
       ctx.save(); if (T.glow) { ctx.shadowColor = T.glow; ctx.shadowBlur = 6; } ctx.strokeStyle = T.sys ? T.line : T.accent; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
@@ -209,16 +213,22 @@ export class HUD {
     for (const b of inp.buttons) {
       if (b.top) continue;
       const on = inp.pressed[b.id];
-      const dim = b.locked || (b.id === 'skill1' && g.state.sp < (b.cost || 0));
+      const dim = b.locked || (b.id === 'skill1' && (g.state.mp || 0) < (b.cost || 0));
       ctx.globalAlpha = a * (dim ? 0.55 : 1);
-      const bimg = skin((b.id === 'act' ? 'btn_act' : 'btn') + (T.sys ? '_sys' : ''));
+      const bimg = skin((on ? 'btn_on' : b.id === 'act' ? 'btn_act' : 'btn') + (T.sys ? '_sys' : ''));
       if (bimg) {
         const rr2 = b.r * (on ? 0.93 : 1); ctx.drawImage(bimg.im, b.x - rr2, b.y - rr2, rr2 * 2, rr2 * 2);
-        const ic = skin('icon_' + b.id);
-        if (ic && !b.locked) ctx.drawImage(ic.im, b.x - b.r * 0.55, b.y - b.r * 0.55, b.r * 1.1, b.r * 1.1);
-        else { ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.font = F(800, Math.round(Math.max(10, b.r * 0.42))); ctx.fillText(b.locked ? '🔒' : b.label, b.x, b.y + b.r * 0.15); }
+        const ic = b.iconItem ? skin(b.iconItem) : icon('icon_' + (b.icon || b.id), T);
+        ctx.textAlign = 'center';
+        if (ic && !b.locked) {
+          const withLabel = b.id === 'act' && b.label && b.icon !== 'act';
+          const sz = b.r * (withLabel ? 0.9 : 1.05);
+          ctx.drawImage(ic.im, b.x - sz / 2, b.y - sz / 2 - (withLabel ? b.r * 0.18 : 0), sz, sz);
+          if (withLabel) { ctx.font = F(800, Math.max(9, Math.round(b.r * 0.26))); ctx.fillStyle = T.text; ctx.fillText(b.label, b.x, b.y + b.r * 0.62); }
+        } else { ctx.fillStyle = T.text; ctx.font = F(800, Math.round(Math.max(10, b.r * 0.42))); ctx.fillText(b.locked ? '🔒' : b.label, b.x, b.y + b.r * 0.15); }
         if (b.sub !== undefined && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = T.accent; ctx.textAlign = 'center'; ctx.fillText('×' + b.sub, b.x, b.y + b.r * 0.62); }
-        ctx.globalAlpha = 1; ctx.textAlign = 'left'; continue;
+        if (b.id === 'skill1' && !b.locked) { ctx.font = F(800, 9); ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.fillText(b.label, b.x, b.y + b.r + 11); }
+        ctx.globalAlpha = 1; ctx.textAlign = 'left'; this.cdOverlay(ctx, b); continue;
       }
       ctx.fillStyle = on ? T.act : b.id === 'act' ? (T.sys ? 'rgba(20,70,120,0.8)' : 'rgba(120,60,30,0.78)') : T.bg;
       ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (on ? 0.93 : 1), 0, Math.PI * 2); ctx.fill();
@@ -227,9 +237,21 @@ export class HUD {
       ctx.font = F(800, Math.round(Math.max(10, b.r * 0.42)));
       ctx.fillText(b.locked ? '🔒' : b.label, b.x, b.y + b.r * 0.15);
       if (b.sub !== undefined && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = T.accent; ctx.fillText('×' + b.sub, b.x, b.y + b.r * 0.62); }
-      if (b.cost && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = '#7fb8ff'; ctx.fillText('기력 ' + b.cost, b.x, b.y + b.r * 0.66); }
+      if (b.cost && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = '#7fb8ff'; ctx.fillText('MP ' + b.cost, b.x, b.y + b.r * 0.66); }
       ctx.globalAlpha = 1; ctx.textAlign = 'left';
+      this.cdOverlay(ctx, b);
     }
+  }
+
+  // 쿨타임: 어둡게 덮고 남은 초 표시
+  cdOverlay(ctx, b) {
+    if (!b.cd || b.cd <= 0 || !b.cdMax) return;
+    const k = Math.min(1, b.cd / b.cdMax);
+    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.arc(b.x, b.y, b.r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * k); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.font = F(900, Math.max(11, Math.round(b.r * 0.5))); ctx.textAlign = 'center';
+    ctx.fillText(b.cd >= 1 ? Math.ceil(b.cd) : b.cd.toFixed(1), b.x, b.y + b.r * 0.2);
+    ctx.restore();
   }
 
   // ---------- 대화 ----------
@@ -244,7 +266,7 @@ export class HUD {
       if (cur.portrait.startsWith('gen:')) ctx.drawImage(pf.im, W - pw - 6, H - pw - 4, pw, pw);
       else { const crop = 0.62, ph = pw * 1.1, pww = pf.w / (pf.h * crop) * ph; ctx.drawImage(pf.im, 0, 0, pf.w, pf.h * crop, W - pww - 4, H - ph - 4, pww, ph); }
     }
-    frame(ctx, bx, by, bw, bh, T);
+    frame(ctx, bx, by, bw, bh, T, 'dialog');
     if (cur.speaker) {
       ctx.font = F(800, 13); const nw = ctx.measureText(cur.speaker).width + 26;
       frame(ctx, bx + 8, by - 22, nw, 22, T);

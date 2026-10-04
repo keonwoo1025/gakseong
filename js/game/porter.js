@@ -38,8 +38,12 @@ export class PorterRun {
   }
 
   dodge(dx, dy) {
+    const me = this.me;
+    if ((me.cd || 0) > 0) return;
+    if (Math.hypot(dx, dy) < 0.01) { const v = this.g.input.vec(); dx = v[0]; dy = v[1]; if (Math.hypot(dx, dy) < 0.1) { dx = me.dir === 'L' ? -1 : me.dir === 'R' ? 1 : 0; dy = me.dir === 'U' ? -1 : me.dir === 'D' ? 1 : 0; } }
     const l = Math.hypot(dx, dy) || 1;
-    this.me.dash = 0.3; this.me.dd = [dx / l, dy / l]; this.me.inv = 0.4;
+    me.dash = 0.3; me.dd = [dx / l, dy / l]; me.inv = 0.3; me.cd = 0.9;
+    this.g.sound.sfx('dodge'); this.g.fx.sfx('dust', me.x, me.y + 4, { s: 1, fps: 16, ground: true });
   }
 
   interact() {
@@ -64,14 +68,14 @@ export class PorterRun {
   update(dt) {
     const g = this.g, me = this.me, w = this.world, s = g.state;
     // 나
-    me.inv = Math.max(0, me.inv - dt);
+    me.inv = Math.max(0, me.inv - dt); me.cd = Math.max(0, (me.cd || 0) - dt);
     w.unstick(me, 22);
     if (me.knock) { w.moveBody(me, me.knock[0] * dt, me.knock[1] * dt, 22); me.knock[0] *= 0.85; me.knock[1] *= 0.85; if (Math.hypot(me.knock[0], me.knock[1]) < 20) me.knock = null; }
-    if (me.dash > 0) { me.dash -= dt; w.moveBody(me, me.dd[0] * 620 * dt, me.dd[1] * 620 * dt, 22); me.moving = true; me.t += dt * 2; }
+    if (me.dash > 0) { me.dash -= dt; w.moveBody(me, me.dd[0] * 560 * dt, me.dd[1] * 560 * dt, 22); me.moving = true; me.t += dt * 2; }
     else {
       const v = g.input.vec(), mag = Math.hypot(v[0], v[1]);
       if (mag > 0.15) {
-        const sp = g.input.running() ? 360 : 240 * Math.min(1, 0.45 + mag);
+        const sp = g.input.running() ? 320 : 200 * Math.min(1, 0.45 + mag);
         w.moveBody(me, v[0] * sp * dt, v[1] * sp * dt, 22);
         me.dir = Math.abs(v[0]) > Math.abs(v[1]) * 0.9 ? (v[0] > 0 ? 'R' : 'L') : v[1] > 0 ? 'D' : 'U';
         me.moving = true; me.t += dt;

@@ -14,7 +14,8 @@
   ],
   "drop": {
    "mana_shard": 0.25
-  }
+  },
+  "eva": 0.03
  },
  "slime_blue": {
   "name": "파랑 슬라임",
@@ -31,7 +32,8 @@
   ],
   "drop": {
    "mana_shard": 0.25
-  }
+  },
+  "eva": 0.05
  },
  "slime_purple": {
   "name": "보라 슬라임",
@@ -48,7 +50,8 @@
   ],
   "drop": {
    "mana_shard": 0.25
-  }
+  },
+  "eva": 0.06
  },
  "wolf": {
   "name": "뿔 늑대",
@@ -65,7 +68,8 @@
   ],
   "drop": {
    "mana_shard": 0.25
-  }
+  },
+  "eva": 0.12
  },
  "wolf_alpha": {
   "name": "뿔 달린 대형 늑대형 개체",
@@ -83,6 +87,7 @@
   ],
   "drop": {
    "mana_shard": 1
-  }
+  },
+  "eva": 0.08
  }
 }
