@@ -1,0 +1,111 @@
+{
+ "_설명": "충돌 0 통행, 1 막힘, 2 물(막힘), 3 낮은 막힘(몸은 막고 원거리·시야는 통과). art는 ttiles 그림 이름",
+ "objects": {
+  "tree": {
+   "name": "나무",
+   "solid": 1,
+   "art": "tree"
+  },
+  "fence": {
+   "name": "울타리",
+   "solid": 3,
+   "art": "fence"
+  },
+  "lamp": {
+   "name": "가로등",
+   "solid": 3,
+   "art": "lamp"
+  },
+  "sign": {
+   "name": "표지판",
+   "solid": 3,
+   "art": "sign"
+  },
+  "bench": {
+   "name": "벤치",
+   "solid": 3,
+   "art": "bench"
+  },
+  "stall": {
+   "name": "노점",
+   "solid": 1,
+   "art": "stall"
+  },
+  "crate": {
+   "name": "상자",
+   "solid": 3,
+   "art": "crate"
+  },
+  "desk": {
+   "name": "책상",
+   "solid": 3,
+   "art": "desk"
+  },
+  "chair": {
+   "name": "의자",
+   "solid": 0,
+   "art": "chair"
+  },
+  "bed": {
+   "name": "침대",
+   "solid": 3,
+   "art": "bed"
+  },
+  "shelf": {
+   "name": "선반",
+   "solid": 1,
+   "art": "shelf"
+  },
+  "counter": {
+   "name": "계산대",
+   "solid": 3,
+   "art": "counter"
+  },
+  "sofa": {
+   "name": "소파",
+   "solid": 3,
+   "art": "sofa"
+  },
+  "plant": {
+   "name": "화분",
+   "solid": 3,
+   "art": "plant"
+  },
+  "fridge": {
+   "name": "냉장고",
+   "solid": 1,
+   "art": "fridge"
+  },
+  "board": {
+   "name": "게시판",
+   "solid": 1,
+   "art": "board"
+  },
+  "screen": {
+   "name": "전광판",
+   "solid": 1,
+   "art": "screen"
+  },
+  "machine": {
+   "name": "기계",
+   "solid": 1,
+   "art": "machine"
+  },
+  "belt": {
+   "name": "컨베이어",
+   "solid": 3,
+   "art": "belt"
+  },
+  "pillar": {
+   "name": "기둥",
+   "solid": 1,
+   "art": "pillar"
+  }
+ },
+ "ground": {
+  "wall": 1,
+  "window": 1,
+  "water": 2,
+  "void": 1
+ }
+}

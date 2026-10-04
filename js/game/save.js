@@ -1,6 +1,6 @@
 // 저장: 브라우저 저장소에 한 칸. 하드코어라 죽으면 지워진다.
 
-const KEY = 'gakseong_save_v3';
+const KEY = 'gakseong_save_v4';   // 장비·마을 구조 개편으로 이전 기록은 이어지지 않는다
 
 export const Save = {
   has() { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } },
@@ -11,16 +11,17 @@ export const Save = {
 
 export function newState(family, given, gender) {
   return {
-    v: 1,
+    v: 2,
     family, given, gender,
     job: '미각성',
     phase: 'porter',
     money: 30000,
-    inv: { first_aid: 1, ramen: 2, painkiller: 1, mana_shard: 0, dagger_old: 1, cloth_work: 1 },
+    inv: { first_aid: 1, ramen: 2, painkiller: 1, mana_shard: 0 },
+    gear: {}, gearN: 0, mastery: {},
     porterDepth: 0,
     objective: '',
     map: 'room',
-    equip: { weapon: 'dagger_old', outfit: 'cloth_work' },
+    equip: {},
     unlocked: 1,
     cleared: {},
     rumor: 0,
@@ -31,7 +32,8 @@ export function newState(family, given, gender) {
     hp: 0, sp: 60,
     day: 0, dayT: 0,
     pattern: { 공격: 0, 수호: 0, 관찰: 0, 탐구: 0, 구조: 0, 은밀: 0 },
-    karma: 0,
+    karma: 0, infamy: 0, pk: 0,
+    folk: [], folkInit: {}, folkDue: [], deadNpc: {},
     flags: {},
     aff: {},
     kills: 0,

@@ -10,10 +10,12 @@ const DV = { D: [0, 1], U: [0, -1], R: [1, 0], L: [-1, 0] };
 const CS = 0.8;
 const now = () => performance.now() / 1000;
 import { charKey } from './people.js';
+import { Character, drawWeapon, drawMask } from './character.js';
 
-export class Player {
+export class Player extends Character {
   constructor(g, x, y) {
-    this.g = g; this.S = g.A.sprites.player;
+    super('player', 'player');
+    this.isPlayer = true; this.g = g; this.S = g.A.sprites.player;
     this.x = x; this.y = y;
     this.dir = 'D'; this.lastH = 1;
     this.state = 'idle'; this.t = 0; this.wf = 0;
@@ -27,7 +29,7 @@ export class Player {
   get s() { return this.g.state; }
   get maxHp() { return this.g.maxHp(); }
   get job() { return this.g.jobs[this.s.job] || this.g.jobs['미각성']; }
-  get combo() { return this.g.combos[this.job.combo || 'base3']; }
+  get combo() { return this.g.gear.combo(); }
   get dg() { return this.job.dodge || this.g.jobs['미각성'].dodge; }
   get aspd() { return this.g.aspd(); }
   dmgMult() { return this.g.atkPower() / 15; }
@@ -41,7 +43,7 @@ export class Player {
   }
 
   autoFace() {
-    const b = this.nearest(200);
+    const st = this.combo[0], b = this.nearest(Math.max(200, st.r * 1.9 + 30));
     if (b) this.dir = this.dirOf(b.x - this.x, b.y - this.y);
     if (this.dir === 'R') this.lastH = 1; if (this.dir === 'L') this.lastH = -1;
   }
@@ -60,9 +62,10 @@ export class Player {
     if (e.hp < e.d.hp * 0.3) { crit += P('execute'); if (o.executeB) m *= 1 + o.executeB; }
     const isCrit = Math.random() < crit;
     if (isCrit) m *= 1.5 + P('execute') * 0.75;
-    const dmg = Math.round(g.atkPower() * m * (0.9 + Math.random() * 0.2));
+    const dmg = Math.max(1, Math.round(g.atkPower() * m * g.gear.dmgMult() * (0.9 + Math.random() * 0.2)));
     g.enemies.damage(e, dmg, kx, ky, isCrit ? 2 : kind, flinch);
     g.sk.onHit(e);
+    if (!o.skill) g.gear.gainMastery();
     return true;
   }
 
@@ -151,7 +154,16 @@ export class Player {
         const flip = !!st.flip !== (this.dir === 'L');
         const set = st.fx, rot = (ROT[set] || ROT.s1)[this.dir];
         const cm = this.s.job === '천마' && g.A.fx2 && g.A.fx2['cm_' + set] ? 'cm_' + set : set;
-        g.fx.sfx(cm, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
+        const wset = g.A.fx2 && g.A.fx2[st.wtype + '_' + set] && !g.A.fx2[st.wtype + '_' + set][0].missing ? st.wtype + '_' + set : cm;
+        if (st.ranged) {
+          // 활·지팡이: 사거리 끝(또는 첫 대상)까지 화살·마력탄
+          let tx = this.x + vv[0] * st.r * 1.9, ty = this.y + vv[1] * st.r * 1.9;
+          const tg = this.nearest(st.r * 1.9 + 30);
+          if (tg && ((tg.x - this.x) * vv[0] + (tg.y - this.y) * vv[1]) > 0) { tx = tg.x; ty = tg.y; }
+          const ang = Math.atan2(ty - this.y, tx - this.x), len = Math.hypot(tx - this.x, ty - this.y);
+          g.fx.beam(this.x + vv[0] * 30, this.y - 55 + vv[1] * 20, ang, len, st.ranged === 'orb' ? 10 : 4, st.col || '#fff');
+          g.fx.sfx(g.A.fx2 && g.A.fx2[st.ranged] ? st.ranged : 'spark', tx, ty - 50, { s: st.fxs, fps: 22 });
+        } else g.fx.sfx(wset, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
         if (st.ring) g.fx.sfx('ring', this.x + vv[0] * 60, this.y + vv[1] * 45, { s: 2.8, fps: 16, ground: true });
         let any = false;
         for (const e of g.enemies.list) {
@@ -265,7 +277,7 @@ export class Player {
         const [f, fl] = pick();
         const a = this.inv > 0 && this.state !== 'dodge' && Math.floor(this.inv * 14) % 2 ? 0.4 : 1;
         if (this.state === 'dead') { const c = v.ctx; c.save(); c.translate(this.x, this.y - 20); c.rotate(-Math.PI / 2 * Math.min(1, this.t * 3)); v.sprite(f, 0, 20, 1.3, fl, a); c.restore(); }
-        else v.sprite(f, this.x, this.y, 1.3, fl, a);
+        else this.layers(v, () => v.sprite(f, this.x, this.y, 1.3, fl, a));
       } });
       return;
     }
@@ -274,10 +286,26 @@ export class Player {
       v.shadow(this.x, this.y, 30);
       const [f, fl, bob] = this.frame();
       const a = this.inv > 0 && this.state !== 'dodge' && Math.floor(this.inv * 14) % 2 ? 0.4 : 1;
-      v.sprite(f, this.x, this.y + bob, CS, fl, a);
+      this.layers(v, () => v.sprite(f, this.x, this.y + bob, CS, fl, a));
     } });
   }
 
+
+  // 장비 레이어: (위를 볼 땐 무기를 몸 뒤에) 몸 → 가면 → 무기
+  layers(v, body) {
+    const g = this.g, ctx = v.ctx, H = 130;
+    const w = g.gear.equipped('weapon'), m = g.gear.equipped('mask');
+    this.swing = null;
+    if (this.state === 'attack' || this.state === 'dash') {
+      const base = { D: Math.PI / 2, U: -Math.PI / 2, R: 0, L: Math.PI }[this.dir];
+      const st = this.combo[this.stage] || {}, k = Math.min(1, this.t * (st.fps || 16) / 3);
+      this.swing = st.thrust || st.ranged ? base - Math.PI / 2 : base - Math.PI / 2 + (this.stage % 2 ? 1 : -1) * (1.6 - 3.2 * k) * 0.6;
+    }
+    drawWeapon(g, ctx, this, w, H, true);
+    body();
+    drawMask(g, ctx, this, m, H);
+    drawWeapon(g, ctx, this, w, H, false);
+  }
 
   drawSwords() {}
 }

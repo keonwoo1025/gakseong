@@ -2,32 +2,96 @@
  "id": "alley",
  "name": "원룸촌 골목",
  "theme": "street",
+ "size": [
+  28,
+  14
+ ],
  "legend": {
   "#": "wall",
   "s": "walk",
-  "n": "sign",
   "D": "door",
-  "T": "tree",
-  "V": "screen",
-  "i": "lamp",
-  "x": "crate",
   "W": "window"
  },
- "rows": [
+ "ground": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "############################",
-  "#####D######V#######D#######",
-  "sssisssssissssssisssssnsisss",
+  "#####D######s#######D#######",
   "ssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssss",
-  "ssssssxsssssssTsssssssssxsss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssss",
   "#########D########D#########",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "props": [
+  {
+   "obj": "screen",
+   "at": [
+    12,
+    2
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    3,
+    3
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    9,
+    3
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    16,
+    3
+   ]
+  },
+  {
+   "obj": "sign",
+   "at": [
+    22,
+    3
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    24,
+    3
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    6,
+    10
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    14,
+    10
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    24,
+    10
+   ]
+  }
  ],
  "music": "hub",
  "edges": {

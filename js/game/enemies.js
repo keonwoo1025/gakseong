@@ -1,4 +1,5 @@
-// 몬스터: data/monsters.json 의 능력치로 움직이고 공격한다.
+// 몬스터: data/monsters.json 의 능력치로 움직이고 공격한다. 공통 Character 틀을 쓴다.
+import { Character } from './character.js';
 
 export class Enemies {
   constructor(g, defs, floor) {
@@ -25,7 +26,7 @@ export class Enemies {
       if (r < 0.08) d = Object.assign({}, d, { name: '정예 ' + d.name, hp: Math.round(d.hp * 2.5), damage: Math.round(d.damage * 1.4), exp: d.exp * 3, eva: d.eva + 0.05, variant: 'elite', drop: { mana_shard: 1 }, money: d.money && [d.money[0] * 3, d.money[1] * 3] });
       else if (r < 0.13) d = Object.assign({}, d, { name: '변이 ' + d.name, hp: Math.round(d.hp * 1.6), speed: d.speed * 1.35, exp: d.exp * 2, variant: 'mutant' });
     }
-    const e = { type, d, noRespawn: !!noRespawn, hp: d.hp, alive: true, t: Math.random() * 5, hit: 0, kx: 0, ky: 0, face: 1, cd: 0, dead: 0, bite: 0 };
+    const e = Object.assign(new Character(type, 'mob'), { type, d, noRespawn: !!noRespawn, hp: d.hp, alive: true, t: Math.random() * 5, hit: 0, kx: 0, ky: 0, face: 1, cd: 0, dead: 0, bite: 0 });
     const p = this.g.player;
     const [x, y] = this.g.world.randomSpot(p, 420);
     e.x = x; e.y = y;

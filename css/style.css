@@ -166,3 +166,15 @@ html.skinned .card{padding:6px 10px}
 .detail .strow{margin-top:4px}
 .editbar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;pointer-events:auto;background:var(--panel);border:1px solid var(--line);padding:6px 10px;border-radius:8px;font-size:13px}
 .editbar .primary{width:auto;margin:0}
+
+/* 장비 창: 착용 부위 6칸 */
+.eqs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.eqc{display:flex;align-items:center;gap:6px;padding:3px 6px;height:38px;min-width:0;text-align:left;border-radius:6px;font-size:11px}
+.eqc.on{border-color:var(--gold);background:rgba(201,162,74,0.22)}
+body.sys .eqc.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
+.eqc .ic{font-size:18px;flex:0 0 auto}
+.eqc span:last-child{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.eqc small{font-size:9px;color:var(--ink-dim)}
+.eqc i{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbody .left .dim{margin:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mapwrap canvas{display:block}

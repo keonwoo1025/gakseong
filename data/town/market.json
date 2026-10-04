@@ -2,32 +2,112 @@
  "id": "market",
  "name": "구도심 상가 거리",
  "theme": "street",
+ "size": [
+  36,
+  14
+ ],
  "legend": {
   "s": "walk",
   "#": "wall",
-  "n": "sign",
   "D": "door",
-  "i": "lamp",
   "W": "window",
-  "k": "stall",
   "l": "lane",
   "r": "road"
  },
- "rows": [
+ "ground": [
   "WWWWWWWWWWsssWWWWWWWWWWWWWWWWWWWWWWW",
   "##########sss#######################",
   "##########sss#####D####D####D#######",
-  "ssssisssnsssssisssssssssssissssssiss",
+  "ssssssssssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssssssssssss",
   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
   "llllllllllllllllllllllllllllllllllll",
   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
   "ssssssssssssssssssssssssssssssssssss",
-  "ssssskssssksssskssssksssskssssksssss",
+  "ssssssssssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssssssssssss",
   "####################################",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "props": [
+  {
+   "obj": "lamp",
+   "at": [
+    4,
+    3
+   ]
+  },
+  {
+   "obj": "sign",
+   "at": [
+    8,
+    3
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    14,
+    3
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    26,
+    3
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    33,
+    3
+   ]
+  },
+  {
+   "obj": "stall",
+   "at": [
+    5,
+    9
+   ]
+  },
+  {
+   "obj": "stall",
+   "at": [
+    10,
+    9
+   ]
+  },
+  {
+   "obj": "stall",
+   "at": [
+    15,
+    9
+   ]
+  },
+  {
+   "obj": "stall",
+   "at": [
+    20,
+    9
+   ]
+  },
+  {
+   "obj": "stall",
+   "at": [
+    25,
+    9
+   ]
+  },
+  {
+   "obj": "stall",
+   "at": [
+    30,
+    9
+   ]
+  }
  ],
  "music": "hub",
  "edges": {

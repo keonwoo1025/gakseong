@@ -2,23 +2,23 @@
  "id": "avenue",
  "name": "중앙 대로",
  "theme": "street",
+ "size": [
+  46,
+  14
+ ],
  "legend": {
   "#": "wall",
   "W": "window",
   "s": "walk",
-  "p": "plant",
-  "n": "sign",
   "D": "door",
   "r": "road",
-  "T": "tree",
-  "l": "lane",
-  "f": "fence"
+  "l": "lane"
  },
- "rows": [
+ "ground": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "##############################################",
   "######D########D########D#####D#####D####D####",
-  "ssspssssssspsssssssspssssssspssssspsssssssssps",
+  "ssssssssssssssssssssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssssssssssssssssssssss",
   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
   "llllllllllllllllllllllllllllllllllllllllllllll",
@@ -26,9 +26,417 @@
   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
   "llllllllllllllllllllllllllllllllllllllllllllll",
   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
-  "ssssssssssssssssssnsssssssssssssssssssssssssss",
-  "sssssTssssssssTssssssssTssssssssTsssssssTsssss",
-  "ffffffffffffffffffffffffffffffffffffffffffffff"
+  "ssssssssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssssssssss"
+ ],
+ "props": [
+  {
+   "obj": "plant",
+   "at": [
+    3,
+    3
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    11,
+    3
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    20,
+    3
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    28,
+    3
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    34,
+    3
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    44,
+    3
+   ]
+  },
+  {
+   "obj": "sign",
+   "at": [
+    18,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    5,
+    12
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    14,
+    12
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    23,
+    12
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    32,
+    12
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    40,
+    12
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    0,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    1,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    2,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    3,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    4,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    5,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    6,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    7,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    8,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    9,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    10,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    11,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    12,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    13,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    14,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    15,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    16,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    17,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    18,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    19,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    20,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    21,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    22,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    23,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    24,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    25,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    26,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    27,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    28,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    29,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    30,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    31,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    32,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    33,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    34,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    35,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    36,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    37,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    38,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    39,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    40,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    41,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    42,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    43,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    44,
+    13
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    45,
+    13
+   ]
+  }
  ],
  "music": "hub",
  "edges": {

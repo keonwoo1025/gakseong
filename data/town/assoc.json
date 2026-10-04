@@ -2,25 +2,112 @@
  "id": "assoc",
  "name": "대한민국 각성자협회 로비",
  "theme": "office",
+ "size": [
+  12,
+  8
+ ],
  "legend": {
   "#": "wall",
   "W": "window",
-  "p": "plant",
   "R": "rug",
   "D": "door",
-  "o": "sofa",
-  "C": "counter",
   "t": "tile"
  },
- "rows": [
+ "ground": [
   "WWWWWWWWWWWW",
-  "#ttCCCCCCttp",
+  "#ttttttttttt",
   "#tttttttttt#",
-  "#oottttttoo#",
+  "#tttttttttt#",
   "#tttRRRRttt#",
   "#tttRRRRttt#",
-  "#ttttttttttp",
+  "#ttttttttttt",
   "#####D######"
+ ],
+ "props": [
+  {
+   "obj": "counter",
+   "at": [
+    3,
+    1
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    4,
+    1
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    5,
+    1
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    6,
+    1
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    7,
+    1
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    8,
+    1
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    11,
+    1
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    1,
+    3
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    2,
+    3
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    9,
+    3
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    10,
+    3
+   ]
+  },
+  {
+   "obj": "plant",
+   "at": [
+    11,
+    6
+   ]
+  }
  ],
  "spawn": [
   5,

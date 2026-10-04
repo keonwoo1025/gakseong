@@ -2,26 +2,98 @@
  "id": "office",
  "name": "오경수 짐꾼 사무소",
  "theme": "porter",
+ "size": [
+  12,
+  8
+ ],
  "legend": {
   "R": "rug",
   "w": "wood",
-  "x": "crate",
   "D": "door",
   "#": "wall",
-  "b": "board",
-  "W": "window",
-  "o": "sofa",
-  "C": "counter"
+  "W": "window"
  },
- "rows": [
-  "##b#WW#W####",
+ "ground": [
+  "##w#WW#W####",
   "#wwwwwwwwwww",
-  "#CCCwwwwwoow",
   "#wwwwwwwwwww",
-  "#wwwwwRRwwxw",
-  "#oowwwRRwwxw",
+  "#wwwwwwwwwww",
+  "#wwwwwRRwwww",
+  "#wwwwwRRwwww",
   "#wwwwwwwwwww",
   "#####D######"
+ ],
+ "props": [
+  {
+   "obj": "board",
+   "at": [
+    2,
+    0
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    1,
+    2
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    2,
+    2
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    3,
+    2
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    9,
+    2
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    10,
+    2
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    10,
+    4
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    1,
+    5
+   ]
+  },
+  {
+   "obj": "sofa",
+   "at": [
+    2,
+    5
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    10,
+    5
+   ]
+  }
  ],
  "spawn": [
   5,

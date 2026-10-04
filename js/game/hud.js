@@ -116,10 +116,37 @@ export class HUD {
   }
 
   // ---------- 모드별 ----------
+  // 대상 체력·아픈 표정·콤보 (탑·마을 공통)
+  combatBits(B) {
+    const g = this.g, v = g.view, ctx = v.ctx, T = this.T(), W = v.W;
+    const tg = g.target;
+    if (tg && tg.e.alive && tg.t > 0 && tg.e !== B) {
+      const w = 200, x = W / 2 - w / 2, y = 56;
+      frame(ctx, x, y, w, 24, T);
+      ctx.font = F(700, 11); ctx.fillStyle = T.text; ctx.textAlign = 'left';
+      ctx.fillText(tg.e.d.name || '', x + 8, y + 15);
+      ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x + 92, y + 9, w - 100, 6);
+      ctx.fillStyle = '#e8433f'; ctx.fillRect(x + 92, y + 9, (w - 100) * Math.max(0, tg.e.hp / tg.e.d.hp), 6);
+    }
+    if (g.player && g.player.painT > 0) {
+      const p2 = g.portraitOf('gen:player', 3), pf = p2 && p2.big ? p2 : g.A.portraits.hero_pain;
+      if (pf && pf.w) { ctx.globalAlpha = Math.min(1, g.player.painT * 3); frame(ctx, 12, 52, 52, 56, T); ctx.drawImage(pf.im, 38 - 24 * pf.w / pf.h, 55, 48 * pf.w / pf.h, 50); ctx.globalAlpha = 1; }
+    }
+    if (g.comboN > 1) {
+      ctx.globalAlpha = Math.min(1, g.comboT * 2); ctx.font = F(900, 26); ctx.fillStyle = T.sys ? '#9fe4ff' : '#ffd23f'; ctx.textAlign = 'right';
+      outlined(ctx, g.comboN + ' HIT', W - 16, g.mode === 'world' ? 164 : 112); ctx.globalAlpha = 1; ctx.textAlign = 'left';
+    }
+    if (this.hintT > 0) {
+      ctx.globalAlpha = Math.min(1, this.hintT); ctx.font = F(600, 12); ctx.fillStyle = T.text; ctx.textAlign = 'center';
+      outlined(ctx, '끝까지 밀면 달리기 · 달리며 공격하면 돌진 베기', W / 2, v.H * 0.3); ctx.globalAlpha = 1; ctx.textAlign = 'left';
+    }
+  }
+
   drawWorld() {
     const g = this.g, s = g.state; if (!s) return;
-    this.topInfo(Math.round(s.money).toLocaleString('ko-KR') + '원 · 31층 D-' + Math.max(0, 365 - s.day));
+    this.topInfo(Math.round(s.money).toLocaleString('ko-KR') + '원 · 31층 D-' + Math.max(0, 365 - s.day) + (Settings.v.pk ? ' · PK' : ''));
     this.objective();
+    this.combatBits(null);
     this.bars('world');
     this.drawToast();
   }
@@ -153,27 +180,7 @@ export class HUD {
       ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x + 8, y + 16, w - 16, 6);
       ctx.fillStyle = B.phase2 ? '#ff4a3a' : '#e8433f'; ctx.fillRect(x + 8, y + 16, (w - 16) * Math.max(0, B.hp / B.d.hp), 6);
     }
-    const tg = g.target;
-    if (tg && tg.e.alive && tg.t > 0 && tg.e !== B) {
-      const w = 200, x = W / 2 - w / 2, y = 56;
-      frame(ctx, x, y, w, 24, T);
-      ctx.font = F(700, 11); ctx.fillStyle = T.text; ctx.textAlign = 'left';
-      ctx.fillText(tg.e.d.name || '', x + 8, y + 15);
-      ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x + 92, y + 9, w - 100, 6);
-      ctx.fillStyle = '#e8433f'; ctx.fillRect(x + 92, y + 9, (w - 100) * Math.max(0, tg.e.hp / tg.e.d.hp), 6);
-    }
-    if (g.player && g.player.painT > 0) {
-      const p2 = g.portraitOf('gen:player', 3), pf = p2 && p2.big ? p2 : g.A.portraits.hero_pain;
-      if (pf && pf.w) { ctx.globalAlpha = Math.min(1, g.player.painT * 3); frame(ctx, 12, 52, 52, 56, T); ctx.drawImage(pf.im, 38 - 24 * pf.w / pf.h, 55, 48 * pf.w / pf.h, 50); ctx.globalAlpha = 1; }
-    }
-    if (g.comboN > 1) {
-      ctx.globalAlpha = Math.min(1, g.comboT * 2); ctx.font = F(900, 26); ctx.fillStyle = T.sys ? '#9fe4ff' : '#ffd23f'; ctx.textAlign = 'right';
-      outlined(ctx, g.comboN + ' HIT', W - 16, 112); ctx.globalAlpha = 1; ctx.textAlign = 'left';
-    }
-    if (this.hintT > 0) {
-      ctx.globalAlpha = Math.min(1, this.hintT); ctx.font = F(600, 12); ctx.fillStyle = T.text; ctx.textAlign = 'center';
-      outlined(ctx, '끝까지 밀면 달리기 · 달리며 공격하면 돌진 베기', W / 2, v.H * 0.3); ctx.globalAlpha = 1; ctx.textAlign = 'left';
-    }
+    this.combatBits(B);
     this.bars('field');
     this.drawToast();
   }

@@ -18,8 +18,9 @@ import { setSkin } from './hud.js';
 import { charKey } from './people.js';
 import { Settings } from '../engine/settings.js';
 import { Skills } from './skills.js';
+import { Gear } from './gear.js';
+import { TS } from './overworld.js';
 
-const PERSONALITIES = ['열혈형', '냉철한 전략가', '다정한 보호자', '겁 많은 선인', '오만한 천재', '호기심 덩어리', '과묵한 고독자', '계산적 실리주의', '헌신적 신앙형', '자유로운 장난꾸러기'];
 const PATTERN_JOB = { 공격: '천마', 수호: '대지의 군주', 관찰: '폭풍의 사수', 탐구: '공간의 절대자', 구조: '성휘의 사도', 은밀: '명왕' };
 const STAT_NAMES = { str: 'STR', dex: 'DEX', int: 'INT', vit: 'VIT' };
 const STAT_DESC = { str: '물리 공격력', dex: '공격속도·명중·회피', int: '마법 공격력·MP', vit: 'HP·방어' };
@@ -43,6 +44,7 @@ export class Game {
     this.sound = new Sound();
     this.ow = new Overworld(this);
     this.sk = new Skills(this);
+    this.gear = new Gear(this);
     this.fx = null;
     this.talking = false;
     this.portraits = {};
@@ -53,19 +55,20 @@ export class Game {
       if (id === 'menu') return this.openMenu('status');
       if (id === 'map') return this.openMenu('map');
       if (id === 'quest') return this.openMenu('quest');
+      const fight = (this.mode === 'field' || this.mode === 'world') && this.player;
+      if (id === 'talk' && this.mode === 'world') this.ow.interact();
       if (id === 'act') {
-        if (this.mode === 'world') this.ow.interact();
-        else if (this.mode === 'porter') this.porter.interact();
-        else if (this.mode === 'field') this.player.attack();
+        if (this.mode === 'porter') this.porter.interact();
+        else if (fight) this.player.attack();
       }
-      if (id === 'dodge') { if (this.mode === 'porter') this.porter.dodge(0, 0); else if (this.mode === 'field') this.player.dodge(0, 0); }
-      const m = /^skill(\d)$/.exec(id); if (m && this.mode === 'field') this.player.skill(Number(m[1]) - 1);
+      if (id === 'dodge') { if (this.mode === 'porter') this.porter.dodge(0, 0); else if (fight) this.player.dodge(0, 0); }
+      const m = /^skill(\d)$/.exec(id); if (m && fight && this.awakened()) this.player.skill(Number(m[1]) - 1);
       if (id === 'potion') this.quickHeal();
     });
     this.input.on('dodge', (dx, dy) => {
       if (this.talking || this.menuOpen) return;
       if (this.mode === 'porter') this.porter.dodge(dx, dy);
-      else if (this.mode === 'field') this.player.dodge(dx, dy);
+      else if ((this.mode === 'field' || (this.mode === 'world' && !this.ow.cut)) && this.player) this.player.dodge(dx, dy);
     });
     this.input.on('tap', (x, y) => { if (this.talking) this.dialogue.tap(x, y); });
   }
@@ -75,9 +78,10 @@ export class Game {
   async boot() {
     this.A = await loadAssets('data/manifest.json', (d, t) => (this.progress = [d, t]));
     this.ver = this.A.version + '.' + Date.now().toString(36).slice(-3);
-    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'store', 'floors', 'barks', 'news', 'music', 'looks', 'citymap', 'skills', 'combos'];
+    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'store', 'floors', 'barks', 'news', 'music', 'looks', 'citymap', 'skills', 'combos', 'personality', 'folk', 'gear', 'objects'];
     const data = await Promise.all(names.map((n) => this.getJSON(`data/${n}.json`)));
-    names.forEach((n, i) => (this[n] = data[i]));
+    const as = { folk: 'folkDef', gear: 'gearDef' };
+    names.forEach((n, i) => (this[as[n] || n] = data[i]));
     this.mapTemplate = await this.getJSON('data/maps/floor01.json');
     this.npcById = Object.fromEntries(this.npcs.map((n) => [n.id, n]));
     this.sound.setTracks(this.music);
@@ -107,7 +111,7 @@ export class Game {
   toast(t) { this.hud.say(t, 2.6); }
   recordPattern(k, amt) { this.state.pattern[k] = (this.state.pattern[k] || 0) + amt; }
   combo() { this.comboN++; this.comboT = 1.6; }
-  equipStat(k) { const s = this.state; let v = 0; for (const slot in s.equip) { const it = this.items[s.equip[slot]]; if (it && it[k]) v += it[k]; } return v; }
+  equipStat(k) { return this.gear.stat(k); }
   expNeed() { return Math.floor(50 * Math.pow(this.state.lv, 1.8)); }
   // ---- 능력치 (STR·DEX·INT·VIT) ----
   st(k) { return (this.state.stats && this.state.stats[k]) || 5; }
@@ -119,9 +123,9 @@ export class Game {
     return Math.round((base + this.equipStat('atk') + this.st(k) * 2) * (job.dmgBase || 1) * (1 + this.sk.P('atk')));
   }
   aspd() { return (1 + (this.st('dex') - 5) * 0.006) * (1 + this.sk.P('aspd')); }
-  moveMult() { return (1 + (this.st('dex') - 5) * 0.002) * (1 + this.sk.P('move')); }
-  playerEva() { return Math.min(0.4, (this.st('dex') - 5) * 0.004 + 0.03 + this.sk.P('eva')); }
-  dmgTaken() { return Math.max(0.3, (1 - (this.st('vit') - 5) * 0.006) * (1 - this.sk.P('dr'))); }
+  moveMult() { return (1 + (this.st('dex') - 5) * 0.002) * (1 + this.sk.P('move') + this.gear.stat('move')); }
+  playerEva() { return Math.min(0.45, (this.st('dex') - 5) * 0.004 + 0.03 + this.sk.P('eva') + this.gear.stat('eva')); }
+  dmgTaken() { const d = this.gear.stat('def'); return Math.max(0.3, (1 - (this.st('vit') - 5) * 0.006) * (1 - this.sk.P('dr')) * 100 / (100 + d)); }
   rollHit(e) { const acc = (this.st('dex') - 5) * 0.003; return Math.random() >= Math.max(0, (e.d.eva || 0) - acc); }
   migrateStats(s) {
     const o = s.stats || {};
@@ -143,14 +147,16 @@ export class Game {
   }
   awakened() { return this.state.phase !== 'porter'; }
 
-  npcName(id) { const n = this.npcById[id]; if (!n) return id; return this.state && this.state.gender === 'f' && n.nameIfFemalePlayer ? n.nameIfFemalePlayer : n.name; }
+  folkOf(id) { return this.state && this.state.folk && this.state.folk.find((f) => f.uid === id); }
+  npcName(id) { const n = this.npcById[id]; if (!n) { const f = this.folkOf(id); return f ? f.name : id; } return this.state && this.state.gender === 'f' && n.nameIfFemalePlayer ? n.nameIfFemalePlayer : n.name; }
   lookOf(id) {
     if (id === 'player') return this.playerLook();
     if (id === 'seoyun') return this.looks[this.state && this.state.gender === 'f' ? 'seoyun_m' : 'seoyun_f'];
+    const f = this.folkOf(id); if (f) return f.look;
     return this.looks[id] || { top: '#777', bottom: '#444' };
   }
   playerLook() { return this.looks[this.state && this.state.gender === 'f' ? 'player_f' : 'player_m']; }
-  speakerName(id) { if (id === 'player') return this.state.given; if (this.npcById[id]) return this.npcName(id); return id; }
+  speakerName(id) { if (id === 'player') return this.state.given; if (this.npcById[id] || this.folkOf(id)) return this.npcName(id); return id; }
   portraitKey(id, override) { if (override) return override; if (id === 'player' || this.npcById[id] || this.looks[id]) return 'gen:' + id; return null; }
   portraitOf(key, emo) {
     if (!key) return null;
@@ -173,7 +179,7 @@ export class Game {
 
   save() {
     const s = this.state; if (!s || s.dead) return;
-    if (this.mode === 'world' && this.ow.map && this.ow.actors.player) { s.map = this.ow.map.id; s.pos = [Math.floor(this.ow.actors.player.x / 80), Math.floor((this.ow.actors.player.y - 10) / 80)]; }
+    if (this.mode === 'world' && this.ow.map && this.ow.actors.player) { s.map = this.ow.map.id; s.pos = [Math.floor(this.ow.actors.player.x / TS), Math.floor((this.ow.actors.player.y - 15) / TS)]; }
     Save.write(s);
   }
 
@@ -218,7 +224,9 @@ export class Game {
       Save.wipe();
       const s = (this.state = newState(fam.value.trim(), giv.value.trim(), gender));
       s.npcs = {};
-      for (const n of this.npcs) s.npcs[n.id] = { personality: n.fixed || this.pick(PERSONALITIES) };
+      const PERS = Object.keys(this.personality);
+      for (const n of this.npcs) s.npcs[n.id] = { personality: PERS.includes(n.fixed) ? n.fixed : this.pick(PERS) };
+      this.gear.give('dagger_old'); s.equip.outfit = this.gear.give('cloth_work');
       s.hp = this.maxHp();
       this.portraits = {};
       this.ow.actors = {};
@@ -231,7 +239,7 @@ export class Game {
     const st = Save.load();
     if (!st) { this.showTitle(); return; }
     this.state = st; this.portraits = {}; this.ow.actors = {};
-    this.migrateStats(st);
+    this.migrateStats(st); this.player = null;
     this.enterWorldMode();
     if (!st.flags.introDone) { this.ow.play('prologue'); return; }
     const gone = { street: 'alley' };
@@ -240,14 +248,32 @@ export class Game {
   }
 
   enterWorldMode() {
-    this.mode = 'world'; this.world = null; this.porter = null;
+    this.mode = 'world'; this.porter = null; this.floor = null; this.boss = null;
     this.fx = new FX(this.A, this.view);
+    this.player = null; this.townPlayer();
     this.worldButtons();
+  }
+
+  // 마을에서도 탑과 같은 주인공·공격 판정을 쓴다. 충돌은 마을 지도, 공격 대상은 마을 사람(PK 허용 시).
+  townPlayer() {
+    if (this.player && this.player.town) return this.player;
+    const ow = this.ow;
+    this.world = {
+      get w() { return ow.W; }, get h() { return ow.H; },
+      solid: (x, y) => ow.solidAt(x, y, null), moveBody: (o, dx, dy) => ow.move(o, dx, dy), unstick: (o) => ow.unstick(o),
+      randomSpot: (avoid) => ow.folk.randomFloor(avoid) || [ow.W / 2, ow.H / 2],
+    };
+    this.enemies = ow.folk;
+    const p = new Player(this, 0, 0);
+    p.town = true; p.look = this.playerLook(); p.fr = { big: false }; p.speed = 390;
+    this.player = p;
+    this.sk.reset(); if (this.awakened()) this.sk.ensure();
+    return p;
   }
 
   worldButtons() { this.ov.innerHTML = ''; this.applyTheme(); }
 
-  zoomForMode() { if (this.mode === 'world') this.view.setZoom(64, 1); else this.view.setZoom(96, 1.12); }
+  zoomForMode() { this.view.setZoom(96, 1.12); }   // 마을·원정·탑 모두 같은 크기 기준
 
   // ---------- 말 걸기와 조사 ----------
   talkTo(npc, actor) {
@@ -257,6 +283,11 @@ export class Game {
       const lines = this.barks[s.npcs[id] ? s.npcs[id].personality : ''] || ['…'];
       if (s.talked[id] !== s.day) { s.talked[id] = s.day; this.aff(id, 1); }
       this.runLine({ speaker: this.npcName(id), portrait: this.portraitKey(id), text: this.pick(lines) });
+      return;
+    }
+    if (npc.talk === 'stranger') {
+      const f = this.folkOf(id), P = this.personality[f ? f.personality : ''] || {};
+      this.runLine({ speaker: this.npcName(id), portrait: null, text: this.pick((P.lines && P.lines.stranger) || ['…']) });
       return;
     }
     if (npc.talk === 'job') return this.talkBoss();
@@ -354,6 +385,8 @@ export class Game {
       s.stats = { str: 5, dex: 5, int: 5, vit: 5 };
       s.unlocked = 1; s.cleared = {};
       s.sk = { p: [1, 0, 0, 0, 0], a: [1, 0, 0, 0] }; s.skp = 0;
+      if (!s.equip.weapon) { const w = this.gear.owned().find((u) => this.gear.item(u).slot === 'weapon'); if (w) s.equip.weapon = w; }
+      this.player = null; if (this.mode === 'world') { const p0 = this.ow.actors.player; const np = this.townPlayer(); if (p0) { np.x = p0.x; np.y = p0.y; np.dir = p0.dir; this.ow.actors.player = np; } }
       s.hp = this.maxHp(); s.mp = this.maxMp();
       if (name === 'grantLegend') return;
     }
@@ -374,28 +407,46 @@ export class Game {
     const sk = this.A.ui && this.A.ui['item_' + id];
     if (sk && sk.im) { this.iconCache = this.iconCache || {}; if (!this.iconCache[id]) this.iconCache[id] = sk.im.toDataURL(); return `<img class="uiimg" src="${this.iconCache[id]}" alt="">`; }
     const it = this.items[id] || {};
-    const map = { ramen: '🍜', painkiller: '💊', first_aid: '🩹', potion: '🧪', return_stone: '🔮', mana_shard: '💎', dagger_old: '🗡️', cloth_work: '👕', jacket_hunter: '🧥', coat_armored: '🥋' };
-    return map[id] || (it.slot === 'weapon' ? '⚔️' : it.slot === 'outfit' ? '🧥' : '📦');
+    const map = { ramen: '🍜', painkiller: '💊', first_aid: '🩹', potion: '🧪', return_stone: '🔮', mana_shard: '💎', cloth_work: '👕', jacket_hunter: '🧥', coat_armored: '🥋' };
+    const W = { sword: '⚔️', blade: '🔪', spear: '🔱', bow: '🏹', staff: '🪄', dagger: '🗡️', gauntlet: '🥊' }, S = { outfit: '🧥', mask: '🎭', shoes: '👟', ring: '💍', neck: '📿' };
+    return map[id] || (it.slot === 'weapon' ? W[it.type] || '⚔️' : S[it.slot] || '📦');
   }
-  itemInfo(it) { return it.atk ? `공격 +${it.atk}` : it.hp ? `체력 +${it.hp}` : it.heal ? `회복 ${it.heal}` : ''; }
+  // 장비 수치 (강화 반영)
+  itemInfo(it, plus = 0) {
+    const k = 1 + this.gearDef.enhance.perLevel * plus, o = [];
+    if (it.atk) o.push(`공격 +${Math.round(it.atk * k)}`);
+    if (it.hp) o.push(`체력 +${Math.round(it.hp * k)}`);
+    if (it.def) o.push(`방어 +${Math.round(it.def * k)}`);
+    if (it.eva) o.push(`회피 +${Math.round(it.eva * 100)}%`);
+    if (it.move) o.push(`이동 +${Math.round(it.move * 100)}%`);
+    if (it.atkPct) o.push(`피해 +${Math.round(it.atkPct * 100)}%`);
+    if (it.heal) o.push(`회복 ${it.heal}`);
+    return o.join(' · ');
+  }
+  rname(it, plus) { return `<b style="color:${this.gear.color(it.rarity)}">${esc(it.name)}${plus ? ' +' + plus : ''}</b>`; }
 
   openShop(list, title) {
     this.menuOpen = true; this.input.reset();
     const s = this.state;
-    let sel = list[0], msg = '';
+    let sel = list[0], msg = '', page = 0;
+    const per = 8, pages = Math.ceil(list.length / per);
     const render = () => {
       const it = this.items[sel];
-      const grid = list.map((id) => `<button class="slot ${id === sel ? 'on' : ''}" data-s="${id}"><span class="ic">${this.icon(id)}</span><span class="nm">${esc(this.items[id].name)}</span><span class="ct">${won(this.items[id].price)}</span></button>`).join('');
+      const pageIds = list.slice(page * per, page * per + per);
+      const pager = pages > 1 ? `<div class="pager"><button data-pg="-1">◀</button><span>${page + 1} / ${pages}</span><button data-pg="1">▶</button></div>` : '';
+      const gear = this.gear.isGear(sel), have = gear ? this.gear.count(sel) : s.inv[sel] || 0;
+      const grid = pageIds.map((id) => `<button class="slot ${id === sel ? 'on' : ''}" data-s="${id}"><span class="ic">${this.icon(id)}</span><span class="nm">${esc(this.items[id].name)}</span><span class="ct">${won(this.items[id].price)}</span></button>`).join('');
       const shard = s.inv.mana_shard || 0;
       const sell = title === '헌터 상점' ? `<button data-sell="1" ${shard ? '' : 'disabled'}>마정석 조각 ${shard}개 팔기</button>` : '';
       this.ov.innerHTML = `<div class="screen"><div class="panel">
         <div class="ptop"><b>${esc(title)}</b><span>${won(s.money)}</span><button class="x" id="close">✕</button></div>
-        <div class="pbody"><div class="grid">${grid}</div>
-          <div class="detail"><div class="big">${this.icon(sel)}</div><b>${esc(it.name)}</b><p>${esc(this.itemInfo(it))}</p><p class="dim">${esc(it.desc || '')}</p><p class="dim">보유 ${s.inv[sel] || 0}</p>
+        <div class="pbody"><div class="left"><div class="grid">${grid}</div>${pager}</div>
+          <div class="detail"><div class="big">${this.icon(sel)}</div>${this.rname(it)}<p class="dim">${esc(it.rarity || '')}${it.type ? ' · ' + esc(this.gearDef.types[it.type].name) : ''}</p><p>${esc(this.itemInfo(it))}</p><p class="dim">${esc(it.desc || '')}</p><p class="dim">보유 ${have}</p>
           <button class="primary" id="buy" ${s.money < it.price ? 'disabled' : ''}>${won(it.price)}에 사기</button>${sell}<p class="dim">${esc(msg)}</p></div></div>
       </div></div>`;
       this.ov.querySelectorAll('[data-s]').forEach((b) => (b.onclick = () => { sel = b.dataset.s; msg = ''; render(); }));
-      this.ov.querySelector('#buy').onclick = () => { if (s.money >= it.price) { s.money -= it.price; s.inv[sel] = (s.inv[sel] || 0) + 1; this.sound.sfx('select'); msg = it.name + ' 구입'; render(); } };
+      this.ov.querySelector('#buy').onclick = () => { if (s.money >= it.price) { s.money -= it.price; if (gear) this.gear.give(sel); else s.inv[sel] = (s.inv[sel] || 0) + 1; this.sound.sfx('select'); msg = it.name + ' 구입'; render(); } };
+      this.ov.querySelectorAll('[data-pg]').forEach((b) => (b.onclick = () => { page = (page + Number(b.dataset.pg) + pages) % pages; render(); }));
       const sb = this.ov.querySelector('[data-sell]'); if (sb) sb.onclick = () => { s.money += shard * this.items.mana_shard.sell; s.inv.mana_shard = 0; msg = '팔았어요'; render(); };
       this.ov.querySelector('#close').onclick = () => this.closeMenu();
     };
@@ -455,20 +506,46 @@ export class Game {
       const it = this.items[this.bagSel], id = this.bagSel;
       let act = '';
       if (it.slot === 'use' && it.heal) act = `<button class="primary" data-use="${id}">사용</button>`;
-      if ((it.slot === 'weapon' || it.slot === 'outfit')) act = this.awakened() ? (s.equip[it.slot] === id ? '<button disabled>장착 중</button>' : `<button class="primary" data-eq="${id}">장착</button>`) : '<p class="dim">짐꾼은 사무소 장비만 쓴다</p>';
       det = `<div class="big">${this.icon(id)}</div><b>${esc(it.name)} ×${s.inv[id]}</b><p>${esc(this.itemInfo(it))}</p><p class="dim">${esc(it.desc || '')}</p>${act}`;
     }
     const pager = pages > 1 ? `<div class="pager"><button data-pg="-1">◀</button><span>${this.bagPage + 1} / ${pages}</span><button data-pg="1">▶</button></div>` : '';
     return `<div class="left"><div class="grid g4">${slots}</div>${pager}</div><div class="detail"><p class="dim">${won(s.money)} · 체력 ${Math.round(s.hp)} / ${this.maxHp()}</p>${det}</div>`;
   }
 
+  // 장비: 왼쪽 위 착용 부위 6칸, 아래 가진 장비(쪽 넘김), 오른쪽 선택한 장비 설명과 장착·강화
   menuGear() {
-    const s = this.state;
-    if (!this.awakened()) return `<div class="detail wide"><b>짐꾼 장비</b><p>사무소에서 빌린 작업복과 짐 지게.</p><p class="dim">각성 전에는 장비를 바꿀 수 없다.</p></div>`;
-    const slot = (k, n) => { const id = s.equip[k], it = this.items[id]; return `<div class="eq"><span class="ic">${it ? this.icon(id) : '·'}</span><div><small>${n}</small><b>${it ? esc(it.name) : '없음'}</b><small>${it ? esc(this.itemInfo(it)) : ''}</small></div></div>`; };
-    const own = Object.keys(s.inv).filter((id) => s.inv[id] > 0 && this.items[id] && ['weapon', 'outfit'].includes(this.items[id].slot));
-    const grid = own.map((id) => `<button class="slot ${s.equip[this.items[id].slot] === id ? 'on' : ''}" data-eq="${id}"><span class="ic">${this.icon(id)}</span><span class="nm">${esc(this.items[id].name)}</span><span class="ct">${esc(this.itemInfo(this.items[id]))}</span></button>`).join('');
-    return `<div class="left">${slot('weapon', '무기')}${slot('outfit', '옷')}<p class="dim">공격력 +${this.equipStat('atk')} · 체력 +${this.equipStat('hp')}</p></div><div class="detail"><b>가진 장비</b><div class="grid g3">${grid}</div></div>`;
+    const s = this.state, G = this.gear, D = this.gearDef;
+    const RO = Object.keys(D.rarity), own = G.owned().sort((a, b) => RO.indexOf(G.item(b).rarity) - RO.indexOf(G.item(a).rarity) || a.localeCompare(b, 'en', { numeric: true }));
+    const per = 8, pages = Math.max(1, Math.ceil(own.length / per));
+    this.gearPage = Math.min(this.gearPage || 0, pages - 1);
+    if (!this.gearSel || !s.gear[this.gearSel]) this.gearSel = s.equip.weapon || own[0] || null;
+    const eqs = D.slots.map(([k, n]) => {
+      const u = s.equip[k], it = u && G.item(u), lock = !G.canEquip(k);
+      return `<button class="eqc ${u && u === this.gearSel ? 'on' : ''}" ${u ? `data-g="${u}"` : 'disabled'}><span class="ic">${it ? this.icon(it.id) : lock ? '🔒' : '·'}</span><span><small>${n}</small>${it ? `<i style="color:${G.color(it.rarity)}">${esc(it.name)}${it.plus ? ' +' + it.plus : ''}</i>` : `<i class="dim">${lock ? '각성 후' : '없음'}</i>`}</span></button>`;
+    }).join('');
+    const pageIds = own.slice(this.gearPage * per, this.gearPage * per + per);
+    const cells = Array.from({ length: per }, (_, i) => {
+      const u = pageIds[i]; if (!u) return '<div class="slot empty"></div>';
+      const it = G.item(u), on = Object.values(s.equip).includes(u);
+      return `<button class="slot ${u === this.gearSel ? 'on' : ''}" data-g="${u}" style="border-color:${G.color(it.rarity)}88"><span class="ic">${this.icon(it.id)}</span><span class="nm">${esc(it.name)}</span><span class="ct">${it.plus ? '+' + it.plus + ' ' : ''}${on ? '착용' : ''}</span></button>`;
+    }).join('');
+    const pager = pages > 1 ? `<div class="pager"><button data-gp="-1">◀</button><span>${this.gearPage + 1} / ${pages}</span><button data-gp="1">▶</button></div>` : '';
+    const wt = G.weaponType(), ms = G.mastery(wt), mName = D.types[wt].name;
+    const sum = `<p class="dim">공격 +${G.stat('atk')} · 체력 +${G.stat('hp')} · 방어 +${G.stat('def')} · ${esc(mName)} 숙련 ${ms.lv}단계${ms.lv < D.mastery.max ? ` (${Math.floor(ms.xp)}/${G.masteryNeed(ms.lv)})` : ''}</p>`;
+    let det = '<p class="dim">가진 장비가 없다.</p>';
+    const it = this.gearSel && G.item(this.gearSel);
+    if (it) {
+      const on = s.equip[it.slot] === it.uid, can = G.canEquip(it.slot);
+      const eqB = !can ? '<p class="dim">각성 전에는 옷만 바꿀 수 있다</p>' : on ? `<button data-uneq="${it.slot}">해제</button>` : `<button class="primary" data-equ="${it.uid}">장착</button>`;
+      let enh = '';
+      if (['weapon', 'outfit'].includes(it.slot) || it.atk || it.hp || it.def) {
+        if (!this.awakened()) enh = '<p class="dim">강화는 각성 후</p>';
+        else if (it.plus >= D.enhance.max) enh = '<p class="dim">최대 강화</p>';
+        else { const c = G.enhanceCost(it), rate = Math.round(D.enhance.rate[it.plus] * 100); enh = `<button data-enh="${it.uid}" ${this.mode === 'world' ? '' : 'disabled'}>강화 +${it.plus + 1} · ${rate}%</button><p class="dim">${won(c.money)} · 마정석 조각 ${c.shard} (보유 ${s.inv.mana_shard || 0})${it.plus >= D.enhance.safeUntil ? ' · 실패 시 하락' : ''}${this.mode === 'world' ? '' : ' · 마을에서만'}</p>`; }
+      }
+      det = `<div class="big">${this.icon(it.id)}</div>${this.rname(it, it.plus)}<p class="dim">${esc(it.rarity)} · ${esc(it.type ? D.types[it.type].name : (D.slots.find(([k]) => k === it.slot) || [, ''])[1])}</p><p>${esc(this.itemInfo(it, it.plus))}</p><p class="dim">${esc(it.desc || '')}</p><div class="strow">${eqB}</div>${enh}`;
+    }
+    return `<div class="left"><div class="eqs">${eqs}</div>${sum}<div class="grid">${cells}</div>${pager}</div><div class="detail">${det}</div>`;
   }
 
   menuStatus() {
@@ -531,8 +608,8 @@ export class Game {
     const V = Settings.v;
     const seg = (key, opts) => `<div class="seg">${opts.map(([v, n]) => `<button data-set="${key}" data-v="${v}" class="${String(V[key]) === String(v) ? 'on' : ''}">${n}</button>`).join('')}</div>`;
     const row = (label, html) => `<div class="setrow"><span>${label}</span>${html}</div>`;
-    return `<div class="left">${row('조이스틱', seg('joyMode', [['fixed', '고정'], ['float', '자유']]))}${row('조이스틱 크기', seg('joySize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('민감도', seg('sens', [['s', '낮음'], ['m', '보통'], ['l', '높음']]))}${row('달리기 전환', seg('runAt', [['s', '빨리'], ['m', '보통'], ['l', '끝까지']]))}${row('밀어서 회피', seg('swipeDodge', [[true, '켬'], [false, '끔']]))}</div>
-      <div class="detail">${this.mode === 'world' ? row('기록', '<div class="seg"><button id="sv">저장하기</button></div>') : ''}${row('버튼 크기', seg('btnSize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('버튼 투명도', seg('btnAlpha', [['s', '흐리게'], ['m', '보통'], ['l', '진하게']]))}${row('왼손 모드', seg('lefty', [[false, '끔'], [true, '켬']]))}${row('버튼 위치', '<div class="seg"><button id="bedit">편집하기</button></div>')}${row('화면 확대', seg('zoom', [['s', '가깝게'], ['m', '보통'], ['l', '멀게']]))}${row('소리', `<div class="seg"><button id="snd" class="${this.sound.enabled ? 'on' : ''}">${this.sound.enabled ? '켜짐' : '꺼짐'}</button><button id="tt">타이틀로</button></div>`)}</div>`;
+    return `<div class="left">${row('조이스틱', seg('joyMode', [['fixed', '고정'], ['float', '자유']]))}${row('조이스틱 크기', seg('joySize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('민감도', seg('sens', [['s', '낮음'], ['m', '보통'], ['l', '높음']]))}${row('달리기 전환', seg('runAt', [['s', '빨리'], ['m', '보통'], ['l', '끝까지']]))}${row('밀어서 회피', seg('swipeDodge', [[true, '켬'], [false, '끔']]))}${row('PK 허용', seg('pk', [[false, '끔'], [true, '켬']]))}${row('화면 확대', seg('zoom', [['s', '가깝게'], ['m', '보통'], ['l', '멀게']]))}</div>
+      <div class="detail">${this.mode === 'world' ? row('기록', '<div class="seg"><button id="sv">저장하기</button></div>') : ''}${row('버튼 크기', seg('btnSize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('버튼 투명도', seg('btnAlpha', [['s', '흐리게'], ['m', '보통'], ['l', '진하게']]))}${row('왼손 모드', seg('lefty', [[false, '끔'], [true, '켬']]))}${row('버튼 위치', '<div class="seg"><button id="bedit">편집하기</button></div>')}${row('소리', `<div class="seg"><button id="snd" class="${this.sound.enabled ? 'on' : ''}">${this.sound.enabled ? '켜짐' : '꺼짐'}</button><button id="tt">타이틀로</button></div>`)}</div>`;
   }
 
   bindMenu(tab) {
@@ -542,7 +619,11 @@ export class Game {
       this.ov.querySelectorAll('[data-pg]').forEach((b) => (b.onclick = () => { this.bagPage = Math.max(0, this.bagPage + Number(b.dataset.pg)); this.renderMenu(); }));
       const u = this.ov.querySelector('[data-use]'); if (u) u.onclick = () => { const id = u.dataset.use, it = this.items[id]; if (s.hp >= this.maxHp()) return this.renderMenu('체력이 가득하다'); s.inv[id]--; s.hp = Math.min(this.maxHp(), s.hp + it.heal); this.renderMenu(it.name + ' 사용'); };
     }
-    this.ov.querySelectorAll('[data-eq]').forEach((b) => (b.onclick = () => { const it = this.items[b.dataset.eq]; s.equip[it.slot] = b.dataset.eq; s.hp = Math.min(s.hp, this.maxHp()); this.renderMenu(it.name + ' 장착'); }));
+    this.ov.querySelectorAll('[data-g]').forEach((b) => (b.onclick = () => { this.gearSel = b.dataset.g; this.renderMenu(); }));
+    this.ov.querySelectorAll('[data-gp]').forEach((b) => (b.onclick = () => { this.gearPage = Math.max(0, (this.gearPage || 0) + Number(b.dataset.gp)); this.renderMenu(); }));
+    const eq = this.ov.querySelector('[data-equ]'); if (eq) eq.onclick = () => { if (this.gear.equip(eq.dataset.equ)) { s.hp = Math.min(s.hp, this.maxHp()); this.sound.sfx('select'); this.renderMenu(this.gear.item(eq.dataset.equ).name + ' 장착'); } };
+    const ue = this.ov.querySelector('[data-uneq]'); if (ue) ue.onclick = () => { this.gear.unequip(ue.dataset.uneq); s.hp = Math.min(s.hp, this.maxHp()); this.renderMenu('해제했다'); };
+    const en = this.ov.querySelector('[data-enh]'); if (en) en.onclick = () => { const r = this.gear.enhance(en.dataset.enh); this.sound.sfx(r.ok ? 'levelup' : 'hurt'); this.renderMenu(r.msg); };
     this.ov.querySelectorAll('[data-k]').forEach((b) => (b.onclick = () => { const pd = this.pend || (this.pend = {}); const used = Object.values(pd).reduce((a, c) => a + c, 0); if (s.pts - used > 0) { pd[b.dataset.k] = (pd[b.dataset.k] || 0) + 1; this.renderMenu(); } }));
     this.ov.querySelectorAll('[data-set]').forEach((b) => (b.onclick = () => { let v = b.dataset.v; if (v === 'true') v = true; if (v === 'false') v = false; Settings.v[b.dataset.set] = v; Settings.save(); this.view.applyZoom(); this.renderMenu(); }));
     const sv = this.ov.querySelector('#sv'); if (sv) sv.onclick = () => { this.save(); this.renderMenu('저장했어요'); };
@@ -714,7 +795,7 @@ export class Game {
 
   healItem() {
     const s = this.state;
-    const order = this.mode === 'field' ? ['potion', 'painkiller', 'ramen'] : ['painkiller', 'ramen', 'potion'];
+    const order = this.mode === 'porter' ? ['painkiller', 'ramen', 'potion'] : ['potion', 'painkiller', 'ramen'];
     return order.find((id) => (s.inv[id] || 0) > 0);
   }
 
@@ -723,7 +804,7 @@ export class Game {
     if (!id) { this.toast('회복 아이템이 없다'); return; }
     if (s.hp >= this.maxHp()) { this.toast('체력이 가득하다'); return; }
     s.inv[id]--; s.hp = Math.min(this.maxHp(), s.hp + this.items[id].heal);
-    const who = this.mode === 'field' ? this.player : this.mode === 'porter' ? this.porter.me : this.ow.actors.player;
+    const who = this.mode === 'porter' ? this.porter.me : this.player;
     if (who && this.fx) this.fx.num(who.x, who.y - 120, '+' + this.items[id].heal, 'exp');
     this.sound.sfx('select');
   }
@@ -739,20 +820,19 @@ export class Game {
       B.push({ id: 'map', top: true, x: 70, y: 28, r: 18, label: '지도' });
       B.push({ id: 'quest', top: true, x: 112, y: 28, r: 18, label: '!' });
     }
-    if (this.mode === 'world' && !this.ow.cut && !this.editBtns) {
-      const lab = this.ow.prompt ? this.ow.prompt.label : '조사';
-      B.push({ id: 'act', icon: 'talk', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab });
-    } else if (this.mode === 'porter' && this.porter && !this.editBtns) {
+    if (this.mode === 'porter' && this.porter && !this.editBtns) {
       const lab = this.porter.prompt ? (this.porter.prompt.kind === 'drop' ? '줍기' : '건네기') : '줍기';
       B.push({ id: 'act', icon: 'talk', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab });
       B.push({ id: 'dodge', x: X(150 * k), y: H - 38 * k, r: 26 * k, label: '회피', cd: this.porter.me.cd || 0, cdMax: 0.9 });
       const hid = this.healItem(); B.push({ id: 'potion', iconItem: hid ? 'item_' + hid : null, x: X(148 * k), y: H - 112 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
-    } else if ((this.mode === 'field' && this.world) || this.editBtns) {
+    } else if ((this.mode === 'field' && this.world) || (this.mode === 'world' && !this.ow.cut) || this.editBtns) {
       B.push({ id: 'act', icon: 'act', x: X(72 * k), y: H - 72 * k, r: 42 * k, label: '공격' });
+      // 말 걸기·조사는 공격과 따로 (근처에 대상이 있을 때만)
+      if ((this.mode === 'world' && this.ow.prompt) || this.editBtns) { const lab = this.ow.prompt ? this.ow.prompt.label : '대화'; B.push({ id: 'talk', icon: 'talk', x: X(44 * k), y: H - 232 * k, r: 26 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab }); }
       const pl = this.player || { cds: {}, dg: { cd: 1 } }, D = this.skills[s.job];
       B.push({ id: 'dodge', x: X(160 * k), y: H - 40 * k, r: 26 * k, label: '회피', cd: pl.cds.dodge, cdMax: pl.dg.cd });
       const pos = [[150, 112], [112, 156], [58, 172], [212, 150]];
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4 && this.awakened(); i++) {
         const a = D && D.active[i], L = a ? this.sk.lv('a', i) : 0;
         B.push({ id: 'skill' + (i + 1), x: X(pos[i][0] * k), y: H - pos[i][1] * k, r: (i === 3 ? 26 : 24) * k, label: a ? a.name.slice(0, 4) : '', cost: a && L ? a.mp : 0, cd: pl.cds['s' + i], cdMax: (pl.cdMax && pl.cdMax['s' + i]) || 1, locked: !L, ult: i === 3 });
       }
@@ -857,6 +937,8 @@ export class Game {
     this.fx.num(e.x, e.y - 100, '+' + e.d.exp + ' EXP', 'exp');
     if (e.d.money) s.money += Math.round(e.d.money[0] + Math.random() * (e.d.money[1] - e.d.money[0]));
     if (e.d.drop) for (const id in e.d.drop) if (Math.random() < e.d.drop[id]) s.inv[id] = (s.inv[id] || 0) + 1;
+    const gd = this.gear.rollDrop(e);
+    if (gd) { const it = this.items[gd]; this.hud.say(`[${it.rarity}] ${it.name} 획득`, 2.6); this.fx.num(e.x, e.y - 130, it.rarity, 'skill'); }
     s.rumor += 0.02;
     while (s.lv < 100 && s.exp >= this.expNeed()) {
       s.exp -= this.expNeed(); s.lv++; s.pts += 5; s.skp = (s.skp || 0) + 1; s.hp = this.maxHp();
@@ -938,7 +1020,13 @@ export class Game {
     }
     if (this.target) { this.target.t -= dt; if (this.target.t <= 0) this.target = null; }
     if (this.talking && this.mode === 'world' && this.ow.cut && this.ow.cut.ff && this.dialogue.cur && !(this.dialogue.cur.choices && this.dialogue.cur.choices.length)) { this.dialogue.t = 999; this.dialogue.next(); }
-    if (this.mode === 'world') { this.ow.update(busy ? 0 : dt); if (busy && this.ow.cut) this.ow.cut.update(0); }
+    if (this.mode === 'world') {
+      if (!busy && this.hitstop > 0) { this.hitstop -= dt; if (this.fx) for (const f of this.fx.list) f.t += dt * 0.3; return; }
+      if (!busy) { this.comboT = Math.max(0, this.comboT - dt); if (this.comboT <= 0) this.comboN = 0; }
+      this.ow.update(busy ? 0 : dt); if (busy && this.ow.cut) this.ow.cut.update(0);
+      if (!busy && !this.ow.cut) { if (this.awakened()) this.sk.update(dt); }
+      if (this.fx) this.fx.update(busy ? 0 : dt);
+    }
     else if (this.mode === 'porter' && this.porter) {
       if (!busy && !this.porter.dead) this.porter.update(dt);
       this.fx.update(busy ? 0 : dt);

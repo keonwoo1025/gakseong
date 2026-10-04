@@ -2,29 +2,249 @@
  "id": "factory_floor",
  "name": "공장 생산동",
  "theme": "factory",
+ "size": [
+  20,
+  12
+ ],
  "legend": {
   "E": "exit",
-  "x": "crate",
   "D": "door",
   "#": "wall",
   "W": "window",
-  "t": "tile",
-  "M": "machine",
-  "=": "belt"
+  "t": "tile"
  },
- "rows": [
+ "ground": [
   "WWWWWWWWWWWWWWWWWWWW",
   "#ttttttttttttttttttE",
-  "#tMMtt=====ttMMtttt#",
   "#tttttttttttttttttt#",
-  "#tt==========tttxxt#",
   "#tttttttttttttttttt#",
-  "#tMMtttxxtttMMtt####",
+  "#tttttttttttttttttt#",
+  "#tttttttttttttttttt#",
+  "#ttttttttttttttt####",
   "#tttttttttttttttDtt#",
-  "#ttxxtttMMtttttt#tt#",
+  "#ttttttttttttttt#tt#",
   "#tttttttttttttttttt#",
   "Etttttttttttttttttt#",
   "####################"
+ ],
+ "props": [
+  {
+   "obj": "machine",
+   "at": [
+    2,
+    2
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    3,
+    2
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    6,
+    2
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    7,
+    2
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    8,
+    2
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    9,
+    2
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    10,
+    2
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    13,
+    2
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    14,
+    2
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    3,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    4,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    5,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    6,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    7,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    8,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    9,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    10,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    11,
+    4
+   ]
+  },
+  {
+   "obj": "belt",
+   "at": [
+    12,
+    4
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    16,
+    4
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    17,
+    4
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    2,
+    6
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    3,
+    6
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    7,
+    6
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    8,
+    6
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    12,
+    6
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    13,
+    6
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    3,
+    8
+   ]
+  },
+  {
+   "obj": "crate",
+   "at": [
+    4,
+    8
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    8,
+    8
+   ]
+  },
+  {
+   "obj": "machine",
+   "at": [
+    9,
+    8
+   ]
+  }
  ],
  "spawn": [
   2,
@@ -63,7 +283,7 @@
    }
   }
  ],
- "triggers": [
+ "events": [
   {
    "id": "injured",
    "rect": [

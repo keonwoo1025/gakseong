@@ -2,27 +2,184 @@
  "id": "commute",
  "name": "출근길",
  "theme": "street",
+ "size": [
+  18,
+  9
+ ],
  "legend": {
   "l": "lane",
   "s": "walk",
-  "f": "fence",
-  "T": "tree",
   "D": "door",
   "#": "wall",
-  "V": "screen",
   "W": "window",
   "r": "road"
  },
- "rows": [
+ "ground": [
   "WWWWWWWWWWWWWWWWWW",
-  "####V#########D###",
+  "####s#########D###",
   "ssssssssssssssssss",
   "ssssssssssssssssss",
   "rrrrrrrrrrrrrrrrrr",
   "llllllllllllllllll",
   "rrrrrrrrrrrrrrrrrr",
-  "ssTssssssTssssssTs",
-  "ffffffffffffffffff"
+  "ssssssssssssssssss",
+  "ssrssssssrssssssrs"
+ ],
+ "props": [
+  {
+   "obj": "screen",
+   "at": [
+    4,
+    1
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    2,
+    7
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    9,
+    7
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    16,
+    7
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    0,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    1,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    2,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    3,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    4,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    5,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    6,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    7,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    8,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    9,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    10,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    11,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    12,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    13,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    14,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    15,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    16,
+    8
+   ]
+  },
+  {
+   "obj": "fence",
+   "at": [
+    17,
+    8
+   ]
+  }
  ],
  "spawn": [
   1,

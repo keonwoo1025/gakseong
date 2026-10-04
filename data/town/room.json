@@ -2,26 +2,69 @@
  "id": "room",
  "name": "원룸",
  "theme": "room",
+ "size": [
+  8,
+  7
+ ],
  "legend": {
   "w": "wood",
-  "S": "shelf",
-  "B": "bed",
-  "F": "fridge",
   "D": "door",
   "#": "wall",
-  "d": "desk",
   "W": "window",
-  "R": "rug",
-  "c": "chair"
+  "R": "rug"
  },
- "rows": [
+ "ground": [
   "#WW##W##",
-  "#wwwwwFw",
-  "#BwwwwwS",
-  "#Bwwwwww",
-  "#wwRRwdw",
-  "#wwRRwcw",
+  "#wwwwwww",
+  "#wwwwwww",
+  "#wwwwwww",
+  "#wwRRwww",
+  "#wwRRwww",
   "###D####"
+ ],
+ "props": [
+  {
+   "obj": "fridge",
+   "at": [
+    6,
+    1
+   ]
+  },
+  {
+   "obj": "bed",
+   "at": [
+    1,
+    2
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    7,
+    2
+   ]
+  },
+  {
+   "obj": "bed",
+   "at": [
+    1,
+    3
+   ]
+  },
+  {
+   "obj": "desk",
+   "at": [
+    6,
+    4
+   ]
+  },
+  {
+   "obj": "chair",
+   "at": [
+    6,
+    5
+   ]
+  }
  ],
  "spawn": [
   3,

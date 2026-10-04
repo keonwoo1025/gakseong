@@ -2,23 +2,124 @@
  "id": "store",
  "name": "편의점",
  "theme": "store",
+ "size": [
+  10,
+  8
+ ],
  "legend": {
-  "S": "shelf",
-  "F": "fridge",
   "D": "door",
   "#": "wall",
-  "t": "tile",
-  "C": "counter"
+  "t": "tile"
  },
- "rows": [
-  "#SSSS#SS#S",
+ "ground": [
+  "#tttt#tt#t",
   "#tttttttt#",
-  "#tSStSStt#",
   "#tttttttt#",
-  "#CCttttttF",
+  "#tttttttt#",
+  "#ttttttttt",
   "#tttttttt#",
   "#tttttttt#",
   "####D#####"
+ ],
+ "props": [
+  {
+   "obj": "shelf",
+   "at": [
+    1,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    2,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    3,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    4,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    6,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    7,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    9,
+    0
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    2,
+    2
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    3,
+    2
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    5,
+    2
+   ]
+  },
+  {
+   "obj": "shelf",
+   "at": [
+    6,
+    2
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    1,
+    4
+   ]
+  },
+  {
+   "obj": "counter",
+   "at": [
+    2,
+    4
+   ]
+  },
+  {
+   "obj": "fridge",
+   "at": [
+    9,
+    4
+   ]
+  }
  ],
  "spawn": [
   4,

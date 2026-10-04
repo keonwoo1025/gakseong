@@ -2,27 +2,388 @@
  "id": "river",
  "name": "강변 공원",
  "theme": "street",
+ "size": [
+  44,
+  12
+ ],
  "legend": {
   "s": "walk",
   "g": "grass",
-  "T": "tree",
   "~": "water",
-  "a": "sand",
-  "h": "bench"
+  "a": "sand"
  },
- "rows": [
+ "ground": [
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "ggggggggggggggggggggsssggggggggggggggggggggg",
-  "gggggghggggggghgggggsssggggghggggggghggggggg",
   "ggggggggggggggggggggsssggggggggggggggggggggg",
   "ggggggggggggggggggggsssggggggggggggggggggggg",
   "ggggggggggggggggggggsssggggggggggggggggggggg",
-  "gggTggggggTggggggTggsssggTggggggTgggggggTggg",
   "ggggggggggggggggggggsssggggggggggggggggggggg",
   "ggggggggggggggggggggsssggggggggggggggggggggg",
-  "TTTTTTTTTTTTTTTTTTTTsssTTTTTTTTTTTTTTTTTTTTT"
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "ggggggggggggggggggggsssggggggggggggggggggggg",
+  "gggggggggggggggggggsssssgggggggggggggggggggg"
+ ],
+ "props": [
+  {
+   "obj": "bench",
+   "at": [
+    6,
+    4
+   ]
+  },
+  {
+   "obj": "bench",
+   "at": [
+    14,
+    4
+   ]
+  },
+  {
+   "obj": "bench",
+   "at": [
+    28,
+    4
+   ]
+  },
+  {
+   "obj": "bench",
+   "at": [
+    36,
+    4
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    3,
+    8
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    10,
+    8
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    17,
+    8
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    25,
+    8
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    32,
+    8
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    40,
+    8
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    0,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    1,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    2,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    3,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    4,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    5,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    6,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    7,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    8,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    9,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    10,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    11,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    12,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    13,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    14,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    15,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    16,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    17,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    18,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    19,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    23,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    24,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    25,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    26,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    27,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    28,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    29,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    30,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    31,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    32,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    33,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    34,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    35,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    36,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    37,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    38,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    39,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    40,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    41,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    42,
+    11
+   ]
+  },
+  {
+   "obj": "tree",
+   "at": [
+    43,
+    11
+   ]
+  }
  ],
  "music": "story",
  "edges": {
@@ -31,6 +392,17 @@
    "dc": -10
   }
  },
+ "objects": [
+  {
+   "at": [
+    14,
+    4
+   ],
+   "label": "앉기",
+   "act": "text",
+   "text": "강 건너로 탑이 보인다. 꼭대기는 구름에 가려 있다."
+  }
+ ],
  "npcs": [
   {
    "id": "jogger",
@@ -43,15 +415,15 @@
    "text": "저 탑, 밤에 보면 꼭 숨 쉬는 것 같지 않아요?"
   }
  ],
- "objects": [
+ "items": [
   {
+   "id": "mana_shard",
    "at": [
-    14,
-    4
+    30,
+    9
    ],
-   "label": "앉기",
-   "act": "text",
-   "text": "강 건너로 탑이 보인다. 꼭대기는 구름에 가려 있다."
+   "n": 1,
+   "key": "river_shard"
   }
  ]
 }

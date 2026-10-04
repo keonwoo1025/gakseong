@@ -42,7 +42,7 @@ export class FX {
     }
     for (const f of this.list) {
       if (f.ghost || !!f.ground !== ground) continue;
-      const arr = this.frames(f.set);
+      const arr = this.frames(f.set); if (!arr) continue;
       const fr = arr[Math.min(arr.length - 1, Math.floor(f.t * f.fps))];
       if (!fr || !fr.w) continue;
       ctx.save();
