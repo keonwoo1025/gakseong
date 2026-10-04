@@ -38,20 +38,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
-   },
-   {
     "type": "slime_blue",
-    "count": 0
+    "count": 4
    },
    {
-    "type": "slime_purple",
-    "count": 0
-   },
-   {
-    "type": "wolf",
-    "count": 2
+    "type": "mushroom",
+    "count": 3
    }
   ]
  },
@@ -66,20 +58,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
-   },
-   {
-    "type": "slime_blue",
+    "type": "mushroom",
     "count": 4
-   },
-   {
-    "type": "slime_purple",
-    "count": 0
    },
    {
     "type": "wolf",
-    "count": 4
+    "count": 2
    }
   ]
  },
@@ -94,20 +78,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
-   },
-   {
-    "type": "slime_blue",
+    "type": "bee",
     "count": 4
-   },
-   {
-    "type": "slime_purple",
-    "count": 0
    },
    {
     "type": "wolf",
-    "count": 4
+    "count": 2
    }
   ]
  },
@@ -119,23 +95,15 @@
   "hpMul": 2.4,
   "dmgMul": 1.8,
   "goal": 18,
-  "boss": "wolf_alpha",
+  "boss": "stag",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
+    "type": "mushroom",
+    "count": 3
    },
    {
-    "type": "slime_blue",
-    "count": 4
-   },
-   {
-    "type": "slime_purple",
-    "count": 4
-   },
-   {
-    "type": "wolf",
-    "count": 4
+    "type": "bee",
+    "count": 3
    }
   ]
  },
@@ -150,20 +118,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
-   },
-   {
-    "type": "slime_blue",
+    "type": "toad",
     "count": 4
    },
    {
     "type": "slime_purple",
-    "count": 4
-   },
-   {
-    "type": "wolf",
-    "count": 5
+    "count": 2
    }
   ]
  },
@@ -178,20 +138,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
-   },
-   {
-    "type": "slime_blue",
+    "type": "bat",
     "count": 4
    },
    {
-    "type": "slime_purple",
-    "count": 4
-   },
-   {
-    "type": "wolf",
-    "count": 5
+    "type": "toad",
+    "count": 2
    }
   ]
  },
@@ -206,20 +158,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
-   },
-   {
-    "type": "slime_blue",
+    "type": "spider",
     "count": 4
    },
    {
-    "type": "slime_purple",
-    "count": 4
-   },
-   {
-    "type": "wolf",
-    "count": 5
+    "type": "bat",
+    "count": 2
    }
   ]
  },
@@ -234,20 +178,12 @@
   "boss": "wolf_alpha",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
+    "type": "treant",
+    "count": 2
    },
    {
-    "type": "slime_blue",
-    "count": 4
-   },
-   {
-    "type": "slime_purple",
-    "count": 4
-   },
-   {
-    "type": "wolf",
-    "count": 7
+    "type": "spider",
+    "count": 3
    }
   ]
  },
@@ -259,23 +195,19 @@
   "hpMul": 4.15,
   "dmgMul": 2.8,
   "goal": 28,
-  "boss": "wolf_alpha",
+  "boss": "stag",
   "spawns": [
    {
-    "type": "slime_green",
-    "count": 5
+    "type": "treant",
+    "count": 2
    },
    {
-    "type": "slime_blue",
-    "count": 4
+    "type": "spider",
+    "count": 2
    },
    {
-    "type": "slime_purple",
-    "count": 4
-   },
-   {
-    "type": "wolf",
-    "count": 7
+    "type": "bat",
+    "count": 2
    }
   ]
  }

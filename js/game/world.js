@@ -74,6 +74,7 @@ export class World {
   drawGround(view) {
     const { ctx, cam, W, H, G } = view;
     const T = this.A.tiles, { TW, TH, m } = this;
+    ctx.save(); if (m.tint) ctx.filter = m.tint;
     ctx.fillStyle = m.bg || '#4cb82c';
     ctx.fillRect(cam.x - W / G, cam.y - H / G, (W / G) * 2, (H / G) * 2);
     const x0 = Math.floor((cam.x - W / G / 2) / TW) - 1, x1 = Math.ceil((cam.x + W / G / 2) / TW) + 1;
@@ -91,6 +92,7 @@ export class World {
     }
     const path = T.path && T.path[0];
     if (path && path.w) for (const p of m.paths) ctx.drawImage(path.im, p[0] * TW, p[1] * TH, path.w, path.h);
+    ctx.restore();
   }
 
   collectProps(view, list) {
@@ -98,7 +100,9 @@ export class World {
       if (!view.visible(p.x, p.y)) continue;
       list.push({ y: p.y, d: () => {
         if (p.kind !== 'deco') view.shadow(p.x, p.y - 2, p.f.w * 0.32);
+        if (this.m.tint) { view.ctx.save(); view.ctx.filter = this.m.tint; }
         view.sprite(p.f, p.x, p.y + (p.kind === 'deco' ? p.f.h * 0.5 : 6), 1, false);
+        if (this.m.tint) view.ctx.restore();
       } });
     }
   }

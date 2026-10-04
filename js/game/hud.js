@@ -144,8 +144,17 @@ export class HUD {
       frame(ctx, W / 2 - w / 2, 10, w, 40, T);
       ctx.textAlign = 'center'; ctx.fillStyle = T.text; ctx.fillText(t1, W / 2, 26); ctx.fillStyle = T.dim; ctx.font = F(600, 11); ctx.fillText(t2, W / 2, 42); ctx.textAlign = 'left';
     }
+    const B = g.boss;
+    if (B && B.alive) {
+      const w = Math.min(380, W * 0.5), x = W / 2 - w / 2, y = 54;
+      frame(ctx, x, y, w, 26, T);
+      ctx.font = F(800, 11); ctx.fillStyle = B.phase2 ? '#ff7a6a' : T.text; ctx.textAlign = 'left';
+      ctx.fillText((B.phase2 ? '격분 · ' : '') + B.d.name, x + 8, y + 12);
+      ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x + 8, y + 16, w - 16, 6);
+      ctx.fillStyle = B.phase2 ? '#ff4a3a' : '#e8433f'; ctx.fillRect(x + 8, y + 16, (w - 16) * Math.max(0, B.hp / B.d.hp), 6);
+    }
     const tg = g.target;
-    if (tg && tg.e.alive && tg.t > 0) {
+    if (tg && tg.e.alive && tg.t > 0 && tg.e !== B) {
       const w = 200, x = W / 2 - w / 2, y = 56;
       frame(ctx, x, y, w, 24, T);
       ctx.font = F(700, 11); ctx.fillStyle = T.text; ctx.textAlign = 'left';
@@ -154,7 +163,7 @@ export class HUD {
       ctx.fillStyle = '#e8433f'; ctx.fillRect(x + 92, y + 9, (w - 100) * Math.max(0, tg.e.hp / tg.e.d.hp), 6);
     }
     if (g.player && g.player.painT > 0) {
-      const pf = g.A.portraits.hero_pain;
+      const p2 = g.portraitOf('gen:player', 3), pf = p2 && p2.big ? p2 : g.A.portraits.hero_pain;
       if (pf && pf.w) { ctx.globalAlpha = Math.min(1, g.player.painT * 3); frame(ctx, 12, 52, 52, 56, T); ctx.drawImage(pf.im, 38 - 24 * pf.w / pf.h, 55, 48 * pf.w / pf.h, 50); ctx.globalAlpha = 1; }
     }
     if (g.comboN > 1) {
@@ -183,7 +192,7 @@ export class HUD {
       ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.font = F(800, b.label.length > 2 ? 9 : 14);
       ctx.fillText(b.label, b.x, b.y + (b.label.length > 2 ? 3 : 5)); ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
-    if (g.talking || g.menuOpen || (g.mode === 'world' && g.ow.cut)) return;
+    if (g.talking || (g.menuOpen && !g.editBtns) || (g.mode === 'world' && g.ow.cut)) return;
     // 조이스틱 (방향 패드 모양)
     const j = inp.joy, base = inp.joyBase();
     if (Settings.v.joyMode === 'fixed' || j.id !== null) {
@@ -213,7 +222,8 @@ export class HUD {
     for (const b of inp.buttons) {
       if (b.top) continue;
       const on = inp.pressed[b.id];
-      const dim = b.locked || (b.id === 'skill1' && (g.state.mp || 0) < (b.cost || 0));
+      const isSk = /^skill\d$/.test(b.id);
+      const dim = b.locked || (isSk && (g.state.mp || 0) < (b.cost || 0));
       ctx.globalAlpha = a * (dim ? 0.55 : 1);
       const bimg = skin((on ? 'btn_on' : b.id === 'act' ? 'btn_act' : 'btn') + (T.sys ? '_sys' : ''));
       if (bimg) {
@@ -227,7 +237,7 @@ export class HUD {
           if (withLabel) { ctx.font = F(800, Math.max(9, Math.round(b.r * 0.26))); ctx.fillStyle = T.text; ctx.fillText(b.label, b.x, b.y + b.r * 0.62); }
         } else { ctx.fillStyle = T.text; ctx.font = F(800, Math.round(Math.max(10, b.r * 0.42))); ctx.fillText(b.locked ? '🔒' : b.label, b.x, b.y + b.r * 0.15); }
         if (b.sub !== undefined && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = T.accent; ctx.textAlign = 'center'; ctx.fillText('×' + b.sub, b.x, b.y + b.r * 0.62); }
-        if (b.id === 'skill1' && !b.locked) { ctx.font = F(800, 9); ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.fillText(b.label, b.x, b.y + b.r + 11); }
+        if (isSk && !b.locked) { ctx.font = F(800, 9); ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.fillText(b.label, b.x, b.y + b.r + 11); }
         ctx.globalAlpha = 1; ctx.textAlign = 'left'; this.cdOverlay(ctx, b); continue;
       }
       ctx.fillStyle = on ? T.act : b.id === 'act' ? (T.sys ? 'rgba(20,70,120,0.8)' : 'rgba(120,60,30,0.78)') : T.bg;
@@ -238,6 +248,7 @@ export class HUD {
       ctx.fillText(b.locked ? '🔒' : b.label, b.x, b.y + b.r * 0.15);
       if (b.sub !== undefined && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = T.accent; ctx.fillText('×' + b.sub, b.x, b.y + b.r * 0.62); }
       if (b.cost && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = '#7fb8ff'; ctx.fillText('MP ' + b.cost, b.x, b.y + b.r * 0.66); }
+      if (b.ult && !b.locked) { ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 3, 0, Math.PI * 2); ctx.stroke(); }
       ctx.globalAlpha = 1; ctx.textAlign = 'left';
       this.cdOverlay(ctx, b);
     }
@@ -258,12 +269,14 @@ export class HUD {
   drawDialogue(dlg) {
     const cur = dlg.cur; if (!cur) return;
     const g = this.g, v = g.view, ctx = v.ctx, W = v.W, H = v.H, T = this.T();
-    const pf = cur.portrait ? g.portraitOf(cur.portrait) : null;
-    const pw = pf && pf.w ? Math.min(H * 0.6, W * 0.28) : 0;
+    const pf = cur.portrait ? g.portraitOf(cur.portrait, cur.emo) : null;
+    const ph = H * 0.66;
+    const pw = pf && pf.w ? (pf.big ? Math.min(W * 0.34, ph * pf.w / pf.h) : Math.min(H * 0.6, W * 0.28)) : 0;
     const bh = Math.min(96, H * 0.27), by = H - bh - 10, bx = 10, bw = W - 20 - (pw ? pw * 0.62 : 0);
     if (pf && pf.w) {
       ctx.imageSmoothingEnabled = false;
-      if (cur.portrait.startsWith('gen:')) ctx.drawImage(pf.im, W - pw - 6, H - pw - 4, pw, pw);
+      if (pf.big) { ctx.imageSmoothingEnabled = true; ctx.drawImage(pf.im, W - pw - 2, H - pw * pf.h / pf.w, pw, pw * pf.h / pf.w); ctx.imageSmoothingEnabled = false; }
+      else if (cur.portrait.startsWith('gen:')) ctx.drawImage(pf.im, W - pw - 6, H - pw - 4, pw, pw);
       else { const crop = 0.62, ph = pw * 1.1, pww = pf.w / (pf.h * crop) * ph; ctx.drawImage(pf.im, 0, 0, pf.w, pf.h * crop, W - pww - 4, H - ph - 4, pww, ph); }
     }
     frame(ctx, bx, by, bw, bh, T, 'dialog');

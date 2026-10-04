@@ -49,16 +49,29 @@
    ]
   },
   {
+   "call": "systemOn"
+  },
+  {
+   "call": "grantLegend"
+  },
+  {
    "text": "균열의 괴물이 다시 움직인다. 이번엔, 손에 무언가가 쥐어져 있다."
+  },
+  {
+   "fight": {
+    "name": "10층 균열",
+    "boss": "rift_guardian",
+    "bossNow": true,
+    "goal": 99,
+    "safe": true,
+    "hint": "기술 버튼으로 첫 액티브를 써보자"
+   }
   },
   {
    "text": "…균열이 닫혔다. 살아서 나온 건 {이름} 혼자다."
   },
   {
    "fade": "out"
-  },
-  {
-   "call": "systemOn"
   },
   {
    "call": "afterAwaken"

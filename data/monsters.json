@@ -15,7 +15,9 @@
   "drop": {
    "mana_shard": 0.25
   },
-  "eva": 0.03
+  "eva": 0.03,
+  "sheet": "slime",
+  "size": 1
  },
  "slime_blue": {
   "name": "파랑 슬라임",
@@ -33,7 +35,10 @@
   "drop": {
    "mana_shard": 0.25
   },
-  "eva": 0.05
+  "eva": 0.05,
+  "sheet": "slime",
+  "size": 1,
+  "tint": "hue-rotate(110deg)"
  },
  "slime_purple": {
   "name": "보라 슬라임",
@@ -51,7 +56,10 @@
   "drop": {
    "mana_shard": 0.25
   },
-  "eva": 0.06
+  "eva": 0.06,
+  "sheet": "slime",
+  "size": 1,
+  "tint": "hue-rotate(170deg) saturate(1.3)"
  },
  "wolf": {
   "name": "뿔 늑대",
@@ -69,7 +77,9 @@
   "drop": {
    "mana_shard": 0.25
   },
-  "eva": 0.12
+  "eva": 0.12,
+  "sheet": "wolf",
+  "size": 1
  },
  "wolf_alpha": {
   "name": "뿔 달린 대형 늑대형 개체",
@@ -88,6 +98,272 @@
   "drop": {
    "mana_shard": 1
   },
-  "eva": 0.08
+  "eva": 0.08,
+  "patterns": [
+   {
+    "id": "bite",
+    "w": 3
+   },
+   {
+    "id": "charge",
+    "w": 2,
+    "len": 520,
+    "wind": 0.8,
+    "dmg": 1.4
+   },
+   {
+    "id": "stomp",
+    "w": 2,
+    "r": 190,
+    "wind": 0.9,
+    "dmg": 1.6
+   },
+   {
+    "id": "howl",
+    "w": 1,
+    "minion": "wolf",
+    "n": 2,
+    "wind": 0.6
+   },
+   {
+    "id": "charge3",
+    "w": 2,
+    "phase": 2,
+    "len": 420,
+    "wind": 0.6,
+    "dmg": 1.2
+   }
+  ],
+  "sheet": "wolf",
+  "size": 1.6,
+  "tint": "brightness(0.75) sepia(0.5) saturate(2) hue-rotate(-25deg)"
+ },
+ "rift_guardian": {
+  "name": "균열의 수호 개체",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 360,
+  "speed": 120,
+  "damage": 10,
+  "exp": 0,
+  "scale": 0.95,
+  "boss": true,
+  "eva": 0.03,
+  "money": [
+   0,
+   0
+  ],
+  "drop": {},
+  "patterns": [
+   {
+    "id": "bite",
+    "w": 2
+   },
+   {
+    "id": "stomp",
+    "w": 2,
+    "r": 200,
+    "wind": 1.0,
+    "dmg": 1.4
+   },
+   {
+    "id": "charge",
+    "w": 2,
+    "len": 480,
+    "wind": 0.9,
+    "dmg": 1.3
+   }
+  ],
+  "sheet": "rift",
+  "size": 0.9
+ },
+ "mushroom": {
+  "name": "버섯 괴물",
+  "kind": "slime",
+  "sprite": "slime_green",
+  "hp": 60,
+  "speed": 90,
+  "damage": 7,
+  "exp": 6,
+  "scale": 0.46,
+  "money": [
+   300,
+   600
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0.04,
+  "sheet": "mushroom",
+  "size": 1
+ },
+ "toad": {
+  "name": "늪 두꺼비",
+  "kind": "slime",
+  "sprite": "slime_green",
+  "hp": 95,
+  "speed": 80,
+  "damage": 10,
+  "exp": 9,
+  "scale": 0.46,
+  "money": [
+   300,
+   600
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0.03,
+  "sheet": "toad",
+  "size": 1
+ },
+ "treant": {
+  "name": "고목 괴물",
+  "kind": "slime",
+  "sprite": "slime_green",
+  "hp": 170,
+  "speed": 70,
+  "damage": 15,
+  "exp": 16,
+  "scale": 0.46,
+  "money": [
+   300,
+   600
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0,
+  "sheet": "treant",
+  "size": 1
+ },
+ "bee": {
+  "name": "거대 벌",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 45,
+  "speed": 170,
+  "damage": 8,
+  "exp": 7,
+  "scale": 0.55,
+  "money": [
+   1000,
+   2000
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0.15,
+  "sheet": "bee",
+  "size": 1
+ },
+ "bat": {
+  "name": "동굴 박쥐",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 40,
+  "speed": 190,
+  "damage": 7,
+  "exp": 7,
+  "scale": 0.55,
+  "money": [
+   1000,
+   2000
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0.18,
+  "sheet": "bat",
+  "size": 1
+ },
+ "spider": {
+  "name": "숲 거미",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 85,
+  "speed": 150,
+  "damage": 11,
+  "exp": 10,
+  "scale": 0.55,
+  "money": [
+   1000,
+   2000
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0.1,
+  "sheet": "spider",
+  "size": 1
+ },
+ "bug": {
+  "name": "포탈 벌레",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 30,
+  "speed": 160,
+  "damage": 6,
+  "exp": 3,
+  "scale": 0.55,
+  "money": [
+   1000,
+   2000
+  ],
+  "drop": {
+   "mana_shard": 0.25
+  },
+  "eva": 0.08,
+  "sheet": "bug",
+  "size": 1
+ },
+ "stag": {
+  "name": "뿔 달린 대형 사슴형 개체",
+  "kind": "wolf",
+  "sprite": "wolf",
+  "hp": 950,
+  "speed": 140,
+  "damage": 16,
+  "exp": 150,
+  "scale": 0.85,
+  "boss": true,
+  "money": [
+   15000,
+   25000
+  ],
+  "drop": {
+   "mana_shard": 1
+  },
+  "eva": 0.08,
+  "patterns": [
+   {
+    "id": "bite",
+    "w": 2
+   },
+   {
+    "id": "charge",
+    "w": 3,
+    "len": 560,
+    "wind": 0.85,
+    "dmg": 1.5
+   },
+   {
+    "id": "stomp",
+    "w": 2,
+    "r": 220,
+    "wind": 1.0,
+    "dmg": 1.7
+   },
+   {
+    "id": "charge3",
+    "w": 2,
+    "phase": 2,
+    "len": 460,
+    "wind": 0.6,
+    "dmg": 1.3
+   }
+  ],
+  "sheet": "stag",
+  "size": 1
  }
 }

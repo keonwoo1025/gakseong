@@ -4,7 +4,10 @@
    "id": "factory_district",
    "name": "공장 지대",
    "x": 0,
-   "y": 1
+   "y": 1,
+   "mx": 0.1,
+   "my": 0.62,
+   "icon": "🏭"
   },
   {
    "id": "alley",
@@ -14,7 +17,10 @@
    "inside": [
     "room",
     "store"
-   ]
+   ],
+   "mx": 0.29,
+   "my": 0.66,
+   "icon": "🏠"
   },
   {
    "id": "market",
@@ -23,19 +29,28 @@
    "y": 1,
    "inside": [
     "office"
-   ]
+   ],
+   "mx": 0.48,
+   "my": 0.62,
+   "icon": "💼"
   },
   {
    "id": "river",
    "name": "강변 공원",
    "x": 2,
-   "y": 0
+   "y": 0,
+   "mx": 0.48,
+   "my": 0.24,
+   "icon": "🌳"
   },
   {
    "id": "plaza",
    "name": "탑 광장",
    "x": 3,
-   "y": 1
+   "y": 1,
+   "mx": 0.68,
+   "my": 0.58,
+   "icon": "🗼"
   },
   {
    "id": "avenue",
@@ -45,7 +60,10 @@
    "inside": [
     "assoc",
     "hunter_shop"
-   ]
+   ],
+   "mx": 0.87,
+   "my": 0.62,
+   "icon": "🏛"
   }
  ],
  "links": [

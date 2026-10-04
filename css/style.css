@@ -162,3 +162,7 @@ html.skinned body.plain .panel,html.skinned body.plain .card{border:14px solid t
 html.skinned body.sys .panel,html.skinned body.sys .card{border:14px solid transparent;border-image:var(--skin-sys) 14 fill / 14px stretch;background:none;box-shadow:0 0 14px rgba(92,200,255,0.35);border-radius:0;padding:4px 6px}
 html.skinned body.sys .panel::before,html.skinned body.sys .panel::after,html.skinned body.sys .card::before,html.skinned body.sys .card::after{display:none}
 html.skinned .card{padding:6px 10px}
+.skgrid .slot small:last-child{color:var(--gold)}
+.detail .strow{margin-top:4px}
+.editbar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;pointer-events:auto;background:var(--panel);border:1px solid var(--line);padding:6px 10px;border-radius:8px;font-size:13px}
+.editbar .primary{width:auto;margin:0}

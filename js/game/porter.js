@@ -2,6 +2,8 @@
 // 직접 공격은 할 수 없다. 행동이 그대로 행동 패턴으로 기록된다.
 import { World } from './world.js';
 import { makePerson } from './pixel.js';
+import { NavGrid, steer } from './path.js';
+import { framesFor, drawPerson as drawP } from './people.js';
 
 const PS = 4.2;
 const PARTY = [
@@ -17,18 +19,20 @@ export class PorterRun {
     const map = Object.assign({}, g.mapTemplate, { seed: floor.seed });
     this.world = new World(g.A, map);
     const sx = this.world.spawn.x, sy = this.world.spawn.y;
-    this.me = { x: sx, y: sy + 120, dir: 'U', t: 0, moving: false, frames: makePerson(g.playerLook()), dash: 0, inv: 0, knock: null };
-    this.party = PARTY.map((p, i) => ({ ...p, look: g.lookOf(p.id), frames: makePerson(g.lookOf(p.id)), x: sx - 90 + i * 60, y: sy, dir: 'U', t: 0, moving: false, hp: p.max, cd: Math.random(), emote: null, help: false }));
+    this.me = { x: sx, y: sy + 120, dir: 'U', t: 0, moving: false, fr: framesFor(g, 'player', g.playerLook()), dash: 0, inv: 0, knock: null };
+    this.party = PARTY.map((p, i) => ({ ...p, look: g.lookOf(p.id), fr: framesFor(g, p.id, g.lookOf(p.id)), x: sx - 90 + i * 60, y: sy, dir: 'U', t: 0, moving: false, hp: p.max, cd: Math.random(), emote: null, help: false }));
     this.mobs = [];
     for (const sp of floor.spawns) for (let i = 0; i < sp.count; i++) this.mobs.push(this.makeMob(sp.type));
     this.drops = []; this.shots = []; this.kills = 0; this.goal = 3 + Math.ceil(floor.n / 3); this.done = false; this.shards = 0;
     this.prompt = null;
+    this.nav = new NavGrid(this.world);
+    this.party.forEach((p) => (p.id2 = p.id)); this.me.id2 = 'me';
   }
 
   makeMob(type) {
     const d = this.g.monsters[type], f = this.floor;
     const [x, y] = this.world.randomSpot({ x: this.world.spawn.x, y: this.world.spawn.y }, 500);
-    return { type, x, y, hp: Math.round(d.hp * f.hpMul * 0.9), max: Math.round(d.hp * f.hpMul * 0.9), dmg: Math.round(d.damage * f.dmgMul), speed: d.speed * 0.9, kind: d.kind, sprite: d.sprite, scale: d.scale, t: Math.random() * 3, cd: 0, hit: 0, alive: true, face: 1 };
+    return { type, x, y, threat: {}, hp: Math.round(d.hp * f.hpMul * 0.9), max: Math.round(d.hp * f.hpMul * 0.9), dmg: Math.round(d.damage * f.dmgMul), speed: d.speed * 0.9, kind: d.kind, sprite: d.sprite, scale: d.scale, t: Math.random() * 3, cd: 0, hit: 0, alive: true, face: 1 };
   }
 
   near(list, x, y, max, filter) {
@@ -81,38 +85,61 @@ export class PorterRun {
         me.moving = true; me.t += dt;
       } else me.moving = false;
     }
-    // 파티
+    // 파티: 직업별 우선순위 + 길 찾기 + 위협도
     const lead = this.party[0];
     const alive = this.mobs.filter((m) => m.alive);
+    const threat = (m, id, v) => { m.threat[id] = (m.threat[id] || 0) + v; };
     for (const p of this.party) {
-      p.cd -= dt; if (p.emote) { p.emote.t -= dt; if (p.emote.t <= 0) p.emote = null; }
+      p.cd -= dt; p.tauntCd = (p.tauntCd || 0) - dt; if (p.emote) { p.emote.t -= dt; if (p.emote.t <= 0) p.emote = null; }
       if (p.hp <= 0) continue;
-      let target = this.near(alive, p.x, p.y, 520);
-      if (p.role === 'heal') {
-        const low = this.party.filter((q) => q.hp > 0 && q.hp < q.max * 0.7).sort((a, b) => a.hp / a.max - b.hp / b.max)[0];
-        if (low && p.cd <= 0) { low.hp = Math.min(low.max, low.hp + 18); p.cd = 2.2; g.fx.sfx('aura', low.x, low.y - 30, { s: 0.6, fps: 20, a: 0.5 }); }
+      let target = null, gx, gy;
+      if (p.role === 'tank') {
+        // 약한 동료를 노리는 적부터 막는다
+        target = alive.find((m) => m.tg && m.tg !== p && Math.hypot(m.x - p.x, m.y - p.y) < 600) || this.near(alive, p.x, p.y, Math.hypot(me.x - p.x, me.y - p.y) < 450 ? 1100 : 560);
+        if (target && p.tauntCd <= 0 && Math.hypot(target.x - p.x, target.y - p.y) < 260) {
+          p.tauntCd = 6; for (const m of alive) if (Math.hypot(m.x - p.x, m.y - p.y) < 320) threat(m, p.id2, 60);
+          g.fx.sfx('ring', p.x, p.y, { s: 2, fps: 18, ground: true }); p.emote = { text: '!', t: 0.8 };
+        }
+      } else if (p.role === 'heal') {
+        const allies = this.party.concat([Object.assign(me, { hp: s.hp, max: g.maxHp() })]);
+        const low = allies.filter((q) => q.hp > 0 && q.hp < q.max * 0.7).sort((a, b) => a.hp / a.max - b.hp / b.max)[0];
+        if (low && p.cd <= 0) {
+          const v = 18; if (low === me) s.hp = Math.min(g.maxHp(), s.hp + v); else low.hp = Math.min(low.max, low.hp + v);
+          p.cd = 2.2; g.fx.sfx('aura', low.x, low.y - 30, { s: 0.6, fps: 20, a: 0.5 }); g.fx.num(low.x, low.y - 120, '+' + v, 'exp');
+          for (const m of alive) if (Math.hypot(m.x - p.x, m.y - p.y) < 420) threat(m, p.id2, v * 0.5);
+        }
+        target = this.near(alive, p.x, p.y, 420);
+        const foe = this.near(alive, lead.x, lead.y, 600);
+        if (foe) { const dx = lead.x - foe.x, dy = lead.y - foe.y, d = Math.hypot(dx, dy) || 1; gx = lead.x + dx / d * 120; gy = lead.y + dy / d * 120; }
+      } else {
+        // 원거리: 체력이 낮은 적을 노리고 거리를 유지한다
+        target = alive.filter((m) => Math.hypot(m.x - p.x, m.y - p.y) < 560).sort((a, b) => a.hp - b.hp)[0];
+        if (target) {
+          const dx = p.x - target.x, dy = p.y - target.y, d = Math.hypot(dx, dy) || 1;
+          if (d < 140) { gx = p.x + dx / d * 120; gy = p.y + dy / d * 120; }
+        }
       }
-      let gx, gy;
       if (target) {
         const d = Math.hypot(target.x - p.x, target.y - p.y);
-        if (d > p.range) { gx = target.x; gy = target.y; }
-        else if (p.cd <= 0) {
+        if (d > p.range && gx === undefined) { gx = target.x; gy = target.y; }
+        else if (d <= p.range && p.cd <= 0) {
           p.cd = p.role === 'tank' ? 0.8 : 1.1;
-          target.hp -= p.atk; target.hit = 0.12; g.fx.num(target.x, target.y - 70, p.atk, p.role === 'mage' ? 'big' : 'normal');
+          target.hp -= p.atk; target.hit = 0.12; threat(target, p.id2, p.atk); p.pose = 'atk'; p.poseT = 0;
+          g.fx.num(target.x, target.y - 70, p.atk, p.role === 'mage' ? 'big' : 'normal');
           if (p.range > 100) this.shots.push({ x: p.x, y: p.y - 60, tx: target.x, ty: target.y - 30, t: 0, col: p.role === 'mage' ? '#b48cff' : '#f0e2a0' });
           g.fx.sfx('imp', target.x, target.y - 28, { s: 0.5, fps: 24, rot: Math.random() * 6 });
           if (target.hp <= 0 && target.alive) this.killMob(target);
         }
         p.dir = Math.abs(target.x - p.x) > Math.abs(target.y - p.y) ? (target.x > p.x ? 'R' : 'L') : target.y > p.y ? 'D' : 'U';
-      } else {
+      } else if (gx === undefined) {
         const idx = this.party.indexOf(p);
         if (p === lead) { const d = Math.hypot(me.x - p.x, me.y - p.y); if (d > 300) { gx = me.x; gy = me.y - 100; } }
         else { gx = lead.x + (idx - 1.5) * 70; gy = lead.y + 70; }
       }
-      if (gx !== undefined) {
-        const dx = gx - p.x, dy = gy - p.y, d = Math.hypot(dx, dy);
-        if (d > 20) { w.moveBody(p, dx / d * 210 * dt, dy / d * 210 * dt, 20); p.moving = true; p.t += dt; if (!target) p.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : dy > 0 ? 'D' : 'U'; }
-        else p.moving = false;
+      if (gx !== undefined && Math.hypot(gx - p.x, gy - p.y) > 20) {
+        const far = Math.hypot(me.x - p.x, me.y - p.y) > 500;
+        const [vx, vy] = steer(this.nav, p, gx, gy, far ? 290 : 210, dt, w, 20);
+        p.moving = true; p.t += dt; if (!target) p.dir = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 'R' : 'L') : vy > 0 ? 'D' : 'U';
       } else p.moving = false;
       if (!p.help && p.hp < p.max * 0.35) { p.help = true; p.emote = { text: '!', t: 2.5 }; }
       if (p.help) p.emote = p.emote || { text: '!', t: 1 };
@@ -124,10 +151,13 @@ export class PorterRun {
       m.st = m.st || 'idle'; m.stt = (m.stt || 0) + dt;
       const targets = this.party.filter((p) => p.hp > 0).concat([me]);
       if (m.st === 'idle') {
-        const tg = this.near(targets, m.x, m.y, 600);
+        let tg = null, best = -1e9;
+        for (const t of targets) { const d = Math.hypot(t.x - m.x, t.y - m.y); if (d > 600) continue; const sc = (m.threat[t.id2] || 0) + 80 - d * 0.12; if (sc > best) { best = sc; tg = t; } }
+        for (const k in m.threat) m.threat[k] *= 1 - 0.1 * dt;
+        m.tg = tg;
         if (!tg) continue;
         const dx = tg.x - m.x, dy = tg.y - m.y, d = Math.hypot(dx, dy) || 1;
-        if (d > 90 && (m.kind === 'wolf' || (m.t % 1.2) < 0.7)) { w.moveBody(m, dx / d * m.speed * dt, dy / d * m.speed * dt, 18); m.face = dx > 0 ? 1 : -1; }
+        if (d > 90 && (m.kind === 'wolf' || (m.t % 1.2) < 0.7)) { steer(this.nav, m, tg.x, tg.y, m.speed, dt, w, 18); m.face = dx > 0 ? 1 : -1; }
         if (d < 120 && m.cd <= 0) { m.st = 'wind'; m.stt = 0; m.tg = tg; m.ax = dx / d; m.ay = dy / d; }
       } else if (m.st === 'wind') {
         if (m.stt >= 0.55) { m.st = 'atk'; m.stt = 0; m.done = false; }
@@ -174,10 +204,8 @@ export class PorterRun {
   }
 
   drawPerson(a, scale) {
-    const v = this.g.view, f = a.dir === 'L' ? a.frames.R : a.frames[a.dir];
-    const step = a.moving ? [1, 0, 2, 0][Math.floor(a.t * 8) % 4] : 0;
-    v.shadow(a.x, a.y, 20);
-    v.sprite(f[step], a.x, a.y, scale || PS, a.dir === 'L', a.hp !== undefined && a.hp <= 0 ? 0.35 : (a.inv > 0 && Math.floor(a.inv * 14) % 2 ? 0.5 : 1));
+    if (a.hp !== undefined && a.hp <= 0) { a.pose = 'down'; a.poseT = 9; } else if (a.poseT !== undefined && a.pose === 'atk') { a.poseT += 1 / 60; if (a.poseT > 0.35) a.pose = null; }
+    drawP(this.g.view, a, 112, a.hp !== undefined && a.hp <= 0 ? 0.6 : (a.inv > 0 && Math.floor(a.inv * 14) % 2 ? 0.5 : 1), scale || PS);
   }
 
   draw() {

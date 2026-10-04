@@ -2,7 +2,7 @@
 
 export class Enemies {
   constructor(g, defs, floor) {
-    this.g = g; this.defs = defs; this.floor = floor; this.list = [];
+    this.g = g; this.defs = defs; this.floor = floor; this.list = []; this.hazards = [];
     for (const sp of floor.spawns) for (let i = 0; i < sp.count; i++) this.list.push(this.make(sp.type));
   }
 
@@ -18,7 +18,13 @@ export class Enemies {
   }
 
   make(type, noRespawn) {
-    const d = this.scaled(type);
+    let d = this.scaled(type);
+    // 정예(금빛, 강함)·변이(보라, 빠르고 죽을 때 폭발) 변종
+    if (!d.boss && !noRespawn) {
+      const r = Math.random();
+      if (r < 0.08) d = Object.assign({}, d, { name: '정예 ' + d.name, hp: Math.round(d.hp * 2.5), damage: Math.round(d.damage * 1.4), exp: d.exp * 3, eva: d.eva + 0.05, variant: 'elite', drop: { mana_shard: 1 }, money: d.money && [d.money[0] * 3, d.money[1] * 3] });
+      else if (r < 0.13) d = Object.assign({}, d, { name: '변이 ' + d.name, hp: Math.round(d.hp * 1.6), speed: d.speed * 1.35, exp: d.exp * 2, variant: 'mutant' });
+    }
     const e = { type, d, noRespawn: !!noRespawn, hp: d.hp, alive: true, t: Math.random() * 5, hit: 0, kx: 0, ky: 0, face: 1, cd: 0, dead: 0, bite: 0 };
     const p = this.g.player;
     const [x, y] = this.g.world.randomSpot(p, 420);
@@ -34,7 +40,8 @@ export class Enemies {
     g.fx.num(e.x, e.y - 70, v, big === 2 ? 'huge' : big >= 1 ? 'big' : 'normal');
     if (e.hp <= 0 && e.alive) {
       e.alive = false; e.dead = 0.6;
-      g.onKill(e);
+      g.onKill(e); if (g.sk) g.sk.onKill(e);
+      if (e.d.variant === 'mutant') this.hazards.push({ x: e.x, y: e.y, r: 130, t: 0, life: 0.9, dmg: e.d.damage * 1.5, col: '#b04aff' });
     }
   }
 
@@ -45,9 +52,13 @@ export class Enemies {
       if (!e.alive) { e.dead -= dt; if (e.dead < -3.5 && !e.noRespawn) Object.assign(e, this.make(e.type)); continue; }
       e.t += dt; e.hit = Math.max(0, e.hit - dt); e.cd = Math.max(0, e.cd - dt);
       w.unstick(e, 18);
+      if (e.slowT > 0) e.slowT -= dt; else e.slowK = 1;
+      if (e.rootT > 0) e.rootT -= dt;
+      const spd = e.d.speed * (e.slowK || 1);
       if (e.stun > 0) { e.stun -= dt; e.st = 'idle'; w.moveBody(e, e.kx * dt, e.ky * dt, 18); e.kx *= 0.86; e.ky *= 0.86; continue; }
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
       const alive = p.state !== 'dead';
+      if (e.d.patterns && this.bossAI(e, dt, p, dx, dy, d, alive)) { w.moveBody(e, e.kx * dt, e.ky * dt, 18); e.kx *= 0.86; e.ky *= 0.86; continue; }
       const wolf = e.d.kind === 'wolf', boss = !!e.d.boss;
       const range = wolf ? 150 : 110, wind = boss ? 0.75 : wolf ? 0.5 : 0.6; e.windT = wind;
       e.st = e.st || 'idle'; e.stt = (e.stt || 0) + dt;
@@ -55,7 +66,7 @@ export class Enemies {
         const chase = d < 520 && alive;
         if (chase && d > range * 0.8) {
           const hop = wolf || (e.t % 1.2) < 0.7;
-          if (hop) w.moveBody(e, dx / d * e.d.speed * dt, dy / d * e.d.speed * dt, 18);
+          if (hop) w.moveBody(e, dx / d * spd * dt, dy / d * spd * dt, 18);
           e.face = dx > 0 ? 1 : -1;
         } else if (!chase) w.moveBody(e, Math.cos(e.t * 0.5) * 30 * dt, Math.sin(e.t * 0.7) * 30 * dt, 18);
         if (chase && d < range && e.cd <= 0) { e.st = 'wind'; e.stt = 0; e.ax = dx / d; e.ay = dy / d; e.face = dx > 0 ? 1 : -1; }
@@ -76,20 +87,93 @@ export class Enemies {
             else if (Math.random() < g.playerEva()) { g.fx.num(p.x, p.y - 120, '회피', 'exp'); g.sound.sfx('dodge'); }
             else {
               p.hurt(e.d.damage, e.ax, e.ay);
-              g.fx.sfx('imp', p.x, p.y - 50, { s: 1.1, fps: 22, rot: Math.random() * 6 });
+              g.fx.sfx(e.d.kind === 'wolf' ? 'bite' : 'claw', p.x, p.y - 50, { s: 1.1, fps: 22 });
               g.hitstop = Math.max(g.hitstop, 0.06); g.view.addShake(boss ? 9 : 5); g.flashHurt = 0.25;
             }
           }
         }
         if (e.stt >= D) { e.st = 'rec'; e.stt = 0; }
       } else if (e.st === 'rec') {
-        if (e.stt >= (boss ? 0.7 : 0.55)) { e.st = 'idle'; e.stt = 0; e.cd = boss ? 1.1 : wolf ? 1.3 : 1.6; }
+        if (e.stt >= (boss ? 0.7 : 0.55)) { e.st = 'idle'; e.stt = 0; e.cd = (boss ? 1.1 : wolf ? 1.3 : 1.6) * (1 + 0.03 * (e.pado || 0)); }
       }
       w.moveBody(e, e.kx * dt, e.ky * dt, 18); e.kx *= 0.86; e.ky *= 0.86;
     }
+    this.updateHazards(dt);
   }
 
+  // 보스 패턴: 체력 50% 이하에서 2페이즈(격분), 패턴마다 전조가 다르다
+  bossAI(e, dt, p, dx, dy, d, alive) {
+    const g = this.g, w = g.world;
+    e.st = e.st || 'idle'; e.stt = (e.stt || 0) + dt;
+    if (!e.phase2 && e.hp < e.d.hp * 0.5) { e.phase2 = true; g.hud.say(e.d.name + '이(가) 격분했다'); g.view.addShake(10); g.flashParry = 0.15; g.sound.sfx('heavy'); }
+    const k = e.phase2 ? 0.75 : 1;
+    const pat = e.pat;
+    if (e.st === 'idle') {
+      if (d > 120 && alive) { w.moveBody(e, dx / d * e.d.speed * dt, dy / d * e.d.speed * dt, 18); e.face = dx > 0 ? 1 : -1; }
+      if (e.cd <= 0 && d < 560 && alive) {
+        const pool = e.d.patterns.filter((q) => !q.phase || (q.phase === 2 && e.phase2));
+        let r = Math.random() * pool.reduce((a, q) => a + q.w, 0), pick = pool[0];
+        for (const q of pool) { r -= q.w; if (r <= 0) { pick = q; break; } }
+        if (pick.id === 'bite' && d > 160) return false;
+        e.pat = pick; e.st = 'wind'; e.stt = 0; e.ax = dx / d; e.ay = dy / d; e.face = dx > 0 ? 1 : -1; e.windT = (pick.wind || 0.6) * k; e.reps = pick.id === 'charge3' ? 3 : 1;
+        if (pick.id === 'bite') return false;
+      }
+      return !!(e.pat && e.pat.id !== 'bite') && e.st !== 'idle';
+    }
+    if (!pat || pat.id === 'bite') return false;
+    if (e.st === 'wind') {
+      if (pat.id === 'charge' || pat.id === 'charge3') { e.ax = e.ax * 0.9 + dx / d * 0.1; e.ay = e.ay * 0.9 + dy / d * 0.1; const l = Math.hypot(e.ax, e.ay) || 1; e.ax /= l; e.ay /= l; }
+      if (e.stt >= e.windT) {
+        e.stt = 0; e.hitDone = false; g.sound.sfx('slash');
+        if (pat.id === 'stomp') { e.st = 'rec'; g.view.addShake(9); g.fx.sfx('ring', e.x, e.y, { s: pat.r / 40, fps: 14, ground: true }); if (d < pat.r && alive) this.bossHit(e, p, pat.dmg); }
+        else if (pat.id === 'howl') { e.st = 'rec'; g.hud.say('울부짖음이 무리를 부른다'); for (let i = 0; i < pat.n; i++) { const m = this.make(pat.minion, true); m.x = e.x + (i ? 80 : -80); m.y = e.y + 60; w.unstick(m, 18); this.list.push(m); } }
+        else e.st = 'atk';
+      }
+      return true;
+    }
+    if (e.st === 'atk') {
+      const sp = pat.len / 0.4;
+      w.moveBody(e, e.ax * sp * dt, e.ay * sp * dt, 18);
+      if (!e.hitDone && Math.hypot(p.x - e.x, p.y - e.y) < 80 && alive) { e.hitDone = true; this.bossHit(e, p, pat.dmg); }
+      if (e.stt >= 0.4) { e.reps--; if (e.reps > 0) { e.st = 'wind'; e.stt = 0; e.windT = 0.35; const l = Math.hypot(dx, dy) || 1; e.ax = dx / l; e.ay = dy / l; } else { e.st = 'rec'; e.stt = 0; } }
+      return true;
+    }
+    if (e.st === 'rec') { if (e.stt >= 0.8 * k) { e.st = 'idle'; e.stt = 0; e.cd = 1.4 * k; e.pat = null; } return true; }
+    return false;
+  }
+
+  bossHit(e, p, mult) {
+    const g = this.g;
+    const since = performance.now() / 1000 - p.lastHitT;
+    if (since < 0.22 && (p.lastHitDir[0] * (e.x - p.x) + p.lastHitDir[1] * (e.y - p.y)) > 0) { g.parry(e); return; }
+    if (p.inv > 0 || p.state === 'dodge' || p.state === 'dash') { g.fx.num(p.x, p.y - 120, '회피', 'exp'); return; }
+    p.hurt(Math.round(e.d.damage * mult), e.ax || 0, e.ay || 0);
+    g.fx.sfx('imp', p.x, p.y - 50, { s: 1.4, fps: 22 }); g.hitstop = Math.max(g.hitstop, 0.08); g.view.addShake(8); g.flashHurt = 0.3;
+  }
+
+  updateHazards(dt) {
+    const g = this.g, p = g.player;
+    for (const h of this.hazards) {
+      h.t += dt;
+      if (h.t >= h.life && !h.done) {
+        h.done = true; g.fx.sfx('imp', h.x, h.y - 30, { s: 2, fps: 18 }); g.view.addShake(5);
+        if (Math.hypot(p.x - h.x, p.y - h.y) < h.r && p.inv <= 0 && p.state !== 'dodge') p.hurt(Math.round(h.dmg), 0, 0);
+      }
+    }
+    this.hazards = this.hazards.filter((h) => h.t < h.life + 0.1);
+  }
+
+  sheet(e) { const M = e.d.sheet && this.g.A.mobs && this.g.A.mobs[e.d.sheet]; return M && M.idle && M.idle.length && !M.idle[0].missing ? M : null; }
+
   sprite(e) {
+    const N = this.sheet(e);
+    if (N) {
+      const pick = (l, fps) => l[Math.floor(e.t * fps) % l.length];
+      if (e.st === 'atk') return pick(N.atk, 12);
+      if (e.st === 'wind') return pick(N.wind, 8);
+      if (e.hit > 0 && N.die.length) return N.die[0];
+      return pick(N.move, 8);
+    }
     const M = this.g.A.monsters[e.d.sprite];
     if (e.d.kind === 'wolf') return e.st === 'atk' ? M.bite[0] : e.st === 'wind' ? M.walk[0] : M.walk[Math.floor(e.t * 8) % M.walk.length];
     if (e.st === 'atk') return M.hop[1];
@@ -101,8 +185,16 @@ export class Enemies {
   }
 
   drawWarn(e) {
+    const ctx0 = this.g.view.ctx;
+    if (e.pat && e.pat.id === 'stomp') {
+      const k = Math.min(1, e.stt / e.windT);
+      ctx0.save(); ctx0.fillStyle = 'rgba(220,40,40,0.18)'; ctx0.beginPath(); ctx0.ellipse(e.x, e.y, e.pat.r, e.pat.r * 0.55, 0, 0, Math.PI * 2); ctx0.fill();
+      ctx0.fillStyle = 'rgba(255,60,40,0.35)'; ctx0.beginPath(); ctx0.ellipse(e.x, e.y, e.pat.r * k, e.pat.r * 0.55 * k, 0, 0, Math.PI * 2); ctx0.fill(); ctx0.restore();
+      return;
+    }
+    if (e.pat && e.pat.id === 'howl') return;
     const ctx = this.g.view.ctx, k = Math.min(1, e.stt / (e.d.boss ? 0.75 : e.d.kind === 'wolf' ? 0.5 : 0.6));
-    const len = (e.d.kind === 'wolf' ? 190 : 150) * (e.d.boss ? 1.3 : 1), wd = e.d.boss ? 90 : 60;
+    const len = e.pat && e.pat.len ? e.pat.len : (e.d.kind === 'wolf' ? 190 : 150) * (e.d.boss ? 1.3 : 1), wd = e.d.boss ? 90 : 60;
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(Math.atan2(e.ay, e.ax));
     ctx.fillStyle = 'rgba(220,40,40,0.18)'; ctx.fillRect(0, -wd / 2, len, wd);
     ctx.fillStyle = 'rgba(255,60,40,0.42)'; ctx.fillRect(0, -wd / 2, len * k, wd);
@@ -113,21 +205,29 @@ export class Enemies {
 
   collect(list) {
     const v = this.g.view, ctx = v.ctx;
+    for (const h of this.hazards) list.push({ y: h.y - 300, d: () => {
+      const k = Math.min(1, h.t / h.life); ctx.save(); ctx.fillStyle = 'rgba(176,74,255,0.2)'; ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r, h.r * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(176,74,255,0.4)'; ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r * k, h.r * 0.55 * k, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } });
     for (const e of this.list) {
       if (!v.visible(e.x, e.y)) continue;
       if (!e.alive && e.dead <= 0) continue;
       if (e.alive && e.st === 'wind') list.push({ y: e.y - 200, d: () => this.drawWarn(e) });
       list.push({ y: e.y, d: () => {
-        let s = e.d.scale;
+        const NS = this.sheet(e);
+        let s = NS ? 1.3 * (e.d.size || 1) : e.d.scale;
         let sx = 1, sy = 1;
         if (e.st === 'wind') { const k = Math.min(1, e.stt / 0.5); sx = 1 + 0.18 * k; sy = 1 - 0.16 * k; }
         if (e.st === 'atk') { sx = 0.86; sy = 1.14; }
         if (e.alive) v.shadow(e.x, e.y, (e.d.kind === 'wolf' ? 34 : 24) * (e.d.scale / (e.d.kind === 'wolf' ? 0.55 : 0.46)));
         const f = this.sprite(e);
         const a = e.alive ? 1 : Math.max(0, e.dead / 0.6);
-        const flip = e.d.kind === 'wolf' && e.face < 0;
+        const flip = NS ? e.face < 0 : e.d.kind === 'wolf' && e.face < 0;
         ctx.save(); ctx.translate(e.x, e.y); ctx.scale(sx, sy); ctx.translate(-e.x, -e.y);
+        if (e.d.tint && !e.hit) ctx.filter = e.d.tint;
         if (e.hit > 0) { ctx.filter = 'brightness(3)'; v.sprite(f, e.x, e.y, s, flip, a); }
+        else if (e.d.variant === 'elite') { ctx.filter = 'sepia(0.7) saturate(3) brightness(1.15)'; v.sprite(f, e.x, e.y, s * 1.15, flip, a); }
+        else if (e.d.variant === 'rift') { ctx.filter = 'brightness(0.35) sepia(1) saturate(4) hue-rotate(-30deg)'; v.sprite(f, e.x, e.y, s, flip, a); }
+        else if (e.d.variant === 'mutant') { ctx.filter = 'hue-rotate(220deg) saturate(2.2)'; v.sprite(f, e.x, e.y, s, flip, a); }
         else if (e.st === 'wind' && Math.floor(e.stt * 14) % 2 === 0) { ctx.filter = 'sepia(1) saturate(6) hue-rotate(-40deg) brightness(1.1)'; v.sprite(f, e.x, e.y, s, flip, a); }
         else v.sprite(f, e.x, e.y, s, flip, a);
         ctx.restore();

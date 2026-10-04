@@ -3,8 +3,16 @@
 export class FX {
   constructor(A, view) { this.A = A; this.v = view; this.list = []; this.nums = []; }
 
+  frames(set) { const n = this.A.fx2 && this.A.fx2[set]; return n && n.length && !n[0].missing ? n : this.A.fx[set]; }
+
   sfx(set, x, y, o = {}) {
-    const frames = this.A.fx[set];
+    const frames = this.frames(set);
+    const base = set.replace(/^cm_/, '');
+    if (frames === (this.A.fx2 && this.A.fx2[set]) && this.A.fx[base] && this.A.fx[base][0]) {
+      // 새 이펙트 그림은 크기가 달라서 기존 배율에 맞춘다
+      const old = this.A.fx[base][0], nw = frames[0];
+      if (old.w && nw.w) o = Object.assign({}, o, { s: (o.s || 1) * Math.max(old.w, old.h) / Math.max(nw.w, nw.h) });
+    }
     if (!frames || !frames.length) return;
     this.list.push(Object.assign({ set, x, y, t: 0, fps: 16, s: 1, rot: 0, flip: false, ground: false, a: 1 }, o, { n: frames.length }));
   }
@@ -34,7 +42,7 @@ export class FX {
     }
     for (const f of this.list) {
       if (f.ghost || !!f.ground !== ground) continue;
-      const arr = this.A.fx[f.set];
+      const arr = this.frames(f.set);
       const fr = arr[Math.min(arr.length - 1, Math.floor(f.t * f.fps))];
       if (!fr || !fr.w) continue;
       ctx.save();

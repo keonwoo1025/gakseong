@@ -10,6 +10,7 @@ export const DEFAULTS = {
   lefty: false,         // 왼손 모드: 조이스틱과 버튼 좌우 바꿈
   zoom: 'm',            // 가깝게 s, 보통 m, 멀게 l
   swipeDodge: true,     // 빈 곳을 밀면 회피
+  btnPos: {},           // 버튼별 위치 이동값
 };
 export const Settings = {
   v: { ...DEFAULTS },

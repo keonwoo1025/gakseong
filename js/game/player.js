@@ -9,6 +9,7 @@ const ROT = {
 const DV = { D: [0, 1], U: [0, -1], R: [1, 0], L: [-1, 0] };
 const CS = 0.8;
 const now = () => performance.now() / 1000;
+import { charKey } from './people.js';
 
 export class Player {
   constructor(g, x, y) {
@@ -18,7 +19,7 @@ export class Player {
     this.state = 'idle'; this.t = 0; this.wf = 0;
     this.inv = 0; this.stage = 0; this.lastStage = -1; this.chain = 0; this.queued = false; this.hitDone = false;
     this.running = false; this.dust = 0; this.painT = 0; this.blink = 0;
-    this.cds = { dodge: 0, skill1: 0 };
+    this.cds = { dodge: 0, s0: 0, s1: 0, s2: 0, s3: 0 }; this.cdMax = {}; this.armorT = 0;
     this.lastHitT = -9; this.lastHitDir = [0, 1];
     this.swords = [];
   }
@@ -46,13 +47,22 @@ export class Player {
   }
 
   // 적중 판정: 회피율, 패링, 피해
-  strike(e, mult, kx, ky, kind, flinch) {
-    const g = this.g;
+  strike(e, mult, kx, ky, kind, flinch, o = {}) {
+    const g = this.g, P = (k) => g.sk.P(k);
     g.combatT = 0;
-    if (e.st === 'atk' && !e.hitDone || (e.st === 'wind' && e.stt > e.windT - 0.12)) { g.parry(e); }
-    if (!g.rollHit(e)) { g.fx.num(e.x, e.y - 70, 'MISS', 'miss'); return false; }
-    const dmg = Math.round(g.atkPower() * mult * (0.9 + Math.random() * 0.2));
-    g.enemies.damage(e, dmg, kx, ky, kind, flinch);
+    if (!o.skill && (e.st === 'atk' && !e.hitDone || (e.st === 'wind' && e.stt > e.windT - 0.12))) { g.parry(e); }
+    if (!(o.noMiss || P('noMiss')) && !g.rollHit(e)) { g.fx.num(e.x, e.y - 70, 'MISS', 'miss'); return false; }
+    let m = mult;
+    if (o.skill) m *= 1 + P('skillDmg');
+    if (o.ignoreDef) m *= 1.15;
+    if (o.behind) m *= 1.4 + P('back');
+    let crit = 0.05 + P('crit') + (o.critBonus || 0);
+    if (e.hp < e.d.hp * 0.3) { crit += P('execute'); if (o.executeB) m *= 1 + o.executeB; }
+    const isCrit = Math.random() < crit;
+    if (isCrit) m *= 1.5 + P('execute') * 0.75;
+    const dmg = Math.round(g.atkPower() * m * (0.9 + Math.random() * 0.2));
+    g.enemies.damage(e, dmg, kx, ky, isCrit ? 2 : kind, flinch);
+    g.sk.onHit(e);
     return true;
   }
 
@@ -85,44 +95,21 @@ export class Player {
     this.g.fx.num(this.x, this.y - 130, d.name, 'dodge');
   }
 
-  skill() {
-    const g = this.g, s = this.s, sk = this.job.skill1;
-    if (!sk || this.state === 'dead') return;
-    if (this.cds.skill1 > 0) return;
-    if (s.mp < sk.mp) { g.toast('MP가 부족하다'); return; }
-    s.mp -= sk.mp; this.cds.skill1 = sk.cd;
-    const tg = this.nearest(sk.range + 40);
-    let ang = Math.atan2(DV[this.dir][1], DV[this.dir][0]);
-    if (tg) { ang = Math.atan2(tg.y - this.y, tg.x - this.x); this.dir = this.dirOf(tg.x - this.x, tg.y - this.y); }
-    this.state = 'skill'; this.t = 0;
-    const col = this.job.color || '#ffffff';
-    g.view.addShake(6); g.hitstop = 0.06; g.sound.sfx('heavy');
-    const ca = Math.cos(ang), sa = Math.sin(ang);
-    let n = 0;
-    for (const e of g.enemies.list) {
-      if (!e.alive) continue;
-      const rx = e.x - this.x, ry = e.y - 30 - (this.y - 30);
-      let ok;
-      if (sk.kind === 'burst') ok = Math.hypot(rx, ry) < sk.range;
-      else { const along = rx * ca + ry * sa, side = Math.abs(-rx * sa + ry * ca); ok = along > -20 && along < sk.range && side < sk.width / 2 + 20; }
-      if (ok && this.strike(e, sk.dmg, ca * 380, sa * 380, 2, 0.5)) n++;
-    }
-    if (sk.kind === 'burst') g.fx.sfx('ring', this.x, this.y, { s: 4, fps: 16, ground: true });
-    else g.fx.beam(this.x + ca * 30, this.y - 40 + sa * 30, ang, sk.range, sk.width, col);
-    if (sk.heal) s.hp = Math.min(this.maxHp, s.hp + this.maxHp * sk.heal);
-    g.fx.num(this.x, this.y - 150, sk.name, 'skill');
-  }
+  skill(i = 0) { this.g.sk.cast(i); }
 
   hurt(v, fx, fy) {
     if (this.inv > 0 || this.state === 'dead' || this.state === 'dash' || this.state === 'dodge') return;
     const s = this.s;
-    v = Math.max(1, Math.round(v * this.g.dmgTaken()));
+    v = Math.max(1, Math.round(v * this.g.dmgTaken() * (1 + this.g.sk.P('enemyAtk'))));
+    v = Math.round(this.g.sk.absorb(v));
+    if (v <= 0) return;
     s.hp = Math.max(0, s.hp - v);
     this.g.combatT = 0;
     this.g.sound.sfx('hurt');
     this.g.fx.num(this.x, this.y - 140, v, 'hurt');
-    if (this.state === 'attack' && this.stage === this.combo.length - 1 && s.hp > 0) { this.inv = 0.4; return; }
+    if (((this.state === 'attack' && this.stage === this.combo.length - 1) || this.armorT > 0) && s.hp > 0) { this.inv = 0.4; return; }
     this.inv = 0.8;
+    if (s.hp <= 0 && this.g.sk.tryRevive()) { this.inv = 2; return; }
     if (s.hp <= 0) { this.state = 'dead'; this.t = 0; this.painT = 3; this.g.onPlayerDeath(); return; }
     this.state = 'hurt'; this.t = 0; this.dx = fx; this.dy = fy; this.heavy = v >= 10;
     if (this.heavy || s.hp < this.maxHp * 0.3) this.painT = 1.3;
@@ -133,6 +120,7 @@ export class Player {
     w.unstick(this, 26);
     this.inv = Math.max(0, this.inv - dt); this.painT = Math.max(0, this.painT - dt); this.chain = Math.max(0, this.chain - dt);
     for (const k in this.cds) this.cds[k] = Math.max(0, this.cds[k] - dt);
+    this.armorT = Math.max(0, (this.armorT || 0) - dt);
     this.blink -= dt; if (this.blink < -3) this.blink = 0.15;
     const v = g.input.vec(), mag = Math.hypot(v[0], v[1]);
 
@@ -162,7 +150,8 @@ export class Player {
         this.lastHitT = now(); this.lastHitDir = vv;
         const flip = !!st.flip !== (this.dir === 'L');
         const set = st.fx, rot = (ROT[set] || ROT.s1)[this.dir];
-        g.fx.sfx(set, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
+        const cm = this.s.job === '천마' && g.A.fx2 && g.A.fx2['cm_' + set] ? 'cm_' + set : set;
+        g.fx.sfx(cm, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
         if (st.ring) g.fx.sfx('ring', this.x + vv[0] * 60, this.y + vv[1] * 45, { s: 2.8, fps: 16, ground: true });
         let any = false;
         for (const e of g.enemies.list) {
@@ -260,6 +249,26 @@ export class Player {
 
   collect(list) {
     const v = this.g.view, S = this.S;
+    const C = this.g.A.chars && this.g.A.chars[charKey(this.g, 'player')];
+    if (C && C.D && C.D.length && !C.D[0].missing) {
+      const pick = () => {
+        const L = this.dir === 'L' ? C.R : C[this.dir] || C.D;
+        let f = L[0], fl = this.dir === 'L';
+        if (this.state === 'walk') f = L[Math.floor(this.wf / (this.running ? 30 : 24)) % L.length];
+        else if (this.state === 'attack' || this.state === 'dash' || this.state === 'skill') f = L[Math.min(L.length - 1, this.stage % 2 ? 5 : 2)];
+        else if (this.state === 'dodge') { f = C.R[Math.floor(this.t * 30) % C.R.length]; fl = this.lastH < 0; }
+        return [f, fl];
+      };
+      for (const g2 of this.g.fx.list) if (g2.ghost) list.push({ y: this.y - 1, d: () => { const [f, fl] = pick(); v.sprite(f, g2.x, g2.y, 1.3, fl, 0.3 * (1 - g2.t / 0.4)); } });
+      list.push({ y: this.y, d: () => {
+        v.shadow(this.x, this.y, 30);
+        const [f, fl] = pick();
+        const a = this.inv > 0 && this.state !== 'dodge' && Math.floor(this.inv * 14) % 2 ? 0.4 : 1;
+        if (this.state === 'dead') { const c = v.ctx; c.save(); c.translate(this.x, this.y - 20); c.rotate(-Math.PI / 2 * Math.min(1, this.t * 3)); v.sprite(f, 0, 20, 1.3, fl, a); c.restore(); }
+        else v.sprite(f, this.x, this.y, 1.3, fl, a);
+      } });
+      return;
+    }
     for (const f of this.g.fx.list) if (f.ghost) list.push({ y: this.y - 1, d: () => v.sprite(S.dodge[f.f], f.x, f.y, CS, f.fl, 0.3 * (1 - f.t / 0.4)) });
     list.push({ y: this.y, d: () => {
       v.shadow(this.x, this.y, 30);

@@ -3,6 +3,8 @@
 import { makePerson, makeTiles, SOLID } from './pixel.js';
 import { Settings } from '../engine/settings.js';
 import { frame as hudFrame } from './hud.js';
+import { findPath } from './path.js';
+import { framesFor, drawPerson } from './people.js';
 
 export const TS = 64;   // 타일 한 칸: 16px 도트 x4
 const PS = 3.2;         // 사람 도트 확대 배율 (키가 타일 약 1.3칸)
@@ -22,6 +24,7 @@ export class Overworld {
     this.map = m;
     this.tiles = makeTiles(m.theme);
     this.grid = m.rows.map((r) => [...r].map((ch) => m.legend[ch] || 'void'));
+    this.applyTownArt(m);
     this.W = this.grid[0].length * TS; this.H = this.grid.length * TS;
     const keep = this.actors.player;
     this.actors = {};
@@ -57,7 +60,7 @@ export class Overworld {
 
   view() { return this.g.view; }
 
-  makeActor(id, look) { return { id, look, frames: makePerson(look), x: 0, y: 0, dir: 'D', t: 0, moving: false, speed: 260, emote: null, visible: true }; }
+  makeActor(id, look) { const fr = framesFor(this.g, id, look); return { id, look, fr, frames: fr.P || makePerson(look), x: 0, y: 0, dir: 'D', t: 0, moving: false, speed: 260, emote: null, visible: true }; }
 
   tileAt(x, y) {
     const c = Math.floor(x / TS), r = Math.floor(y / TS);
@@ -73,6 +76,57 @@ export class Overworld {
       if (self && self.id === 'player' && Math.hypot(a.x - x, (a.y - y) * 1.6) < 26) return true;
     }
     return false;
+  }
+
+  // 받은 타일 그림으로 교체 (없으면 코드 타일 유지). 물건 타일은 그 맵의 바닥 위에 얹는다.
+  applyTownArt(m) {
+    const T = this.g.A.ttiles; if (!T) return;
+    const ok = (k) => T[k] && T[k].w && !T[k].missing;
+    const out = !!(m.edges && Object.keys(m.edges).length);
+    const fac = /factory/.test(m.id) && !out;
+    const OBJ = new Set(['tree', 'fence', 'lamp', 'sign', 'bench', 'stall', 'crate', 'desk', 'chair', 'bed', 'shelf', 'counter', 'sofa', 'plant', 'fridge', 'board', 'screen', 'machine', 'belt', 'crate_m', 'pillar', 'planter', 'barrier', 'booth']);
+    const map = out
+      ? { walk: 'walk', road: 'road', lane: 'lane', grass: 'grass', sand: 'sand', water: 'water', wall: 'wall', window: 'window', door: 'door', floor: m.id === 'plaza' ? 'plaza' : 'walk', tree: 'tree', fence: 'fence', lamp: 'lamp', sign: 'sign', bench: 'bench', stall: 'stall', crate: 'crate', pillar: 'pillar', plant: 'planter' }
+      : fac ? { floor: 'floor_f', tile: 'floor_f', wall: 'wall_m', window: 'wall_m', door: 'door_m', exit: 'door_m', machine: 'machine', belt: 'belt', crate: 'crate_m', desk: 'desk', chair: 'chair', shelf: 'shelf', board: 'board', screen: 'screen', plant: 'plant' }
+      : { wood: 'wood', tile: 'tile', rug: 'rug', floor: 'tile', wall: 'wall_in', window: 'window_in', door: 'door_in', exit: 'door_in', desk: 'desk', chair: 'chair', bed: 'bed', shelf: 'shelf', counter: 'counter', sofa: 'sofa', plant: 'plant', fridge: 'fridge', board: 'board', screen: 'screen', crate: 'crate' };
+    const used = new Set(this.grid.flat());
+    const baseName = out ? (m.id === 'plaza' ? 'floor' : 'walk') : ['wood', 'tile', 'floor'].find((k) => used.has(k)) || 'floor';
+    const baseKey = map[baseName];
+    const can = (k, under) => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); if (under) x.drawImage(under, 0, 0, 64, 64); const o = T[k]; x.drawImage(o.im, 0, 0, 64, 64); return c; };
+    const base = ok(baseKey) ? can(baseKey) : this.tiles[baseName];
+    for (const name of used) {
+      const k = map[name]; if (!k || !ok(k)) continue;
+      this.tiles[name] = OBJ.has(k) ? can(k, base) : can(k);
+    }
+    this.outdoor = out;
+  }
+
+  drawBuildings() {
+    const B = this.g.A.bld, m = this.map; if (!B || !this.outdoor) return;
+    const ok = (k) => B[k] && B[k].w && !B[k].missing, ctx = this.view().ctx;
+    const pick = { room: 'apartment', store: 'conv', office: 'agency', assoc: 'assoc', hunter_shop: 'restaurant', factory_office: 'factory', factory_floor: 'factory' };
+    let i = 0;
+    for (const d of m.doors || []) {
+      if (d.at[1] > this.grid.length / 2) continue;
+      const k = pick[d.to] || (m.id === 'avenue' ? 'guild' : ['warehouse', 'restaurant'][i++ % 2]);
+      if (!ok(k)) continue;
+      const f = B[k], s = 4.4 * TS / f.w;
+      ctx.drawImage(f.im, (d.at[0] + 0.5) * TS - f.w * s / 2, (d.at[1] + 1) * TS - f.h * s, f.w * s, f.h * s);
+    }
+    if (ok('gate')) {
+      let c0 = 1e9, c1 = -1, r1 = -1;
+      this.grid.forEach((row, r) => row.forEach((t, c) => { if (t === 'gate') { c0 = Math.min(c0, c); c1 = Math.max(c1, c); r1 = Math.max(r1, r); } }));
+      if (r1 >= 0) { const f = B.gate, w = (c1 - c0 + 5) * TS, s = w / f.w; ctx.drawImage(f.im, (c0 + c1 + 1) / 2 * TS - w / 2, (r1 + 1) * TS - f.h * s, w, f.h * s); }
+    }
+  }
+
+  // 컷신 이동도 실제로 걸어서 장애물을 돌아간다
+  routeTo(a, to) {
+    const cols = this.grid[0].length, rows = this.grid.length;
+    const sc = Math.floor(a.x / TS), sr = Math.floor((a.y - 10) / TS);
+    const p = findPath(cols, rows, (c, r) => SOLID.has(this.grid[r][c]), sc, sr, to[0], to[1], 3000);
+    if (!p || p.length < 3) return null;
+    return p.slice(1, -1).map(([c, r]) => [(c + 0.5) * TS, (r + 0.8) * TS]);
   }
 
   unstick(a) {
@@ -99,7 +153,11 @@ export class Overworld {
     for (const id in this.actors) {
       const a = this.actors[id];
       if (a.emote) { a.emote.t -= dt; if (a.emote.t <= 0) a.emote = null; }
-      if (a.path) {
+      if (a.route && a.route.length) {
+        const [tx, ty] = a.route[0], dx = tx - a.x, dy = ty - a.y, d = Math.hypot(dx, dy);
+        if (d < 4) { a.x = tx; a.y = ty; a.route.shift(); }
+        else { const sp = Math.min(d, a.speed * dt); a.x += dx / d * sp; a.y += dy / d * sp; a.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : dy > 0 ? 'D' : 'U'; a.moving = true; a.t += dt; }
+      } else if (a.path) {
         const [tx, ty] = a.path, dx = tx - a.x, dy = ty - a.y, d = Math.hypot(dx, dy);
         if (d < 4) { a.x = tx; a.y = ty; a.path = null; a.moving = false; }
         else {
@@ -318,6 +376,7 @@ export class Overworld {
       const T = performance.now() / 1000, x = (fx[0] + 0.5) * TS, y = (fx[1] + 0.5) * TS;
       ctx.fillStyle = `rgba(150,110,255,${0.18 + Math.sin(T * 3) * 0.08})`; ctx.beginPath(); ctx.ellipse(x, y, 120, 60, 0, 0, Math.PI * 2); ctx.fill();
     }
+    this.drawBuildings();
     if (this.g.portal) this.drawPortal(this.g.portal);
     const list = [];
     for (const id in this.actors) { const a = this.actors[id]; if (a.visible) list.push({ y: a.y, d: () => this.drawActor(a) }); }
@@ -334,13 +393,7 @@ export class Overworld {
     }
   }
 
-  drawActor(a) {
-    const v = this.view();
-    const f = a.dir === 'L' ? a.frames.R : a.frames[a.dir];
-    const step = a.moving ? [1, 0, 2, 0][Math.floor(a.t * 8) % 4] : 0;
-    v.shadow(a.x, a.y, 17);
-    v.sprite(f[step], a.x, a.y, PS, a.dir === 'L');
-  }
+  drawActor(a) { drawPerson(this.view(), a, 86, 1, PS); }
 
   drawEmote(a) {
     const ctx = this.view().ctx, x = a.x, y = a.y - 108;
@@ -389,7 +442,7 @@ export class Cutscene {
         g.runLine(line, () => this.next());
         return;
       }
-      if (s.move) { const a = ow.actors[s.move]; if (a) { a.path = [(s.to[0] + 0.5) * TS, (s.to[1] + 0.8) * TS]; if (s.speed) a.speed = s.speed; } if (s.nowait) continue; this.waitFor = () => !a || !a.path; return; }
+      if (s.move) { const a = ow.actors[s.move]; if (a) { a.path = [(s.to[0] + 0.5) * TS, (s.to[1] + 0.8) * TS]; if (s.speed) a.speed = s.speed; a.route = ow.routeTo(a, s.to); } if (s.nowait) continue; this.waitFor = () => !a || (!a.path && !(a.route && a.route.length)); return; }
       if (s.face) { const a = ow.actors[s.face]; if (a) a.dir = s.dir; continue; }
       if (s.wait) { this.wait = s.wait; return; }
       if (s.emote) { const a = ow.actors[s.emote]; if (a) a.emote = { text: s.mark || '!', t: s.t || 1.2 }; continue; }
@@ -408,6 +461,11 @@ export class Cutscene {
       if (s.portal !== undefined) { g.portal = s.portal; continue; }
       if (s.mobs) { ow.spawnMobs(s.mobs); continue; }
       if (s.clearMobs) { ow.mobs = []; continue; }
+      if (s.fight) {
+        const mapId = ow.map.id, p = ow.actors.player, at = [Math.floor(p.x / TS), Math.floor((p.y - 10) / TS)];
+        g.eventFight(s.fight, () => { g.enterWorldMode(); ow.load(mapId, at).then(() => this.next()); });
+        return;
+      }
       if (s.call) { const r = g.cutCall(s.call, s.arg, () => this.next()); if (r === 'async') return; continue; }
       if (s.end) { this.onEnd(); return; }
     }
@@ -417,7 +475,7 @@ export class Cutscene {
 
   update(dt) {
     if (this.ff) {
-      for (const id in this.ow.actors) { const a = this.ow.actors[id]; if (a.path) { a.x = a.path[0]; a.y = a.path[1]; a.path = null; a.moving = false; } }
+      for (const id in this.ow.actors) { const a = this.ow.actors[id]; if (a.path) { a.x = a.path[0]; a.y = a.path[1]; a.path = null; a.route = null; a.moving = false; } }
       this.ow.fade = this.ow.fadeTo;
       if (this.wait > 0) { this.wait = 0; this.next(); return; }
     }

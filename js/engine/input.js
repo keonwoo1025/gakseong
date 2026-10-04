@@ -35,6 +35,7 @@ export class Input {
   down(e) {
     try { this.c.setPointerCapture(e.pointerId); } catch (_) {}
     const x = e.clientX, y = e.clientY;
+    if (this.editor) { this.editor.down(x, y); this.edId = e.pointerId; return; }
     for (const b of this.buttons) {
       if (b.always && Math.hypot(x - b.x, y - b.y) < b.r * 1.2) { this.pressed[b.id] = 0.15; this.btnTouch[e.pointerId] = b.id; this.emit('button', b.id); return; }
     }
@@ -57,10 +58,12 @@ export class Input {
   }
 
   move(e) {
+    if (this.editor && e.pointerId === this.edId) { this.editor.move(e.clientX, e.clientY); return; }
     if (e.pointerId === this.joy.id) { this.joy.x = e.clientX; this.joy.y = e.clientY; }
   }
 
   up(e) {
+    if (this.editor && e.pointerId === this.edId) { this.editor.up(); this.edId = null; return; }
     if (e.pointerId === this.joy.id) { this.joy.id = null; return; }
     if (this.btnTouch[e.pointerId]) { delete this.btnTouch[e.pointerId]; return; }
     if (e.pointerId === this.swipe.id) {
@@ -77,7 +80,10 @@ export class Input {
     if (this.mode !== 'field') { if (k === ' ' || k === 'enter' || k === 'j') this.emit('tap', -1, -1); return; }
     if (k === 'j' || k === 'z' || k === 'enter') this.emit('button', 'act');
     if (k === 'k' || k === 'x' || k === ' ') this.emit('button', 'dodge');
-    if (k === 'l') this.emit('button', 'skill1');
+    if (k === 'l' || k === '1') this.emit('button', 'skill1');
+    if (k === 'u' || k === '2') this.emit('button', 'skill2');
+    if (k === 'i' || k === '3') this.emit('button', 'skill3');
+    if (k === 'o' || k === '4') this.emit('button', 'skill4');
     if (k === 'h') this.emit('button', 'potion');
     if (k === 'm' || k === 'escape') this.emit('button', 'menu');
   }

@@ -15,7 +15,9 @@ import { Overworld } from './overworld.js';
 import { PorterRun } from './porter.js';
 import { makePortrait } from './pixel.js';
 import { setSkin } from './hud.js';
+import { charKey } from './people.js';
 import { Settings } from '../engine/settings.js';
+import { Skills } from './skills.js';
 
 const PERSONALITIES = ['열혈형', '냉철한 전략가', '다정한 보호자', '겁 많은 선인', '오만한 천재', '호기심 덩어리', '과묵한 고독자', '계산적 실리주의', '헌신적 신앙형', '자유로운 장난꾸러기'];
 const PATTERN_JOB = { 공격: '천마', 수호: '대지의 군주', 관찰: '폭풍의 사수', 탐구: '공간의 절대자', 구조: '성휘의 사도', 은밀: '명왕' };
@@ -40,6 +42,7 @@ export class Game {
     this.hud = new HUD(this);
     this.sound = new Sound();
     this.ow = new Overworld(this);
+    this.sk = new Skills(this);
     this.fx = null;
     this.talking = false;
     this.portraits = {};
@@ -56,7 +59,7 @@ export class Game {
         else if (this.mode === 'field') this.player.attack();
       }
       if (id === 'dodge') { if (this.mode === 'porter') this.porter.dodge(0, 0); else if (this.mode === 'field') this.player.dodge(0, 0); }
-      if (id === 'skill1' && this.mode === 'field') this.player.skill();
+      const m = /^skill(\d)$/.exec(id); if (m && this.mode === 'field') this.player.skill(Number(m[1]) - 1);
       if (id === 'potion') this.quickHeal();
     });
     this.input.on('dodge', (dx, dy) => {
@@ -79,6 +82,8 @@ export class Game {
     this.npcById = Object.fromEntries(this.npcs.map((n) => [n.id, n]));
     this.sound.setTracks(this.music);
     setSkin((n) => this.A.ui && this.A.ui[n]);
+    this.applyArt();
+    this.genFloors();
     this.applyCssSkin();
     this.showTitle();
   }
@@ -111,12 +116,12 @@ export class Game {
   atkPower() {
     const job = this.jobs[this.state.job] || {}, k = job.dmgStat || 'str';
     const base = this.awakened() ? 12 : 8;
-    return Math.round((base + this.equipStat('atk') + this.st(k) * 2) * (job.dmgBase || 1));
+    return Math.round((base + this.equipStat('atk') + this.st(k) * 2) * (job.dmgBase || 1) * (1 + this.sk.P('atk')));
   }
-  aspd() { return 1 + (this.st('dex') - 5) * 0.006; }
-  moveMult() { return 1 + (this.st('dex') - 5) * 0.002; }
-  playerEva() { return Math.min(0.3, (this.st('dex') - 5) * 0.004 + 0.03); }
-  dmgTaken() { return Math.max(0.5, 1 - (this.st('vit') - 5) * 0.006); }
+  aspd() { return (1 + (this.st('dex') - 5) * 0.006) * (1 + this.sk.P('aspd')); }
+  moveMult() { return (1 + (this.st('dex') - 5) * 0.002) * (1 + this.sk.P('move')); }
+  playerEva() { return Math.min(0.4, (this.st('dex') - 5) * 0.004 + 0.03 + this.sk.P('eva')); }
+  dmgTaken() { return Math.max(0.3, (1 - (this.st('vit') - 5) * 0.006) * (1 - this.sk.P('dr'))); }
   rollHit(e) { const acc = (this.st('dex') - 5) * 0.003; return Math.random() >= Math.max(0, (e.d.eva || 0) - acc); }
   migrateStats(s) {
     const o = s.stats || {};
@@ -147,8 +152,12 @@ export class Game {
   playerLook() { return this.looks[this.state && this.state.gender === 'f' ? 'player_f' : 'player_m']; }
   speakerName(id) { if (id === 'player') return this.state.given; if (this.npcById[id]) return this.npcName(id); return id; }
   portraitKey(id, override) { if (override) return override; if (id === 'player' || this.npcById[id] || this.looks[id]) return 'gen:' + id; return null; }
-  portraitOf(key) {
+  portraitOf(key, emo) {
     if (!key) return null;
+    if (key.startsWith('gen:') && this.A.port2) {
+      const P2 = this.A.port2[charKey(this, key.slice(4))];
+      if (P2 && P2[emo || 0] && !P2[emo || 0].missing) { const o = P2[emo || 0]; o.big = true; return o; }
+    }
     if (key.startsWith('gen:')) { const id = key.slice(4); if (!this.portraits[id]) this.portraits[id] = makePortrait(this.lookOf(id)); return this.portraits[id]; }
     return this.A.portraits[key] || null;
   }
@@ -339,11 +348,16 @@ export class Game {
       ], next);
       return 'async';
     }
-    if (name === 'afterAwaken') {
+    if (name === 'grantLegend' || (name === 'afterAwaken' && s.phase === 'porter')) {
       s.phase = 'hidden'; s.flags.masked = true;
       s.lv = 1; s.exp = 0; s.pts = 5;
       s.stats = { str: 5, dex: 5, int: 5, vit: 5 };
       s.unlocked = 1; s.cleared = {};
+      s.sk = { p: [1, 0, 0, 0, 0], a: [1, 0, 0, 0] }; s.skp = 0;
+      s.hp = this.maxHp(); s.mp = this.maxMp();
+      if (name === 'grantLegend') return;
+    }
+    if (name === 'afterAwaken') {
       s.hp = this.maxHp(); s.mp = this.maxMp();
       s.flags.jobToday = false; s.flags.workedToday = true;
       s.objective = '상태 창에서 스탯을 분배하고, 탑 광장에서 정체를 숨긴 채 탑에 오르기';
@@ -422,7 +436,7 @@ export class Game {
     this.bindMenu(tab);
   }
 
-  closeMenu() { this.menuOpen = false; this.pend = {}; this.restoreButtons(); }
+  closeMenu() { this.menuOpen = false; this.pend = {}; this.skPend = {}; this.restoreButtons(); }
 
   menuBag() {
     const s = this.state;
@@ -485,14 +499,26 @@ export class Game {
     const s = this.state;
     const J = this.awakened() ? this.skills[s.job] : null;
     if (!J) return '<div class="detail"><b>스킬</b><p class="dim">아직 아무 기술도 없다.</p><p class="dim">각성자들은 저마다의 기술을 가진다. 비각성자에게는 해당되지 않는 이야기다.</p></div><div class="skgrid">' + Array.from({ length: 10 }, () => '<div class="slot empty"></div>').join('') + '</div>';
-    const items = [{ k: 'd', name: J.dodge.name, type: '전용 회피', desc: J.dodge.desc, open: true }]
-      .concat(J.active.map((a, i) => ({ k: 'a' + i, name: a[0], type: i === 3 ? '액티브 · 궁극' : '액티브', desc: a[1], lv: a[2], open: s.lv >= a[2] })))
-      .concat(J.passive.map((a, i) => ({ k: 'p' + i, name: a[0], type: '패시브', desc: a[1], open: i === 0 })));
+    this.sk.ensure();
+    const pend = this.skPend || (this.skPend = {});
+    const used = Object.values(pend).reduce((a, b) => a + b, 0);
+    const cur = (k) => (k[0] === 'a' ? s.sk.a : s.sk.p)[Number(k.slice(1))] + (pend[k] || 0);
+    const items = [{ k: 'd', name: J.dodge.name, type: '전용 회피', desc: J.dodge.desc, max: 1, fixed: true }]
+      .concat(J.active.map((a, i) => ({ k: 'a' + i, name: a.name, type: i === 3 ? '궁극' : '액티브', desc: a.desc, req: a.req, max: a.max })))
+      .concat(J.passive.map((a, i) => ({ k: 'p' + i, name: a.name, type: '패시브', desc: a.desc, req: this.sk.passiveReq(i), max: a.max })));
     if (!this.skillSel || !items.find((x) => x.k === this.skillSel)) this.skillSel = 'a0';
-    const cells = items.map((x) => `<button class="slot ${x.k === this.skillSel ? 'on' : ''}" data-sk="${x.k}"><small>${esc(x.type)}</small><span class="ic">${x.open ? '✦' : '🔒'}</span><span class="nm">${esc(x.name)}</span></button>`).join('');
+    const cells = items.map((x) => {
+      const L = x.fixed ? 1 : cur(x.k);
+      return `<button class="slot ${x.k === this.skillSel ? 'on' : ''}" data-sk="${x.k}"><small>${esc(x.type)}</small><span class="ic">${L ? '✦' : '🔒'}</span><span class="nm">${esc(x.name)}</span><small>${x.fixed ? '기본' : 'Lv ' + L + '/' + x.max}</small></button>`;
+    }).join('');
     const x = items.find((i) => i.k === this.skillSel);
-    const note = x.k === 'a0' ? '기술 버튼에 연결됨' : x.k === 'd' ? '회피 버튼에 연결됨' : x.open ? '스킬 포인트 투자는 다음 단계에서 열린다' : `LV.${x.lv}에 습득 가능`;
-    return `<div class="detail"><b>${esc(x.name)}</b><p class="dim">${esc(x.type)}${x.lv ? ' · 습득 LV.' + x.lv : ''}</p><p>${esc(x.desc)}</p><p class="dim">${esc(note)}</p></div><div class="skgrid">${cells}</div>`;
+    const L = x.fixed ? 1 : cur(x.k);
+    const can = !x.fixed && s.skp - used > 0 && L < x.max && s.lv >= (x.req || 1);
+    const why = x.fixed ? '회피 버튼에 연결됨' : s.lv < (x.req || 1) ? `LV.${x.req}부터 배울 수 있다` : L >= x.max ? '최대 레벨' : '';
+    const grow = x.k[0] === 'a' ? '레벨마다 피해 +8%, 재사용 -2%' : x.k[0] === 'p' ? '레벨마다 효과 +15%' : '';
+    return `<div class="detail"><b>${esc(x.name)}</b><p class="dim">${esc(x.type)}${x.req ? ' · 습득 LV.' + x.req : ''} · Lv ${L}/${x.max}</p><p>${esc(x.desc)}</p><p class="dim">${esc(grow)}</p>
+      <div class="strow"><span style="flex:1">스킬 포인트 <b>${s.skp - used}</b>${why ? ' · ' + esc(why) : ''}</span><button data-skup="${x.k}" ${can ? '' : 'disabled'}>+</button></div>
+      <div class="strow"><button id="skreset" ${used ? '' : 'disabled'}>되돌리기</button><button class="primary" id="skapply" ${used ? '' : 'disabled'}>적용</button></div></div><div class="skgrid">${cells}</div>`;
   }
 
   menuQuest() {
@@ -506,7 +532,7 @@ export class Game {
     const seg = (key, opts) => `<div class="seg">${opts.map(([v, n]) => `<button data-set="${key}" data-v="${v}" class="${String(V[key]) === String(v) ? 'on' : ''}">${n}</button>`).join('')}</div>`;
     const row = (label, html) => `<div class="setrow"><span>${label}</span>${html}</div>`;
     return `<div class="left">${row('조이스틱', seg('joyMode', [['fixed', '고정'], ['float', '자유']]))}${row('조이스틱 크기', seg('joySize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('민감도', seg('sens', [['s', '낮음'], ['m', '보통'], ['l', '높음']]))}${row('달리기 전환', seg('runAt', [['s', '빨리'], ['m', '보통'], ['l', '끝까지']]))}${row('밀어서 회피', seg('swipeDodge', [[true, '켬'], [false, '끔']]))}</div>
-      <div class="detail">${this.mode === 'world' ? row('기록', '<div class="seg"><button id="sv">저장하기</button></div>') : ''}${row('버튼 크기', seg('btnSize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('버튼 투명도', seg('btnAlpha', [['s', '흐리게'], ['m', '보통'], ['l', '진하게']]))}${row('왼손 모드', seg('lefty', [[false, '끔'], [true, '켬']]))}${row('화면 확대', seg('zoom', [['s', '가깝게'], ['m', '보통'], ['l', '멀게']]))}${row('소리', `<div class="seg"><button id="snd" class="${this.sound.enabled ? 'on' : ''}">${this.sound.enabled ? '켜짐' : '꺼짐'}</button><button id="tt">타이틀로</button></div>`)}</div>`;
+      <div class="detail">${this.mode === 'world' ? row('기록', '<div class="seg"><button id="sv">저장하기</button></div>') : ''}${row('버튼 크기', seg('btnSize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('버튼 투명도', seg('btnAlpha', [['s', '흐리게'], ['m', '보통'], ['l', '진하게']]))}${row('왼손 모드', seg('lefty', [[false, '끔'], [true, '켬']]))}${row('버튼 위치', '<div class="seg"><button id="bedit">편집하기</button></div>')}${row('화면 확대', seg('zoom', [['s', '가깝게'], ['m', '보통'], ['l', '멀게']]))}${row('소리', `<div class="seg"><button id="snd" class="${this.sound.enabled ? 'on' : ''}">${this.sound.enabled ? '켜짐' : '꺼짐'}</button><button id="tt">타이틀로</button></div>`)}</div>`;
   }
 
   bindMenu(tab) {
@@ -522,9 +548,13 @@ export class Game {
     const sv = this.ov.querySelector('#sv'); if (sv) sv.onclick = () => { this.save(); this.renderMenu('저장했어요'); };
     const cv = this.ov.querySelector('#stp'); if (cv) { const pf = this.portraitOf('gen:player'); const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(pf.im, 0, 0); }
     this.ov.querySelectorAll('[data-sk]').forEach((b) => (b.onclick = () => { this.skillSel = b.dataset.sk; this.renderMenu(); }));
+    const su = this.ov.querySelector('[data-skup]'); if (su) su.onclick = () => { const k = su.dataset.skup; this.skPend = this.skPend || {}; this.skPend[k] = (this.skPend[k] || 0) + 1; this.renderMenu(); };
+    const sr = this.ov.querySelector('#skreset'); if (sr) sr.onclick = () => { this.skPend = {}; this.renderMenu(); };
+    const sa = this.ov.querySelector('#skapply'); if (sa) sa.onclick = () => { const pd = this.skPend || {}; let n = 0; for (const k in pd) { (k[0] === 'a' ? s.sk.a : s.sk.p)[Number(k.slice(1))] += pd[k]; n += pd[k]; } s.skp -= n; this.skPend = {}; this.sound.sfx('levelup'); this.renderMenu('스킬을 배웠습니다'); };
     const ap = this.ov.querySelector('#apply'); if (ap) ap.onclick = () => { const pd = this.pend || {}; let n = 0; for (const k in pd) { s.stats[k] += pd[k]; n += pd[k]; if (k === 'vit') s.hp += 12 * pd[k]; } s.pts -= n; this.pend = {}; this.sound.sfx('levelup'); this.renderMenu('적용했습니다'); };
     const pr = this.ov.querySelector('#preset'); if (pr) pr.onclick = () => { this.pend = {}; this.renderMenu(); };
     const snd = this.ov.querySelector('#snd'); if (snd) snd.onclick = () => { this.sound.toggle(); this.renderMenu(); };
+    const be = this.ov.querySelector('#bedit'); if (be) be.onclick = () => this.openButtonEditor();
     const tt = this.ov.querySelector('#tt'); if (tt) tt.onclick = () => { this.save(); this.menuOpen = false; this.showTitle(); };
     if (tab === 'map') this.drawCityMap();
   }
@@ -537,23 +567,38 @@ export class Game {
     const s = this.state, cm = this.citymap, cur = this.ow.map ? this.ow.map.id : null;
     const nodeOf = (id) => cm.nodes.find((n) => n.id === id || (n.inside || []).includes(id));
     const here = this.mode === 'world' ? nodeOf(cur) : cm.nodes.find((n) => n.id === 'plaza');
-    const cols = 5, rows = 2, bw = Math.min(150, (W - 40) / cols - 14), bh = Math.min(64, (H - 70) / rows - 20);
-    const pos = (n) => [20 + n.x * ((W - 40) / cols) + ((W - 40) / cols - bw) / 2, 30 + n.y * ((H - 60) / rows) + ((H - 60) / rows - bh) / 2];
-    x.fillStyle = '#1a2a3a'; x.fillRect(0, 0, W, H);
-    x.fillStyle = 'rgba(58,120,184,0.5)'; x.fillRect(0, 0, W, 18 + bh * 0.4);
-    x.strokeStyle = '#8a8f96'; x.lineWidth = 6;
-    for (const [a, b] of cm.links) { const A = pos(cm.nodes.find((n) => n.id === a)), B = pos(cm.nodes.find((n) => n.id === b)); x.beginPath(); x.moveTo(A[0] + bw / 2, A[1] + bh / 2); x.lineTo(B[0] + bw / 2, B[1] + bh / 2); x.stroke(); }
-    for (const n of cm.nodes) {
-      const [px, py] = pos(n), seen = s.visited && s.visited[n.id];
-      x.fillStyle = seen ? (n.id === 'plaza' ? '#4a3a6a' : '#3a4a3a') : '#2a2a2a'; x.fillRect(px, py, bw, bh);
-      x.strokeStyle = here === n ? '#ffd23f' : '#c9a24a'; x.lineWidth = here === n ? 3 : 1.5; x.strokeRect(px, py, bw, bh);
-      x.fillStyle = seen ? '#f3e3b5' : '#777'; x.font = '700 13px system-ui'; x.textAlign = 'center';
-      x.fillText(seen ? n.name : '???', px + bw / 2, py + bh / 2 + 4);
-      if (here === n) { x.fillStyle = '#ff4a4a'; x.beginPath(); x.arc(px + bw / 2, py - 8, 6, 0, Math.PI * 2); x.fill(); x.font = '600 11px system-ui'; x.fillStyle = '#ffd23f'; x.fillText('현재 위치', px + bw / 2, py + bh + 14); }
-      if (n.id === 'plaza') { x.fillStyle = '#b48cff'; x.fillRect(px + bw / 2 - 6, py - 26, 12, 22); }
+    const goal = s.objTarget ? nodeOf(s.objTarget.map) : null;
+    const P = (n) => [n.mx * W, n.my * H];
+    const bg = this.A.ui && this.A.ui.worldmap;
+    if (bg && bg.im && !bg.missing) x.drawImage(bg.im, 0, 0, W, H);
+    else {
+      // 그림 지도가 들어오기 전까지 쓰는 지도
+      x.fillStyle = '#5f7f4f'; x.fillRect(0, 0, W, H);
+      for (let i = 0; i < 40; i++) { x.fillStyle = i % 2 ? '#587748' : '#668656'; x.fillRect((i * 97) % W, (i * 53) % H, 30, 18); }
+      x.fillStyle = '#3a78b8'; x.beginPath(); x.moveTo(0, H * 0.08); x.bezierCurveTo(W * 0.3, H * 0.02, W * 0.6, H * 0.16, W, H * 0.06); x.lineTo(W, H * 0.16); x.bezierCurveTo(W * 0.6, H * 0.26, W * 0.3, H * 0.12, 0, H * 0.18); x.fill();
+      x.fillStyle = '#7a7d84'; x.fillRect(0, H * 0.74, W, H * 0.06);
     }
-    x.textAlign = 'left'; x.fillStyle = '#c9a24a'; x.font = '600 12px system-ui'; x.fillText('한성특별시', 10, H - 10);
+    for (const [a, b] of cm.links) {
+      const A = P(cm.nodes.find((n) => n.id === a)), B = P(cm.nodes.find((n) => n.id === b));
+      x.strokeStyle = '#4a4d55'; x.lineWidth = 12; x.beginPath(); x.moveTo(A[0], A[1]); x.lineTo(B[0], B[1]); x.stroke();
+      x.strokeStyle = '#e6e2c8'; x.lineWidth = 1.5; x.setLineDash([6, 6]); x.beginPath(); x.moveTo(A[0], A[1]); x.lineTo(B[0], B[1]); x.stroke(); x.setLineDash([]);
+    }
+    for (const n of cm.nodes) {
+      const [px, py] = P(n), seen = s.visited && s.visited[n.id];
+      x.fillStyle = seen ? 'rgba(20,16,12,0.8)' : 'rgba(20,16,12,0.5)';
+      x.beginPath(); x.arc(px, py, 20, 0, Math.PI * 2); x.fill();
+      x.strokeStyle = here === n ? '#ffd23f' : '#c9a24a'; x.lineWidth = here === n ? 3 : 1.5; x.stroke();
+      x.font = '18px system-ui'; x.textAlign = 'center'; x.globalAlpha = seen ? 1 : 0.35; x.fillText(n.icon, px, py + 6); x.globalAlpha = 1;
+      x.font = '700 11px system-ui'; x.lineWidth = 3; x.strokeStyle = '#000'; x.fillStyle = seen ? '#fff' : '#aaa';
+      const label = seen ? n.name : '???'; x.strokeText(label, px, py + 34); x.fillText(label, px, py + 34);
+      if (here === n) { const T2 = performance.now() / 300; x.fillStyle = '#ff4a4a'; x.beginPath(); x.moveTo(px, py - 24); x.lineTo(px - 7, py - 36 - Math.sin(T2) * 2); x.lineTo(px + 7, py - 36 - Math.sin(T2) * 2); x.fill(); }
+      if (goal === n) { x.font = '16px system-ui'; x.fillText('⭐', px + 22, py - 16); }
+    }
+    x.textAlign = 'left'; x.font = '700 12px system-ui'; x.fillStyle = '#fff'; x.strokeStyle = '#000'; x.lineWidth = 3;
+    x.strokeText('한성특별시', 10, 18); x.fillText('한성특별시', 10, 18);
+    x.font = '600 10px system-ui'; x.strokeText('🔻 현재 위치  ⭐ 목표', 10, H - 8); x.fillText('🔻 현재 위치  ⭐ 목표', 10, H - 8);
   }
+
 
   // ---------- 짐꾼 원정 ----------
   gather() {
@@ -647,13 +692,16 @@ export class Game {
     this.ov.querySelector('#close').onclick = () => this.closeMenu();
   }
 
-  enterFloor(n) {
-    const s = this.state, f = this.floors[n - 1];
+  enterFloor(n, custom) {
+    const s = this.state, f = custom || this.floors[n - 1];
+    if (!custom) this.eventFightCb = null;
     this.floor = f; this.kills = 0; this.boss = null; this.floorDone = false;
-    const map = Object.assign({}, this.mapTemplate, { seed: f.seed });
+    const map = Object.assign({}, this.mapTemplate, { seed: f.seed, tint: f.tint });
+    if (f.propsMix) map.props = f.propsMix.map(([set, count]) => ({ kind: ['grass', 'shroom', 'rocks', 'crystal'].includes(set) ? 'deco' : set === 'bush' ? 'bush' : 'tree', set, count, col: ['grass', 'shroom', 'rocks', 'crystal'].includes(set) ? 0 : 26, minDist: 60 + (count < 20 ? 60 : 0) }));
     this.world = new World(this.A, map);
     this.fx = new FX(this.A, this.view);
     this.player = new Player(this, this.world.spawn.x, this.world.spawn.y);
+    this.sk.reset(); this.sk.ensure();
     this.enemies = new Enemies(this, this.monsters, f);
     this.view.cam.x = this.player.x; this.view.cam.y = this.player.y;
     this.mode = 'field';
@@ -691,26 +739,65 @@ export class Game {
       B.push({ id: 'map', top: true, x: 70, y: 28, r: 18, label: '지도' });
       B.push({ id: 'quest', top: true, x: 112, y: 28, r: 18, label: '!' });
     }
-    if (this.mode === 'world' && !this.ow.cut) {
+    if (this.mode === 'world' && !this.ow.cut && !this.editBtns) {
       const lab = this.ow.prompt ? this.ow.prompt.label : '조사';
       B.push({ id: 'act', icon: 'talk', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab });
-    } else if (this.mode === 'porter' && this.porter) {
+    } else if (this.mode === 'porter' && this.porter && !this.editBtns) {
       const lab = this.porter.prompt ? (this.porter.prompt.kind === 'drop' ? '줍기' : '건네기') : '줍기';
       B.push({ id: 'act', icon: 'talk', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab });
       B.push({ id: 'dodge', x: X(150 * k), y: H - 38 * k, r: 26 * k, label: '회피', cd: this.porter.me.cd || 0, cdMax: 0.9 });
       const hid = this.healItem(); B.push({ id: 'potion', iconItem: hid ? 'item_' + hid : null, x: X(148 * k), y: H - 112 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
-    } else if (this.mode === 'field' && this.world) {
+    } else if ((this.mode === 'field' && this.world) || this.editBtns) {
       B.push({ id: 'act', icon: 'act', x: X(72 * k), y: H - 72 * k, r: 42 * k, label: '공격' });
-      const pl = this.player, jb = this.jobs[s.job] || {}, sk = jb.skill1;
-      B.push({ id: 'dodge', x: X(156 * k), y: H - 38 * k, r: 26 * k, label: '회피', cd: pl.cds.dodge, cdMax: pl.dg.cd });
-      B.push({ id: 'skill1', x: X(150 * k), y: H - 112 * k, r: 24 * k, label: sk ? sk.name : '기술', cost: sk ? sk.mp : 0, cd: pl.cds.skill1, cdMax: sk ? sk.cd : 1, locked: !sk });
-      B.push({ id: 'skill2', x: X(104 * k), y: H - 152 * k, r: 22 * k, label: '', locked: true });
-      B.push({ id: 'skill3', x: X(44 * k), y: H - 160 * k, r: 22 * k, label: '', locked: true });
-      const hid = this.healItem(); B.push({ id: 'potion', iconItem: hid ? 'item_' + hid : null, x: X(212 * k), y: H - 92 * k, r: 20 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
+      const pl = this.player || { cds: {}, dg: { cd: 1 } }, D = this.skills[s.job];
+      B.push({ id: 'dodge', x: X(160 * k), y: H - 40 * k, r: 26 * k, label: '회피', cd: pl.cds.dodge, cdMax: pl.dg.cd });
+      const pos = [[150, 112], [112, 156], [58, 172], [212, 150]];
+      for (let i = 0; i < 4; i++) {
+        const a = D && D.active[i], L = a ? this.sk.lv('a', i) : 0;
+        B.push({ id: 'skill' + (i + 1), x: X(pos[i][0] * k), y: H - pos[i][1] * k, r: (i === 3 ? 26 : 24) * k, label: a ? a.name.slice(0, 4) : '', cost: a && L ? a.mp : 0, cd: pl.cds['s' + i], cdMax: (pl.cdMax && pl.cdMax['s' + i]) || 1, locked: !L, ult: i === 3 });
+      }
+      const hid = this.healItem(); B.push({ id: 'potion', iconItem: hid ? 'item_' + hid : null, x: X(228 * k), y: H - 84 * k, r: 20 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
     }
-    const out = this.talking || this.menuOpen ? [] : B;
+    for (const b of B) { const o = Settings.v.btnPos && Settings.v.btnPos[b.id]; if (o) { b.x += o[0]; b.y += o[1]; } }
+    const out = this.talking || (this.menuOpen && !this.editBtns) ? [] : B;
     if (this.mode === 'world' && this.ow.cut && !this.menuOpen) out.push({ id: 'skip', top: true, always: true, x: W - 40, y: 26, r: 20, label: 'SKIP' });
     this.input.buttons = out;
+  }
+
+  // 받은 그림으로 탑 층 타일·소품 교체 (없으면 기존 그림 유지)
+  applyArt() {
+    const A = this.A, ok = (o) => o && o.w && !o.missing;
+    if (A.ftiles) for (const k of ['grass', 'flower', 'ledge', 'stairs']) if (ok(A.ftiles[k])) A.tiles[k] = [A.ftiles[k]];
+    const P = A.fprops; if (!P) return;
+    const set = (name, keys) => { const l = keys.map((k) => P[k]).filter(ok); if (l.length) A.props[name] = l; };
+    set('pine', ['pine']); set('pine2', ['pine']); set('tree', ['tree']); set('bush', ['bush']); set('grass', ['tallgrass']); set('small', ['rocks', 'shroom', 'stump']);
+    for (const k of ['boulder', 'log', 'rune', 'crystal', 'stump', 'shroom', 'rocks']) set(k, [k]);
+  }
+
+  // 11~30층: 받은 맵 그림으로 무작위 구성 (바이옴 색감·소품 조합·몬스터 조합이 층마다 다름)
+  genFloors() {
+    if (this.floors.length >= 30) return;
+    const B = [
+      { name: '안개 숲', tint: 'saturate(0.7) brightness(0.85)', props: [['pine', 50], ['tree', 20], ['bush', 40], ['log', 10], ['rocks', 40], ['grass', 50]] },
+      { name: '수정 동굴 입구', tint: 'hue-rotate(95deg) saturate(0.7) brightness(0.8)', props: [['crystal', 40], ['boulder', 30], ['rocks', 50], ['rune', 6], ['bush', 20]] },
+      { name: '황혼의 평원', tint: 'sepia(0.45) saturate(1.4) hue-rotate(-18deg)', props: [['tree', 30], ['bush', 50], ['stump', 20], ['grass', 70], ['shroom', 20]] },
+      { name: '고목의 숲', tint: 'saturate(0.85) brightness(0.72)', props: [['tree', 40], ['pine', 40], ['stump', 30], ['log', 20], ['shroom', 40]] },
+      { name: '룬의 유적', tint: 'grayscale(0.6) sepia(0.3) brightness(0.85)', props: [['rune', 14], ['boulder', 40], ['rocks', 60], ['stump', 10], ['crystal', 15]] },
+    ];
+    const pool = ['slime_purple', 'mushroom', 'bee', 'toad', 'bat', 'spider', 'treant', 'wolf'];
+    const bosses = ['stag', 'wolf_alpha', 'rift_guardian'];
+    let seed = 9137;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    for (let n = this.floors.length + 1; n <= 30; n++) {
+      const b = B[(n - 11) % B.length];
+      const types = [...pool].sort(() => rnd() - 0.5).slice(0, 3);
+      this.floors.push({
+        n, name: `${n}층 ${b.name}`, map: 'floor01', seed: 1000 + n * 7919, hpMul: 1 + 0.25 * (n - 1), dmgMul: 1 + 0.15 * (n - 1), goal: 10 + Math.floor(n / 3),
+        boss: n % 5 === 0 ? bosses[(n / 5) % bosses.length] : bosses[n % bosses.length],
+        spawns: types.map((t, i) => ({ type: t, count: i === 0 ? 4 : 2 })),
+        tint: b.tint, propsMix: b.props,
+      });
+    }
   }
 
   // HTML 창(메뉴, 상점 등)에도 그림 테두리를 입힌다
@@ -722,6 +809,21 @@ export class Game {
       const o = U[n]; if (o && o.im && !o.missing) { root.setProperty(v, `url(${o.im.toDataURL()})`); any = true; }
     }
     if (any) document.documentElement.classList.add('skinned');
+  }
+
+  // 버튼 위치 편집: 버튼을 끌어 옮기고 저장
+  openButtonEditor() {
+    this.menuOpen = true; this.editBtns = true; this.input.reset();
+    this.ov.innerHTML = `<div class="editbar"><span>버튼을 끌어서 옮기세요</span><button id="ebr">초기화</button><button class="primary" id="ebd">완료</button></div>`;
+    let drag = null;
+    this.input.editor = {
+      down: (x, y) => { drag = this.input.buttons.find((b) => !b.top && Math.hypot(x - b.x, y - b.y) < b.r * 1.2); if (drag) drag.off = [x, y]; },
+      move: (x, y) => { if (!drag) return; const o = Settings.v.btnPos[drag.id] || [0, 0]; Settings.v.btnPos[drag.id] = [o[0] + x - drag.off[0], o[1] + y - drag.off[1]]; drag.off = [x, y]; },
+      up: () => { drag = null; Settings.save(); },
+    };
+    Settings.v.btnPos = Settings.v.btnPos || {};
+    this.ov.querySelector('#ebr').onclick = () => { Settings.v.btnPos = {}; Settings.save(); };
+    this.ov.querySelector('#ebd').onclick = () => { this.input.editor = null; this.editBtns = false; Settings.save(); this.closeMenu(); };
   }
 
   applyTheme() { document.body.className = this.state && this.mode !== 'title' && this.mode !== 'create' && this.awakened() ? 'sys' : 'plain'; }
@@ -757,7 +859,7 @@ export class Game {
     if (e.d.drop) for (const id in e.d.drop) if (Math.random() < e.d.drop[id]) s.inv[id] = (s.inv[id] || 0) + 1;
     s.rumor += 0.02;
     while (s.lv < 100 && s.exp >= this.expNeed()) {
-      s.exp -= this.expNeed(); s.lv++; s.pts += 5; s.hp = this.maxHp();
+      s.exp -= this.expNeed(); s.lv++; s.pts += 5; s.skp = (s.skp || 0) + 1; s.hp = this.maxHp();
       this.hud.say('레벨 업! Lv.' + s.lv + ' · 스탯 포인트 +5'); this.sound.sfx('levelup');
     }
     if (e === this.boss) { this.clearFloor(); return; }
@@ -765,6 +867,7 @@ export class Game {
   }
 
   clearFloor() {
+    if (this.eventFightCb) { const cb = this.eventFightCb; this.eventFightCb = null; this.floorDone = true; setTimeout(() => { this.world = null; this.player = null; this.boss = null; cb(); }, 1200); return; }
     const s = this.state, n = this.floor.n;
     this.floorDone = true; this.sound.play('hub');
     if (!s.cleared[n]) s.rumor += 1;
@@ -781,13 +884,24 @@ export class Game {
     }, 1500);
   }
 
+  // 이벤트 전투: 컷신 도중 전투로 들어갔다가 목표를 채우면 컷신으로 돌아온다
+  eventFight(def, done) {
+    const f = Object.assign({ n: 0, name: def.name || '전투', seed: 777, hpMul: 1, dmgMul: 1, goal: def.goal || 1, boss: def.boss }, { spawns: def.spawns || [] });
+    this.eventFightCb = done; this.eventSafe = !!def.safe;
+    this.enterFloor(0, f);
+    if (def.boss && def.bossNow) { this.boss = this.enemies.spawnBoss(def.boss); this.sound.play('boss'); }
+    if (def.hint) this.toast(def.hint);
+  }
+
   backToPlaza() {
     this.world = null; this.player = null; this.floor = null; this.boss = null;
     this.enterWorldMode();
     this.ow.load('plaza', [7, 3], 'D').then(() => this.save());
   }
 
-  onPlayerDeath() { this.state.dead = true; Save.wipe(); this.sound.stopMusic(); this.sound.sfx('death'); setTimeout(() => this.showEnd(), 2600); }
+  onPlayerDeath() {
+    if (this.eventSafe && this.eventFightCb) { this.state.hp = 1; this.player.state = 'idle'; this.player.inv = 2; this.toast('아직 쓰러질 수 없다'); return; }
+    this.state.dead = true; Save.wipe(); this.sound.stopMusic(); this.sound.sfx('death'); setTimeout(() => this.showEnd(), 2600); }
 
   showEnd() {
     this.mode = 'end'; this.menuOpen = true;
@@ -834,7 +948,7 @@ export class Game {
       if (busy) return;
       if (this.hitstop > 0) { this.hitstop -= dt; for (const f of this.fx.list) f.t += dt * 0.3; return; }
       this.comboT = Math.max(0, this.comboT - dt); if (this.comboT <= 0) this.comboN = 0;
-      this.player.update(dt); this.enemies.update(dt); this.fx.update(dt);
+      this.player.update(dt); this.enemies.update(dt); this.sk.update(dt); this.fx.update(dt);
       this.view.follow(this.player.x, this.player.y, dt, { w: this.world.w, h: this.world.h });
 
     }
@@ -868,7 +982,8 @@ export class Game {
       const list = [];
       this.world.collectProps(v, list); this.enemies.collect(list); this.player.collect(list);
       list.sort((a, b) => a.y - b.y).forEach((o) => o.d());
-      this.fx.draw(false); this.player.drawSwords(); this.fx.drawNums();
+      this.sk.draw();
+      this.fx.draw(false); this.fx.drawNums();
       v.screen();
       this.hud.draw();
       this.hud.drawControls();
