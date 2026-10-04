@@ -34,8 +34,8 @@
 
 - 왼쪽 아래 조이스틱으로 이동 (끝까지 밀면 달리기). 손가락이 밖으로 나가도 떼기 전까지 방향 유지
 - 오른쪽 큰 버튼: 마을과 탑에서 공격 (달리며 누르면 돌진 베기), 원정에서는 줍기·건네기
-- 말 걸기·조사: 대상 근처에서만 공격 버튼 위쪽에 따로 뜨는 작은 버튼
-- 마을 PK: 시스템 탭 'PK 허용'(기본 끔). 켜면 마을 사람도 공격 대상, 성격에 따라 반격·도망·애원·신고. 이름 있는 인물은 기절, 행인은 죽으면 다른 구역에 새 행인
+- 말 걸기·조사: 마을에서 대상 근처면 공격 버튼이 말 걸기·조사로 바뀐다
+- 마을 PK: 오른쪽 위 PK 버튼으로 켜고 끔(기본 끔, 켜면 빨간 테두리). 켜면 마을 사람도 공격 대상, 성격에 따라 반격·도망·애원·신고. 이름 있는 인물은 기절, 행인은 죽으면 다른 구역에 새 행인
 - 회피, 기술, 회복 버튼. 빈 곳을 밀어도 회피
 - 메뉴: 가방, 장비, 상태, 지도, 퀘스트, 설정 (조이스틱 방식, 민감도, 버튼 크기, 왼손 모드, 화면 확대)
 - 도시는 구역이 길로 이어져 있고, 가장자리로 걸어가면 옆 구역으로 넘어간다. 오른쪽 위에 미니맵
@@ -71,3 +71,17 @@
 - 충돌: 0 통행, 1 막힘, 2 물, 3 낮은 막힘. 오브젝트·바닥에서 자동 계산, 필요하면 `collision` 글자 지도(0~3)로 덮어쓰기
 - `items`: 놓인 아이템 `{id, at, n, key}`. 한 번 주우면 key로 기록되어 다시 안 생김
 - `doors`·`edges`: 문과 가장자리 이동, `npcs`: 배치 NPC, `events`: 밟으면 실행되는 컷신, `objects`: 조사 지점
+
+## 이벤트 (data/events.json, data/events/*.json, 맵의 events)
+
+- 이벤트 = 트리거(on) + 조건(if) + 행동(play 또는 steps). once 기본 true
+- 트리거: step(밟기 rect), talk(npc), examine(조사 지점 id), enter(맵), item(아이템), kill(처치 수 count, monster), day·flag(조건만)
+- 조건: flag, noflag, gender, phase, job, awakened, var, day, karma, aff, item, lv, quest, all·any·not
+- 행동: 기존 컷신 명령(say·move·face·spawn·cam·fade·card·map·fight 등) + label·goto(if 붙이면 조건 분기), camMove·zoom·camReset, quest(act: start·done), var(set·add), give, money, aff, karma, sys(시스템창), event(다른 이벤트 이어 붙이기)
+- 선택지 분기: 선택지에 flag 를 달고 다음 줄에 {goto, if:{flag}}
+
+## 퀘스트 (data/quests.json)
+
+- 메인·서브, 단계별 목표(kill·collect·talk·go·floor), 보상(money·exp·items·aff), 기한(deadline)
+- 머리 위 표시: 받을 수 있으면 ?, 보고할 수 있으면 !. 각성 전에는 퀘스트 없음(지금 할 일 안내만)
+- 퀘스트 창에서 고른 퀘스트를 목표 화살표가 안내

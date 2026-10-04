@@ -1,0 +1,85 @@
+{
+ "main_31": {
+  "type": "main",
+  "title": "31층 기한",
+  "auto": true,
+  "deadline": 365,
+  "desc": "1년 안에 31층이 돌파되지 않으면 세계 어딘가에 포탈이 열린다. 정체를 숨긴 채 탑을 오른다.",
+  "stages": [
+   {
+    "text": "31층 돌파",
+    "target": {
+     "map": "plaza",
+     "at": [
+      16,
+      2
+     ]
+    },
+    "goals": [
+     {
+      "type": "floor",
+      "floor": 31
+     }
+    ]
+   }
+  ]
+ },
+ "sub_shard": {
+  "type": "sub",
+  "title": "납품 물량",
+  "giver": "merchant",
+  "giverAt": {
+   "map": "hunter_shop",
+   "at": [
+    1,
+    5
+   ]
+  },
+  "if": {
+   "awakened": true
+  },
+  "desc": "헌터 상점 주인이 협회에 납품할 마정석 조각이 모자라다고 한다.",
+  "offer": [
+   "혹시 마정석 조각 좀 구해 올 수 있어요? 협회 납품 물량이 모자라서요.",
+   "다섯 개면 돼요. 시세보다는 더 쳐 드릴게요."
+  ],
+  "accept": [
+   "아래층에서도 나오니까 무리하진 마요."
+  ],
+  "decline": [
+   "그래요, 바쁘면 어쩔 수 없죠."
+  ],
+  "report": [
+   "다섯 개 맞네요. 덕분에 납품 날짜 맞췄어요.",
+   "약속한 돈이에요. 이건 그냥 가져가요."
+  ],
+  "stages": [
+   {
+    "text": "마정석 조각 모으기",
+    "target": {
+     "map": "plaza",
+     "at": [
+      16,
+      2
+     ]
+    },
+    "goals": [
+     {
+      "type": "collect",
+      "item": "mana_shard",
+      "n": 5
+     }
+    ]
+   }
+  ],
+  "reward": {
+   "money": 30000,
+   "items": {
+    "potion": 2
+   },
+   "aff": {
+    "merchant": 5
+   }
+  }
+ }
+}

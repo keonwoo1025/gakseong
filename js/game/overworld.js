@@ -238,18 +238,9 @@ export class Overworld {
         else this.goto(d.to, d.spawn, d.dir);
       }
     }
-    // 트리거
-    for (const t of this.map.triggers || []) {
-      if (t.if && !g.check(t.if)) continue;
-      const key = t.id || t.scene;
-      if (t.once !== false && (this.firedTriggers.has(key) || g.state.flags['trig_' + key])) continue;
-      const [x, y, w, h] = t.rect;
-      if (p.x > x * TS && p.x < (x + w) * TS && p.y > y * TS && p.y < (y + h) * TS) {
-        this.firedTriggers.add(key); if (t.once !== false) g.state.flags['trig_' + key] = true;
-        this.play(t.scene);
-        return;
-      }
-    }
+    // 밟기 트리거 (이벤트 DB)
+    if (g.events.fire('step', { c: Math.floor(p.x / TS), r: Math.floor((p.y - 15) / TS) })) return;
+    g.events.update(dt);
     this.prompt = this.findInteract();
   }
 
@@ -294,6 +285,7 @@ export class Overworld {
     if (g.gear.isGear(it.id)) g.gear.give(it.id); else s.inv[it.id] = (s.inv[it.id] || 0) + (it.n || 1);
     s.flags['item_' + it.key] = true;
     this.items = this.items.filter((x) => x !== it);
+    g.onItem(it.id);
     g.sound.sfx('select'); g.toast(`${def.name}${(it.n || 1) > 1 ? ' ×' + it.n : ''}을(를) 주웠다`);
   }
 
@@ -399,7 +391,7 @@ export class Overworld {
 
   // ---------- 컷신 ----------
   async play(id, onEnd) {
-    const data = typeof id === 'string' ? await this.g.getJSON(`data/cutscenes/${id}.json`) : id;
+    const data = typeof id === 'string' ? await this.g.getJSON(`data/events/${id}.json`) : id;
     this.prompt = null;
     this.cut = new Cutscene(this, data.steps || data, () => { this.cut = null; this.camTarget = 'player'; onEnd && onEnd(); this.g.onCutsceneEnd && this.g.onCutsceneEnd(); });
     this.g.input.reset();
@@ -443,10 +435,10 @@ export class Overworld {
     }
     for (const m of this.mobs) list.push({ y: m.y, d: () => { const f = m.M.hop[Math.floor(m.t * 3) % m.M.hop.length]; v.shadow(m.x, m.y, 18 * K); v.sprite(f, m.x, m.y, 0.34 * K); } });
     list.sort((a, b) => a.y - b.y).forEach((o) => o.d());
-    for (const id in this.actors) { const a = this.actors[id]; if (a.emote && a.visible) this.drawEmote(a); if (a.say && a.visible) this.drawSay(a); }
+    for (const id in this.actors) { const a = this.actors[id]; if (a.emote && a.visible) this.drawEmote(a); if (a.say && a.visible) this.drawSay(a); if (a.npc && a.visible && a.alive && !a.ko && !a.say && !this.cut) { const mk = this.g.quests.mark(id); if (mk) this.drawMark(a, mk); } }
     if (this.g.sk && this.g.awakened && this.g.state && this.g.awakened()) this.g.sk.draw();
     if (this.g.mode === 'world' && !this.g.talking) this.drawGuide();
-    if (this.prompt && !this.cut && this.g.mode === 'world') {
+    if (this.prompt && !this.cut && this.g.mode === 'world' && this.g.actTarget()) {
       const p = this.prompt;
       ctx.font = '700 30px system-ui,sans-serif'; ctx.textAlign = 'center';
       const w = ctx.measureText(p.label).width + 36;
@@ -473,6 +465,13 @@ export class Overworld {
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(a.x - 36, top, 72, 8);
       ctx.fillStyle = '#e8433f'; ctx.fillRect(a.x - 35, top + 1, 70 * Math.max(0, a.hp / a.d.hp), 6);
     }
+  }
+
+  // 퀘스트 표시: 받을 수 있으면 ?, 보고할 수 있으면 !
+  drawMark(a, m) {
+    const ctx = this.view().ctx, T = performance.now() / 1000, x = a.x, y = a.y - CH - 36 + Math.sin(T * 4) * 5;
+    ctx.font = '900 44px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 6; ctx.strokeStyle = '#1a1420';
+    ctx.fillStyle = m === '!' ? '#ffd23f' : '#7fd8ff'; ctx.strokeText(m, x, y); ctx.fillText(m, x, y); ctx.textAlign = 'left';
   }
 
   drawSay(a) {
@@ -557,6 +556,22 @@ export class Cutscene {
         return;
       }
       if (s.call) { const r = g.cutCall(s.call, s.arg, () => this.next()); if (r === 'async') return; continue; }
+      // ---- 분기 (조건 if 가 맞을 때만 이동, 선택지는 flag 로 받아서 분기) ----
+      if (s.label) continue;
+      if (s.goto) { const k = this.steps.findIndex((x) => x.label === s.goto); if (k >= 0) this.i = k; continue; }
+      // ---- 카메라 ----
+      if (s.camMove) { ow.camTarget = [(s.camMove[0] + 0.5) * TS, (s.camMove[1] + 0.5) * TS]; if (s.t) { this.wait = s.t; return; } continue; }
+      if (s.zoom !== undefined) { g.camZoom = s.zoom; if (s.t) { this.wait = s.t; return; } continue; }
+      if (s.camReset) { ow.camTarget = 'player'; g.camZoom = 1; continue; }
+      // ---- 진행·보상 ----
+      if (s.quest) { if (s.act === 'done') g.quests.complete(s.quest); else g.quests.start(s.quest); continue; }
+      if (s.var) { const V = (g.state.vars = g.state.vars || {}); V[s.var] = s.set !== undefined ? s.set : (V[s.var] || 0) + (s.add || 1); continue; }
+      if (s.give) { for (const id in s.give) { if (g.gear.isGear(id)) g.gear.give(id); else g.state.inv[id] = (g.state.inv[id] || 0) + s.give[id]; g.onItem(id); } continue; }
+      if (s.money) { g.state.money += s.money; continue; }
+      if (s.aff) { for (const id in s.aff) g.aff(id, s.aff[id]); continue; }
+      if (s.karma) { g.state.karma = (g.state.karma || 0) + s.karma; continue; }
+      if (s.sys) { g.sysPopup(s.sys, () => this.next()); return; }
+      if (s.event) { g.getJSON(`data/events/${s.event}.json`).then((d) => { this.steps.splice(this.i + 1, 0, ...(d.steps || d)); this.next(); }); return; }
       if (s.end) { this.onEnd(); return; }
     }
   }

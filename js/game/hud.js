@@ -245,6 +245,7 @@ export class HUD {
         } else { ctx.fillStyle = T.text; ctx.font = F(800, Math.round(Math.max(10, b.r * 0.42))); ctx.fillText(b.locked ? '🔒' : b.label, b.x, b.y + b.r * 0.15); }
         if (b.sub !== undefined && !b.locked) { ctx.font = F(700, 9); ctx.fillStyle = T.accent; ctx.textAlign = 'center'; ctx.fillText('×' + b.sub, b.x, b.y + b.r * 0.62); }
         if (isSk && !b.locked) { ctx.font = F(800, 9); ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.fillText(b.label, b.x, b.y + b.r + 11); }
+        if (b.warn) { ctx.globalAlpha = 1; ctx.strokeStyle = '#ff3b3b'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke(); }
         ctx.globalAlpha = 1; ctx.textAlign = 'left'; this.cdOverlay(ctx, b); continue;
       }
       ctx.fillStyle = on ? T.act : b.id === 'act' ? (T.sys ? 'rgba(20,70,120,0.8)' : 'rgba(120,60,30,0.78)') : T.bg;

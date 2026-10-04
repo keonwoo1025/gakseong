@@ -178,3 +178,9 @@ body.sys .eqc.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
 .eqc i{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pbody .left .dim{margin:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mapwrap canvas{display:block}
+
+/* 퀘스트 목록 */
+.qrow{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:4px 8px;min-height:0;text-align:left;border-radius:6px;font-size:12px;line-height:1.25}
+.qrow.on{border-color:var(--gold);background:rgba(201,162,74,0.22)}
+body.sys .qrow.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
+.qrow small{font-size:9px;color:var(--ink-dim)}.qrow i{font-style:normal;font-size:10px;color:var(--ink-dim)}

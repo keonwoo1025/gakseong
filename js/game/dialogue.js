@@ -1,3 +1,4 @@
+import { checkCond } from './events.js';
 // 대사 실행기: data/dialogue/*.json 의 줄을 순서대로 보여주고, 선택지는 행동 패턴과 친밀도에 기록한다.
 // 줄 형식: { speaker, portrait, text, variants:[{if:{...}, text}], choices:[{text, pattern, aff, flag}], if:{...} }
 import { fmt } from './korean.js';
@@ -18,27 +19,8 @@ export class Dialogue {
     this.next();
   }
 
-  match(cond) {
-    if (!cond) return true;
-    const s = this.g.state;
-    for (const k in cond) {
-      const v = cond[k];
-      if (k === 'gender' && s.gender !== v) return false;
-      if (k === 'job' && s.job !== v) return false;
-      if (k === 'flag' && !s.flags[v]) return false;
-      if (k === 'noflag' && s.flags[v]) return false;
-      if (k === 'minKarma' && s.karma < v) return false;
-      if (k === 'maxKarma' && s.karma > v) return false;
-      if (k === 'personality') {
-        const npc = this.g.npcs[cond.npc];
-        if (!npc || npc.personality !== v) return false;
-      }
-      if (k === 'minAff') {
-        for (const id in v) if ((s.aff[id] || 0) < v[id]) return false;
-      }
-    }
-    return true;
-  }
+  // 조건은 이벤트와 같은 형식 (events.js checkCond)
+  match(cond) { return checkCond(this.g, cond, { npc: cond && cond.npc }); }
 
   next() {
     const lines = this.scene.lines;

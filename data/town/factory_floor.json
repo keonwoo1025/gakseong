@@ -286,33 +286,42 @@
  "events": [
   {
    "id": "injured",
-   "rect": [
-    11,
-    8,
-    5,
-    3
-   ],
-   "scene": "prologue_injured"
+   "on": {
+    "type": "step",
+    "rect": [
+     11,
+     8,
+     5,
+     3
+    ]
+   },
+   "play": "prologue_injured"
   },
   {
    "id": "locked",
-   "rect": [
-    15,
-    6,
-    3,
-    3
-   ],
-   "scene": "prologue_locked"
+   "on": {
+    "type": "step",
+    "rect": [
+     15,
+     6,
+     3,
+     3
+    ]
+   },
+   "play": "prologue_locked"
   },
   {
    "id": "exit",
-   "rect": [
-    16,
-    1,
-    4,
-    2
-   ],
-   "scene": "prologue_exit"
+   "on": {
+    "type": "step",
+    "rect": [
+     16,
+     1,
+     4,
+     2
+    ]
+   },
+   "play": "prologue_exit"
   }
  ]
 }
