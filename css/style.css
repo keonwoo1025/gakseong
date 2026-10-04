@@ -110,3 +110,49 @@ button:disabled{opacity:.4}
 .field{min-width:0}
 .field input{width:100%;min-width:0}
 .setrow .seg button{white-space:nowrap;padding:4px 7px}
+/* ===== 테마: 각성 전(plain) / 각성 후 시스템창(sys) ===== */
+body.plain{--ink:#f2f2f4;--ink-dim:#a9a9b2;--gold:#e9a85a;--panel:rgba(30,30,36,0.94);--line:rgba(255,255,255,0.16)}
+body.plain .card,body.plain .panel{border-radius:16px}
+body.plain button{border-radius:10px;border-color:rgba(255,255,255,0.14);background:rgba(255,255,255,0.07)}
+body.plain button.on,body.plain button.primary,body.plain .tab.on{background:#e9a85a;border-color:#e9a85a;color:#1c1408}
+body.sys{--ink:#eaf6ff;--ink-dim:#8fb4cc;--gold:#7fd8ff;--panel:rgba(6,14,30,0.92);--line:#5cc8ff}
+body.sys .card,body.sys .panel{border-radius:2px;border:1px solid #5cc8ff;box-shadow:0 0 12px rgba(92,200,255,0.55),inset 0 0 18px rgba(92,200,255,0.12);position:relative}
+body.sys .card::before,body.sys .panel::before,body.sys .card::after,body.sys .panel::after{content:"";position:absolute;width:14px;height:14px;border:2px solid #bfeaff;pointer-events:none}
+body.sys .card::before,body.sys .panel::before{left:-3px;top:-3px;border-right:none;border-bottom:none}
+body.sys .card::after,body.sys .panel::after{right:-3px;bottom:-3px;border-left:none;border-top:none}
+body.sys button{border-radius:2px;border-color:rgba(92,200,255,0.5);background:rgba(92,200,255,0.06);color:#eaf6ff}
+body.sys button.on,body.sys button.primary,body.sys .tab.on{background:rgba(92,200,255,0.28);border-color:#7fd8ff;color:#ffffff;box-shadow:0 0 8px rgba(92,200,255,0.6)}
+body.sys .slot.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
+body.sys .detail{background:rgba(92,200,255,0.05);border-color:rgba(92,200,255,0.3)}
+body.sys .ptop b,body.sys .card h2{color:#9fe4ff;letter-spacing:.08em;text-shadow:0 0 8px rgba(92,200,255,0.7)}
+/* 시스템 알림 창 */
+.sysmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:auto;background:rgba(0,4,12,0.55)}
+.sysmsg .win{min-width:min(420px,86vw);max-width:90vw;padding:14px 22px 16px;background:rgba(6,14,30,0.94);border:1px solid #5cc8ff;box-shadow:0 0 16px rgba(92,200,255,0.7),inset 0 0 20px rgba(92,200,255,0.15);text-align:center;color:#eaf6ff;animation:sysin .35s ease-out;position:relative}
+.sysmsg .win .h{display:inline-block;padding:2px 14px;margin-bottom:10px;border:1px solid #7fd8ff;color:#9fe4ff;font-weight:700;letter-spacing:.2em;font-size:13px}
+.sysmsg .win p{margin:4px 0;font-size:15px;line-height:1.6;white-space:pre-line}
+.sysmsg .win .t{margin-top:10px;font-size:11px;color:#8fb4cc}
+@keyframes sysin{from{opacity:0;transform:scaleY(0.2)}to{opacity:1;transform:scaleY(1)}}
+/* 상태창 (제노니아식) */
+.stwrap{display:flex;gap:10px;flex:1;min-height:0}
+.stleft{flex:0.9;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px}
+.stleft canvas{width:min(110px,22vh);height:min(110px,22vh);image-rendering:pixelated}
+.bar{width:100%;height:9px;background:rgba(255,255,255,0.08);position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0}
+.bar.hp i{background:#e8433f}.bar.sp i{background:#4aa3ff}.bar.xp i{background:#9fe07a}
+.stright{flex:1.6;display:flex;flex-direction:column;gap:6px;min-width:0}
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.big3 div{border:1px solid var(--line);padding:4px;text-align:center;font-size:11px;color:var(--ink-dim)}
+.big3 b{display:block;font-size:17px;color:var(--ink)}
+.stats5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.stats5 div{border:1px solid var(--line);padding:3px;text-align:center;font-size:11px;color:var(--ink-dim)}
+.stats5 b{display:block;font-size:15px;color:var(--ink)}
+.stats5 b.up{color:#7fffb0}
+.stats5 button{width:100%;padding:2px 0;margin-top:2px;font-size:13px}
+.strow{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--ink-dim)}
+.strow button{flex:0 0 auto}
+.skgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;flex:1.4;align-content:start}
+.skgrid .slot{height:min(54px,12vh)}
+.skgrid .slot small{font-size:9px;color:var(--ink-dim)}
+.strow .primary{width:auto;margin-top:0}
+.strow span{min-width:0}
+.uiimg{width:28px;height:28px;image-rendering:pixelated;object-fit:contain}

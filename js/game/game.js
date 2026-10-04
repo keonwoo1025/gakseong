@@ -14,6 +14,7 @@ import { fmt } from './korean.js';
 import { Overworld } from './overworld.js';
 import { PorterRun } from './porter.js';
 import { makePortrait } from './pixel.js';
+import { setSkin } from './hud.js';
 import { Settings } from '../engine/settings.js';
 
 const PERSONALITIES = ['열혈형', '냉철한 전략가', '다정한 보호자', '겁 많은 선인', '오만한 천재', '호기심 덩어리', '과묵한 고독자', '계산적 실리주의', '헌신적 신앙형', '자유로운 장난꾸러기'];
@@ -42,8 +43,12 @@ export class Game {
     this.talking = false;
     this.portraits = {};
     this.input.on('button', (id) => {
+      if (id === 'skip') { if (this.ow.cut) this.ow.cut.skip(); return; }
       if (this.talking || this.menuOpen || (this.mode === 'world' && this.ow.cut)) return;
-      if (id === 'menu') return this.openMenu();
+      if (id === 'skip') { if (this.ow.cut) this.ow.cut.skip(); return; }
+      if (id === 'menu') return this.openMenu('status');
+      if (id === 'map') return this.openMenu('map');
+      if (id === 'quest') return this.openMenu('quest');
       if (id === 'act') {
         if (this.mode === 'world') this.ow.interact();
         else if (this.mode === 'porter') this.porter.interact();
@@ -66,12 +71,13 @@ export class Game {
   async boot() {
     this.A = await loadAssets('data/manifest.json', (d, t) => (this.progress = [d, t]));
     this.ver = this.A.version + '.' + Date.now().toString(36).slice(-3);
-    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'store', 'floors', 'barks', 'news', 'music', 'looks', 'citymap'];
+    const names = ['jobs', 'monsters', 'npcs', 'items', 'shop', 'store', 'floors', 'barks', 'news', 'music', 'looks', 'citymap', 'skills'];
     const data = await Promise.all(names.map((n) => this.getJSON(`data/${n}.json`)));
     names.forEach((n, i) => (this[n] = data[i]));
     this.mapTemplate = await this.getJSON('data/maps/floor01.json');
     this.npcById = Object.fromEntries(this.npcs.map((n) => [n.id, n]));
     this.sound.setTracks(this.music);
+    setSkin((n) => this.A.ui && this.A.ui[n]);
     this.showTitle();
   }
 
@@ -131,7 +137,7 @@ export class Game {
 
   // ---------- 타이틀과 생성 ----------
   showTitle() {
-    this.mode = 'title'; this.ow.map = null; this.world = null;
+    this.mode = 'title'; this.ow.map = null; this.world = null; document.body.className = 'plain';
     this.sound.play('title');
     const has = Save.has();
     this.ov.innerHTML = `<div class="screen"><div class="title">
@@ -196,10 +202,7 @@ export class Game {
     this.worldButtons();
   }
 
-  worldButtons() {
-    this.ov.innerHTML = `<button id="menuBtn" class="fieldbtn">메뉴</button>`;
-    this.ov.querySelector('#menuBtn').onclick = () => this.openMenu();
-  }
+  worldButtons() { this.ov.innerHTML = ''; this.applyTheme(); }
 
   zoomForMode() { if (this.mode === 'world') this.view.setZoom(64, 1); else this.view.setZoom(96, 1.12); }
 
@@ -229,11 +232,9 @@ export class Game {
     if (this.awakened()) { this.runLine({ speaker: n, portrait: k, text: this.pick(['얼굴 좋아졌네. 무슨 일 있었냐.', '요즘 안 보이더라. 어디서 뭘 하든, 살아서 다녀라.', '짐꾼 일은 안 하냐? …그래, 잘됐다.']) }); return; }
     if (s.flags.jobToday) { this.runLine({ speaker: n, portrait: k, text: '광장에서 들꽃 파티 기다린다. 늦지 마.' }); return; }
     if (s.flags.workedToday) { this.runLine({ speaker: n, portrait: k, text: '오늘 일은 끝났다. 들어가서 쉬어.' }); return; }
-    this.runLine({ speaker: n, portrait: k, text: '들꽃 파티 동행 건 있다. 일당 4만 원에 회수 수당 따로. 할래?', choices: [{ text: '하겠습니다', flag: '_job' }, { text: '오늘은 쉴게요' }] }, () => {
-      if (s.flags._job) {
-        delete s.flags._job; s.flags.jobToday = true; s.objective = '탑 입구 광장에서 들꽃 파티와 합류하기 (거리 오른쪽 끝)';
-        this.runLine({ speaker: n, portrait: k, text: '구급상자는 챙겼냐. 없으면 편의점 들렀다 가.' });
-      }
+    const last = s.porterDepth >= 9;
+    this.runLine({ speaker: n, portrait: k, text: last ? '들꽃 파티가 10층 보스방 앞까지 간단다. 일당 두 배. 갈래?' : '들꽃 파티 동행 건 있다. 일당 4만 원에 회수 수당 따로. 할래?', choices: [{ text: '하겠습니다', flag: '_job' }, { text: '오늘은 쉴게요' }] }, () => {
+      if (s.flags._job) { delete s.flags._job; s.flags.jobToday = true; this.gather(); }
     });
   }
 
@@ -286,6 +287,7 @@ export class Game {
     const s = this.state;
     if (name === 'startPorterLife') {
       s.objective = '사장님에게 말을 걸어 의뢰 받기';
+      s.objTarget = { map: 'office', at: [2, 2] };
       this.save();
       return;
     }
@@ -295,6 +297,14 @@ export class Game {
       this.ow.play('awaken');
       return 'async';
     }
+    if (name === 'systemOn') {
+      this.sysPopup([
+        { h: '알림', t: '조건을 충족했습니다.' },
+        { h: '알림', t: '전설 「{직업}」의 계승이 확인되었습니다.' },
+        { h: '시스템', t: '지금부터 이 창은 당신에게만 보입니다.' },
+      ], next);
+      return 'async';
+    }
     if (name === 'afterAwaken') {
       s.phase = 'hidden'; s.flags.masked = true;
       s.lv = 1; s.exp = 0; s.pts = 5;
@@ -302,7 +312,8 @@ export class Game {
       s.unlocked = 1; s.cleared = {};
       s.hp = this.maxHp();
       s.flags.jobToday = false; s.flags.workedToday = true;
-      s.objective = '메뉴의 상태에서 스탯을 분배하고, 정체를 숨긴 채 탑에 오르기';
+      s.objective = '상태 창에서 스탯을 분배하고, 탑 광장에서 정체를 숨긴 채 탑에 오르기';
+      s.objTarget = { map: 'plaza', at: [16, 2] };
       this.ow.goto('room', [3, 4], 'D').then(() => { this.save(); next(); });
       return 'async';
     }
@@ -312,6 +323,8 @@ export class Game {
 
   // ---------- 상점 ----------
   icon(id) {
+    const sk = this.A.ui && this.A.ui['item_' + id];
+    if (sk && sk.im) { this.iconCache = this.iconCache || {}; if (!this.iconCache[id]) this.iconCache[id] = sk.im.toDataURL(); return `<img class="uiimg" src="${this.iconCache[id]}" alt="">`; }
     const it = this.items[id] || {};
     const map = { ramen: '🍜', painkiller: '💊', first_aid: '🩹', potion: '🧪', return_stone: '🔮', mana_shard: '💎', dagger_old: '🗡️', cloth_work: '👕', jacket_hunter: '🧥', coat_armored: '🥋' };
     return map[id] || (it.slot === 'weapon' ? '⚔️' : it.slot === 'outfit' ? '🧥' : '📦');
@@ -344,7 +357,7 @@ export class Game {
   restoreButtons() { this.worldButtons(); }
 
   // ---------- 메뉴 (제노니아식 한 화면 탭) ----------
-  openMenu(tab = 'bag') {
+  openMenu(tab = 'status') {
     if (this.talking || (this.mode === 'world' && this.ow.cut)) return;
     if (!['world', 'porter', 'field'].includes(this.mode)) return;
     this.menuOpen = true; this.input.reset();
@@ -354,17 +367,18 @@ export class Game {
 
   renderMenu(msg = '') {
     const s = this.state, tab = this.menuTab;
-    const tabs = [['bag', '가방'], ['gear', '장비'], ['status', '상태'], ['map', '지도'], ['quest', '퀘스트'], ['settings', '설정']];
+    const tabs = [['status', '상태'], ['gear', '장비'], ['bag', '가방'], ['skill', '스킬'], ['quest', '퀘스트'], ['map', '지도'], ['settings', '시스템']];
     let body = '';
     if (tab === 'bag') body = this.menuBag();
     if (tab === 'gear') body = this.menuGear();
     if (tab === 'status') body = this.menuStatus();
     if (tab === 'map') body = '<div class="mapwrap"><canvas id="cmap"></canvas></div>';
     if (tab === 'quest') body = this.menuQuest();
+    if (tab === 'skill') body = this.menuSkill();
     if (tab === 'settings') body = this.menuSettings();
     this.ov.innerHTML = `<div class="screen"><div class="panel">
       <div class="ptop">${tabs.map(([k, n]) => `<button class="tab ${tab === k ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}
-        ${this.mode === 'world' ? '<button class="tab" id="sv">저장</button>' : ''}<button class="x" id="close">✕</button></div>
+<button class="x" id="close">✕</button></div>
       <div class="pbody">${body}</div>
       ${msg ? `<div class="pmsg">${esc(msg)}</div>` : ''}
     </div></div>`;
@@ -374,7 +388,7 @@ export class Game {
     this.bindMenu(tab);
   }
 
-  closeMenu() { this.menuOpen = false; this.restoreButtons(); }
+  closeMenu() { this.menuOpen = false; this.pend = {}; this.restoreButtons(); }
 
   menuBag() {
     const s = this.state;
@@ -411,19 +425,42 @@ export class Game {
 
   menuStatus() {
     const s = this.state, D = Math.max(0, DEADLINE - s.day);
-    const left = `<div class="kv"><span>이름</span><b>${esc(fmt('{성이름}', s))}</b></div>
-      <div class="kv"><span>신분</span><b>${this.awakened() ? esc(s.job) + ' · Lv.' + s.lv : '비각성자 · 짐꾼'}</b></div>
-      <div class="kv"><span>체력</span><b>${Math.round(s.hp)} / ${this.maxHp()}</b></div>
-      ${this.awakened() ? `<div class="kv"><span>경험치</span><b>${s.exp} / ${this.expNeed()}</b></div><div class="kv"><span>소문</span><b>${s.rumor.toFixed(1)}</b></div>` : `<div class="kv"><span>동행 최고층</span><b>${s.porterDepth}층</b></div>`}
-      <div class="kv"><span>가진 돈</span><b>${won(s.money)}</b></div>
-      <div class="kv"><span>31층 기한</span><b>D-${D}</b></div>`;
-    let right;
-    if (!this.awakened()) right = '<p class="dim">비각성자는 레벨과 경험치가 없다.</p><p class="dim">행동 하나하나가 어딘가에 기록되고 있다는 걸, 아직 아무도 모른다.</p>';
-    else {
-      const main = (this.jobs[s.job] || {}).main || [];
-      right = `<p class="dim">남은 포인트 <b>${s.pts}</b> · 데미지 배율 ×${(new Player(this, 0, 0)).dmgMult().toFixed(2)}</p>` + Object.keys(STAT_NAMES).map((k) => `<div class="kv"><span>${STAT_NAMES[k]}${main.includes(k) ? ' <small>주</small>' : ''}</span><b>${s.stats[k]}</b><button data-k="${k}" ${s.pts ? '' : 'disabled'}>+</button></div>`).join('');
+    const pend = this.pend || (this.pend = {});
+    const used = Object.values(pend).reduce((a, b) => a + b, 0);
+    const hpK = Math.min(1, s.hp / this.maxHp()), spK = Math.min(1, s.sp / 60), xpK = this.awakened() ? Math.min(1, s.exp / this.expNeed()) : 0;
+    const left = `<div class="stleft"><canvas id="stp" width="34" height="34"></canvas>
+      <b>${esc(fmt('{성이름}', s))}</b><span class="dim">${this.awakened() ? esc(s.job) + ' · LV.' + s.lv : '비각성자 · 짐꾼'}</span>
+      <div class="bar hp"><i style="width:${hpK * 100}%"></i></div><span class="dim">체력 ${Math.round(s.hp)} / ${this.maxHp()}</span>
+      ${this.awakened() ? `<div class="bar sp"><i style="width:${spK * 100}%"></i></div><div class="bar xp"><i style="width:${xpK * 100}%"></i></div><span class="dim">경험치 ${s.exp} / ${this.expNeed()}</span>` : ''}
+      <span class="dim">${won(s.money)} · 31층 D-${D}</span></div>`;
+    if (!this.awakened()) {
+      return `<div class="stwrap">${left}<div class="stright"><div class="big3"><div>동행 최고층<b>${s.porterDepth}층</b></div><div>일한 날<b>${s.day + 1}</b></div><div>회수 수당<b>${SHARD_BONUS}</b></div></div>
+        <p class="dim">비각성자는 레벨과 경험치가 없다.</p><p class="dim">행동 하나하나가 어딘가에 기록되고 있다는 걸, 아직 아무도 모른다.</p></div></div>`;
     }
-    return `<div class="left">${left}</div><div class="detail">${right}</div>`;
+    const main = (this.jobs[s.job] || {}).main || [];
+    const p = new Player(this, 0, 0);
+    const att = Math.round((15 + this.equipStat('atk')) * p.dmgMult()), def = Math.round(s.stats.vit * 1.5 + this.equipStat('hp') / 10);
+    const stats = Object.keys(STAT_NAMES).map((k) => `<div>${STAT_NAMES[k]}${main.includes(k) ? '★' : ''}<b class="${pend[k] ? 'up' : ''}">${s.stats[k] + (pend[k] || 0)}</b><button data-k="${k}" ${s.pts - used > 0 ? '' : 'disabled'}>+</button></div>`).join('');
+    return `<div class="stwrap">${left}<div class="stright">
+      <div class="big3"><div>공격력<b>${att}</b></div><div>방어력<b>${def}</b></div><div>데미지 배율<b>×${p.dmgMult().toFixed(2)}</b></div></div>
+      <div class="stats5">${stats}</div>
+      <div class="strow"><span style="flex:1">남은 포인트 <b>${s.pts - used}</b> · ★ 주 스탯 · 소문 ${s.rumor.toFixed(1)}</span><button id="preset" ${used ? '' : 'disabled'}>되돌리기</button><button class="primary" id="apply" ${used ? '' : 'disabled'}>적용</button></div>
+    </div></div>`;
+  }
+
+  menuSkill() {
+    const s = this.state;
+    const list = this.awakened() ? (this.skills[s.job] || []) : [];
+    if (!this.skillSel || !list.find((k) => k.id === this.skillSel)) this.skillSel = list[0] ? list[0].id : null;
+    const cells = Array.from({ length: 15 }, (_, i) => {
+      const k = list[i];
+      if (!k) return `<div class="slot empty"></div>`;
+      const open = s.lv >= k.lv;
+      return `<button class="slot ${k.id === this.skillSel ? 'on' : ''}" data-sk="${k.id}"><small>${esc(k.type)}</small><span class="ic">${open ? '✦' : '🔒'}</span><span class="nm">${esc(k.name)}</span></button>`;
+    }).join('');
+    const k = list.find((x) => x.id === this.skillSel);
+    const det = k ? `<b>${esc(k.name)}</b><p class="dim">${esc(k.type)} · 습득 LV.${k.lv}${k.sp ? ' · 기력 ' + k.sp : ''}</p><p>${esc(k.desc)}</p><p class="dim">${s.lv >= k.lv ? (k.id === 'burst' ? '기술 버튼에 연결됨' : '추후 개방') : '레벨이 부족하다'}</p>` : '<p class="dim">아직 아무 기술도 없다.</p><p class="dim">각성자들은 저마다의 기술을 가진다. 비각성자에게는 해당되지 않는 이야기다.</p>';
+    return `<div class="detail">${det}</div><div class="skgrid">${cells}</div>`;
   }
 
   menuQuest() {
@@ -437,7 +474,7 @@ export class Game {
     const seg = (key, opts) => `<div class="seg">${opts.map(([v, n]) => `<button data-set="${key}" data-v="${v}" class="${String(V[key]) === String(v) ? 'on' : ''}">${n}</button>`).join('')}</div>`;
     const row = (label, html) => `<div class="setrow"><span>${label}</span>${html}</div>`;
     return `<div class="left">${row('조이스틱', seg('joyMode', [['fixed', '고정'], ['float', '자유']]))}${row('조이스틱 크기', seg('joySize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('민감도', seg('sens', [['s', '낮음'], ['m', '보통'], ['l', '높음']]))}${row('달리기 전환', seg('runAt', [['s', '빨리'], ['m', '보통'], ['l', '끝까지']]))}${row('밀어서 회피', seg('swipeDodge', [[true, '켬'], [false, '끔']]))}</div>
-      <div class="detail">${row('버튼 크기', seg('btnSize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('버튼 투명도', seg('btnAlpha', [['s', '흐리게'], ['m', '보통'], ['l', '진하게']]))}${row('왼손 모드', seg('lefty', [[false, '끔'], [true, '켬']]))}${row('화면 확대', seg('zoom', [['s', '가깝게'], ['m', '보통'], ['l', '멀게']]))}${row('소리', `<div class="seg"><button id="snd" class="${this.sound.enabled ? 'on' : ''}">${this.sound.enabled ? '켜짐' : '꺼짐'}</button><button id="tt">타이틀로</button></div>`)}</div>`;
+      <div class="detail">${this.mode === 'world' ? row('기록', '<div class="seg"><button id="sv">저장하기</button></div>') : ''}${row('버튼 크기', seg('btnSize', [['s', '작게'], ['m', '보통'], ['l', '크게']]))}${row('버튼 투명도', seg('btnAlpha', [['s', '흐리게'], ['m', '보통'], ['l', '진하게']]))}${row('왼손 모드', seg('lefty', [[false, '끔'], [true, '켬']]))}${row('화면 확대', seg('zoom', [['s', '가깝게'], ['m', '보통'], ['l', '멀게']]))}${row('소리', `<div class="seg"><button id="snd" class="${this.sound.enabled ? 'on' : ''}">${this.sound.enabled ? '켜짐' : '꺼짐'}</button><button id="tt">타이틀로</button></div>`)}</div>`;
   }
 
   bindMenu(tab) {
@@ -448,8 +485,13 @@ export class Game {
       const u = this.ov.querySelector('[data-use]'); if (u) u.onclick = () => { const id = u.dataset.use, it = this.items[id]; if (s.hp >= this.maxHp()) return this.renderMenu('체력이 가득하다'); s.inv[id]--; s.hp = Math.min(this.maxHp(), s.hp + it.heal); this.renderMenu(it.name + ' 사용'); };
     }
     this.ov.querySelectorAll('[data-eq]').forEach((b) => (b.onclick = () => { const it = this.items[b.dataset.eq]; s.equip[it.slot] = b.dataset.eq; s.hp = Math.min(s.hp, this.maxHp()); this.renderMenu(it.name + ' 장착'); }));
-    this.ov.querySelectorAll('[data-k]').forEach((b) => (b.onclick = () => { if (s.pts > 0) { s.stats[b.dataset.k]++; s.pts--; if (b.dataset.k === 'vit') s.hp += 10; this.renderMenu(); } }));
+    this.ov.querySelectorAll('[data-k]').forEach((b) => (b.onclick = () => { const pd = this.pend || (this.pend = {}); const used = Object.values(pd).reduce((a, c) => a + c, 0); if (s.pts - used > 0) { pd[b.dataset.k] = (pd[b.dataset.k] || 0) + 1; this.renderMenu(); } }));
     this.ov.querySelectorAll('[data-set]').forEach((b) => (b.onclick = () => { let v = b.dataset.v; if (v === 'true') v = true; if (v === 'false') v = false; Settings.v[b.dataset.set] = v; Settings.save(); this.view.applyZoom(); this.renderMenu(); }));
+    const sv = this.ov.querySelector('#sv'); if (sv) sv.onclick = () => { this.save(); this.renderMenu('저장했어요'); };
+    const cv = this.ov.querySelector('#stp'); if (cv) { const pf = this.portraitOf('gen:player'); const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(pf.im, 0, 0); }
+    this.ov.querySelectorAll('[data-sk]').forEach((b) => (b.onclick = () => { this.skillSel = b.dataset.sk; this.renderMenu(); }));
+    const ap = this.ov.querySelector('#apply'); if (ap) ap.onclick = () => { const pd = this.pend || {}; let n = 0; for (const k in pd) { s.stats[k] += pd[k]; n += pd[k]; if (k === 'vit') s.hp += 10 * pd[k]; } s.pts -= n; this.pend = {}; this.sound.sfx('levelup'); this.renderMenu('적용했습니다'); };
+    const pr = this.ov.querySelector('#preset'); if (pr) pr.onclick = () => { this.pend = {}; this.renderMenu(); };
     const snd = this.ov.querySelector('#snd'); if (snd) snd.onclick = () => { this.sound.toggle(); this.renderMenu(); };
     const tt = this.ov.querySelector('#tt'); if (tt) tt.onclick = () => { this.save(); this.menuOpen = false; this.showTitle(); };
     if (tab === 'map') this.drawCityMap();
@@ -482,12 +524,27 @@ export class Game {
   }
 
   // ---------- 짐꾼 원정 ----------
+  gather() {
+    const s = this.state;
+    s.objective = ''; s.objTarget = null;
+    this.ow.goto('plaza', [18, 9], 'R').then(() => {
+      const lead = { speaker: this.npcName('taesung'), portrait: this.portraitKey('taesung') };
+      const lines = s.porterDepth >= 9
+        ? [{ ...lead, text: '오늘은 10층 보스방 앞까지. 들어가면 짐 내려놓고 뒤에 붙어 있어.' }]
+        : s.porterDepth === 0
+          ? [{ ...lead, text: '네가 새 짐꾼이구나. 짐 들고 뒤에만 붙어 있어. 싸움은 우리가 한다.' }, { speaker: this.npcName('yuna'), portrait: this.portraitKey('yuna'), text: '잘 부탁해요! 다치면 저한테 말하고요.' }]
+          : [{ ...lead, text: this.pick(['오늘도 세 층. 가자.', '어제처럼만 하면 돼. 출발.', '짐 챙겼지? 가자.']) }];
+      this.runLines(lines, () => this.startExpedition());
+    });
+  }
+
   startExpedition() {
     const s = this.state;
-    const n = Math.min(10, s.porterDepth + 1);
-    this.dayShards = 0; this.floorsToday = 0;
-    if (n >= 10) { this.startRift(); return; }
-    this.startPorterFloor(n);
+    const start = Math.min(10, s.porterDepth + 1);
+    this.dayShards = 0;
+    if (start >= 10) { this.startRift(); return; }
+    this.expFloors = [start, start + 1, start + 2].filter((n) => n <= 9);
+    this.startPorterFloor(this.expFloors.shift());
   }
 
   startPorterFloor(n) {
@@ -499,36 +556,36 @@ export class Game {
     this.sound.play('field');
     this.worldButtons();
     this.toast(`${f.name} · 들꽃 파티 동행`);
-    if (n === 1 && !this.state.flags.porterTip) { this.state.flags.porterTip = true; this.runLines([
-      { speaker: this.npcName('taesung'), portrait: this.portraitKey('taesung'), text: '짐 들고 뒤에만 붙어 있어. 싸움은 우리가 한다.' },
-      { text: '[조작] 떨어진 마정석 근처에서 오른쪽을 탭하면 줍기. 오른쪽을 밀면 회피. 다친 파티원 위에 !가 뜨면 다가가서 구급상자를 건넬 수 있다.' }]); }
+    if (!this.state.flags.porterTip) { this.state.flags.porterTip = true; this.runLines([
+      { text: '[조작] 떨어진 마정석 근처에서 큰 버튼으로 줍기. 붉은 경고가 뜨면 회피. 다친 파티원 위에 !가 뜨면 다가가서 구급상자를 건넬 수 있다.' }]); }
   }
 
   porterGoal() {
     const s = this.state, n = this.porter.floor.n;
     s.porterDepth = Math.max(s.porterDepth, n);
     this.dayShards += this.porter.shards;
-    this.floorsToday++;
-    const lead = { speaker: this.npcName('taesung'), portrait: this.portraitKey('taesung') };
-    if (this.floorsToday < 2 && n < 9) {
-      this.runLine({ ...lead, text: `${n}층 정리 끝. 한 층 더 갈까?`, choices: [{ text: '다음 층으로', flag: '_next' }, { text: '오늘은 여기까지 하죠' }] }, () => {
-        if (s.flags._next) { delete s.flags._next; this.startPorterFloor(n + 1); } else this.endExpedition();
-      });
-    } else {
-      this.runLine({ ...lead, text: n >= 9 ? '9층까지 왔다. 내일은 10층 보스방 앞까지 간다. 일당 두 배.' : '오늘은 여기까지. 수고했다.' }, () => this.endExpedition());
+    if (this.expFloors && this.expFloors.length) {
+      this.toast(`${n}층 정리 · 다음 층으로`);
+      setTimeout(() => { if (this.mode === 'porter') this.startPorterFloor(this.expFloors.shift()); }, 1200);
+      return;
     }
+    const lead = { speaker: this.npcName('taesung'), portrait: this.portraitKey('taesung') };
+    this.runLine({ ...lead, text: n >= 9 ? '9층까지 왔다. 다음엔 10층 보스방 앞까지 간다. 일당 두 배.' : '오늘은 여기까지. 수고했다.' }, () => this.endExpedition());
   }
 
   endExpedition() {
     const s = this.state;
     const pay = WAGE + this.dayShards * SHARD_BONUS;
-    s.money += pay;
-    s.flags.jobToday = false; s.flags.workedToday = true;
-    s.objective = '원룸에 돌아가 쉬기';
+    s.money += pay - LIVING_COST;
+    s.day++;
+    s.flags.jobToday = false; s.flags.workedToday = false;
+    s.hp = this.maxHp();
+    s.objective = s.porterDepth >= 9 ? '사무소에서 10층 의뢰 받기' : '사무소에서 다음 의뢰 받기';
+    s.objTarget = { map: 'office', at: [2, 2] };
     this.porter = null;
     this.enterWorldMode();
-    this.ow.load('plaza', [7, 4], 'D').then(() => {
-      this.runLine({ text: `일당 ${won(WAGE)}에 회수 수당 ${won(this.dayShards * SHARD_BONUS)}. 가진 돈 ${won(s.money)}.` }, () => this.save());
+    this.ow.load('room', [3, 4], 'D').then(() => {
+      this.runLine({ text: `일당 ${won(WAGE)} + 회수 수당 ${won(this.dayShards * SHARD_BONUS)}. 월세와 식비 ${won(LIVING_COST)}을 빼고 남은 돈 ${won(s.money)}.\n하루가 지났다. 31층 기한 D-${Math.max(0, DEADLINE - s.day)}.` }, () => this.save());
     });
   }
 
@@ -596,21 +653,47 @@ export class Game {
     const X = (x) => (L ? x : W - x);
     const B = [];
     const s = this.state;
+    const playing = ['world', 'porter', 'field'].includes(this.mode) && !(this.mode === 'world' && this.ow.cut);
+    if (playing) {
+      B.push({ id: 'menu', top: true, x: 28, y: 28, r: 18, label: '☰' });
+      B.push({ id: 'map', top: true, x: 70, y: 28, r: 18, label: '지도' });
+      B.push({ id: 'quest', top: true, x: 112, y: 28, r: 18, label: '!' });
+    }
     if (this.mode === 'world' && !this.ow.cut) {
       const lab = this.ow.prompt ? this.ow.prompt.label : '조사';
-      B.push({ id: 'act', x: X(78 * k), y: H - 74 * k, r: 40 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab });
+      B.push({ id: 'act', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab.length > 4 ? lab.slice(0, 4) : lab });
     } else if (this.mode === 'porter' && this.porter) {
       const lab = this.porter.prompt ? (this.porter.prompt.kind === 'drop' ? '줍기' : '건네기') : '줍기';
-      B.push({ id: 'act', x: X(78 * k), y: H - 74 * k, r: 40 * k, label: lab });
-      B.push({ id: 'dodge', x: X(162 * k), y: H - 46 * k, r: 28 * k, label: '회피' });
-      const hid = this.healItem(); B.push({ id: 'potion', x: X(150 * k), y: H - 128 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
+      B.push({ id: 'act', x: X(70 * k), y: H - 70 * k, r: 40 * k, label: lab });
+      B.push({ id: 'dodge', x: X(150 * k), y: H - 38 * k, r: 26 * k, label: '회피' });
+      const hid = this.healItem(); B.push({ id: 'potion', x: X(148 * k), y: H - 112 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
     } else if (this.mode === 'field' && this.world) {
-      B.push({ id: 'act', x: X(78 * k), y: H - 74 * k, r: 42 * k, label: '공격' });
-      B.push({ id: 'dodge', x: X(166 * k), y: H - 44 * k, r: 28 * k, label: '회피' });
-      B.push({ id: 'skill1', x: X(70 * k), y: H - 168 * k, r: 26 * k, label: '기술', cost: 25 });
-      const hid = this.healItem(); B.push({ id: 'potion', x: X(150 * k), y: H - 132 * k, r: 22 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
+      B.push({ id: 'act', x: X(72 * k), y: H - 72 * k, r: 42 * k, label: '공격' });
+      B.push({ id: 'dodge', x: X(156 * k), y: H - 38 * k, r: 26 * k, label: '회피' });
+      B.push({ id: 'skill1', x: X(150 * k), y: H - 112 * k, r: 24 * k, label: '기술', cost: 25 });
+      B.push({ id: 'skill2', x: X(104 * k), y: H - 152 * k, r: 22 * k, label: '', locked: true });
+      B.push({ id: 'skill3', x: X(44 * k), y: H - 160 * k, r: 22 * k, label: '', locked: true });
+      const hid = this.healItem(); B.push({ id: 'potion', x: X(212 * k), y: H - 92 * k, r: 20 * k, label: hid ? this.items[hid].name.slice(0, 3) : '없음', sub: hid ? s.inv[hid] : 0 });
     }
-    this.input.buttons = this.talking || this.menuOpen ? [] : B;
+    const out = this.talking || this.menuOpen ? [] : B;
+    if (this.mode === 'world' && this.ow.cut && !this.menuOpen) out.push({ id: 'skip', top: true, always: true, x: W - 40, y: 26, r: 20, label: 'SKIP' });
+    this.input.buttons = out;
+  }
+
+  applyTheme() { document.body.className = this.state && this.mode !== 'title' && this.mode !== 'create' && this.awakened() ? 'sys' : 'plain'; }
+
+  sysPopup(lines, cb) {
+    this.menuOpen = true; this.input.reset();
+    let i = 0;
+    const show = () => {
+      if (i >= lines.length) { this.ov.innerHTML = ''; this.menuOpen = false; cb && cb(); return; }
+      const L = lines[i];
+      this.ov.innerHTML = `<div class="sysmsg"><div class="win"><div class="h">${esc(L.h || '알림')}</div><p>${esc(this.fmt(L.t))}</p><div class="t">화면을 눌러 계속</div></div></div>`;
+      this.sound.sfx('select');
+      this.ov.querySelector('.sysmsg').onclick = () => { i++; show(); };
+    };
+    document.body.className = 'sys';
+    show();
   }
 
   goalText() {
@@ -685,7 +768,9 @@ export class Game {
     const busy = this.talking || this.menuOpen;
     this.input.mode = this.talking ? 'dialogue' : (this.menuOpen || (this.mode === 'world' && this.ow.cut)) ? 'menu' : (['world', 'porter', 'field'].includes(this.mode) ? 'field' : 'menu');
     if (this.talking) this.dialogue.update(dt);
-    const btn = this.ov.querySelector('#menuBtn'); if (btn) btn.style.display = this.talking || this.ow.cut ? 'none' : '';
+    if (this.flashHurt) this.flashHurt = Math.max(0, this.flashHurt - dt);
+    if (this.target) { this.target.t -= dt; if (this.target.t <= 0) this.target = null; }
+    if (this.talking && this.mode === 'world' && this.ow.cut && this.ow.cut.ff && this.dialogue.cur && !(this.dialogue.cur.choices && this.dialogue.cur.choices.length)) { this.dialogue.t = 999; this.dialogue.next(); }
     if (this.mode === 'world') { this.ow.update(busy ? 0 : dt); if (busy && this.ow.cut) this.ow.cut.update(0); }
     else if (this.mode === 'porter' && this.porter) {
       if (!busy && !this.porter.dead) this.porter.update(dt);
@@ -716,12 +801,12 @@ export class Game {
       if (this.fx) { this.fx.draw(false); this.fx.drawNums(); }
       v.screen();
       this.ow.drawOverlay();
-      if (!this.ow.cut || this.talking) { this.hud.drawWorld(); if (!this.talking) this.ow.drawMinimap(v.W - 12, 52, 150, 64); }
+      if (!this.ow.cut && !this.talking) { this.hud.drawWorld(); this.ow.drawMinimap(v.W - 12, 52, 150, 64); }
       this.hud.drawControls();
     } else if (this.mode === 'porter' && this.porter) {
       this.porter.draw();
       v.screen();
-      this.hud.drawPorter();
+      if (!this.talking) this.hud.drawPorter();
       this.hud.drawControls();
     } else if (this.mode === 'field' && this.world) {
       v.world();
@@ -738,6 +823,11 @@ export class Game {
       const g = ctx.createRadialGradient(v.W / 2, v.H / 2, 40, v.W / 2, v.H / 2, Math.max(v.W, v.H) * 0.7);
       g.addColorStop(0, '#2a2018'); g.addColorStop(1, '#0d0a08');
       ctx.fillStyle = g; ctx.fillRect(0, 0, v.W, v.H);
+    }
+    if (this.flashHurt > 0 && ['field', 'porter'].includes(this.mode)) {
+      const gr = ctx.createRadialGradient(v.W / 2, v.H / 2, Math.min(v.W, v.H) * 0.3, v.W / 2, v.H / 2, Math.max(v.W, v.H) * 0.7);
+      gr.addColorStop(0, 'rgba(255,0,0,0)'); gr.addColorStop(1, `rgba(220,20,20,${this.flashHurt * 1.6})`);
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, v.W, v.H);
     }
     if (this.talking) this.hud.drawDialogue(this.dialogue);
   }

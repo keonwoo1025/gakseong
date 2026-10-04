@@ -9,6 +9,7 @@ const MODES = {
   weapons: 'center',
   portraits: 'center',
   tiles: 'none',
+  ui: 'center',
 };
 
 function computeAnchor(o, mode) {

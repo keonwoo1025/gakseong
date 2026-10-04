@@ -9,13 +9,13 @@ export class FX {
     this.list.push(Object.assign({ set, x, y, t: 0, fps: 16, s: 1, rot: 0, flip: false, ground: false, a: 1 }, o, { n: frames.length }));
   }
 
-  num(x, y, v, kind = 'normal') { this.nums.push({ x: x + (Math.random() - 0.5) * 20, y, v, t: 0, kind }); }
+  num(x, y, v, kind = 'normal') { this.nums.push({ x: x + (Math.random() - 0.5) * 24, y, v, t: 0, kind, vx: (Math.random() - 0.5) * 40 }); }
 
   update(dt) {
     for (const f of this.list) f.t += dt;
     this.list = this.list.filter((f) => f.t < f.n / f.fps);
     for (const n of this.nums) n.t += dt;
-    this.nums = this.nums.filter((n) => n.t < 0.8);
+    this.nums = this.nums.filter((n) => n.t < 0.95);
   }
 
   draw(ground) {
@@ -38,17 +38,19 @@ export class FX {
   drawNums() {
     const ctx = this.v.ctx;
     const style = {
-      normal: ['800 26px', '#ffffff'], big: ['900 34px', '#ffd23f'], huge: ['900 46px', '#ff9a2e'], hurt: ['800 26px', '#ff5a5a'], exp: ['700 22px', '#9fe07a'],
+      normal: [800, 34, '#ffffff'], big: [900, 42, '#ffd23f'], huge: [900, 56, '#ff9a2e'], hurt: [800, 34, '#ff5a5a'], exp: [700, 26, '#9fe07a'],
     };
     for (const n of this.nums) {
-      const [font, col] = style[n.kind] || style.normal;
+      const [w, size, col] = style[n.kind] || style.normal;
+      const pop = n.t < 0.1 ? 1.5 - n.t * 5 : 1;
       ctx.save();
-      ctx.globalAlpha = Math.max(0, 1 - n.t / 0.8);
-      ctx.font = font + ' system-ui,sans-serif';
+      ctx.globalAlpha = n.t > 0.6 ? Math.max(0, 1 - (n.t - 0.6) / 0.35) : 1;
+      ctx.translate(n.x + n.vx * n.t, n.y - Math.min(n.t, 0.5) * 70);
+      ctx.scale(pop, pop);
+      ctx.font = `${w} ${size}px system-ui,sans-serif`;
       ctx.textAlign = 'center';
-      ctx.lineWidth = 6; ctx.strokeStyle = '#2a1a10'; ctx.fillStyle = col;
-      const y = n.y - n.t * 50;
-      ctx.strokeText(n.v, n.x, y); ctx.fillText(n.v, n.x, y);
+      ctx.lineWidth = 7; ctx.strokeStyle = '#1a0f08'; ctx.fillStyle = col;
+      ctx.strokeText(n.v, 0, 0); ctx.fillText(n.v, 0, 0);
       ctx.restore();
     }
   }

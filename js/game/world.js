@@ -43,7 +43,20 @@ export class World {
     return false;
   }
 
+  // 구조물 안에 끼었으면 가장 가까운 빈자리로 빼낸다
+  unstick(o, r) {
+    if (!this.solid(o.x, o.y, r)) return false;
+    for (let d = 12; d < 600; d += 12) {
+      for (let k = 0; k < 16; k++) {
+        const a = k / 16 * Math.PI * 2, x = o.x + Math.cos(a) * d, y = o.y + Math.sin(a) * d;
+        if (!this.solid(x, y, r)) { o.x = x; o.y = y; return true; }
+      }
+    }
+    return false;
+  }
+
   moveBody(o, dx, dy, r) {
+    if (this.solid(o.x, o.y, r)) { this.unstick(o, r); return; }
     if (!this.solid(o.x + dx, o.y, r)) o.x += dx;
     if (!this.solid(o.x, o.y + dy, r)) o.y += dy;
   }

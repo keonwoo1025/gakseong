@@ -21,7 +21,7 @@ export class PorterRun {
     this.party = PARTY.map((p, i) => ({ ...p, look: g.lookOf(p.id), frames: makePerson(g.lookOf(p.id)), x: sx - 90 + i * 60, y: sy, dir: 'U', t: 0, moving: false, hp: p.max, cd: Math.random(), emote: null, help: false }));
     this.mobs = [];
     for (const sp of floor.spawns) for (let i = 0; i < sp.count; i++) this.mobs.push(this.makeMob(sp.type));
-    this.drops = []; this.shots = []; this.kills = 0; this.goal = 4 + floor.n; this.done = false; this.shards = 0;
+    this.drops = []; this.shots = []; this.kills = 0; this.goal = 3 + Math.ceil(floor.n / 3); this.done = false; this.shards = 0;
     this.prompt = null;
   }
 
@@ -65,6 +65,7 @@ export class PorterRun {
     const g = this.g, me = this.me, w = this.world, s = g.state;
     // 나
     me.inv = Math.max(0, me.inv - dt);
+    w.unstick(me, 22);
     if (me.knock) { w.moveBody(me, me.knock[0] * dt, me.knock[1] * dt, 22); me.knock[0] *= 0.85; me.knock[1] *= 0.85; if (Math.hypot(me.knock[0], me.knock[1]) < 20) me.knock = null; }
     if (me.dash > 0) { me.dash -= dt; w.moveBody(me, me.dd[0] * 620 * dt, me.dd[1] * 620 * dt, 22); me.moving = true; me.t += dt * 2; }
     else {
@@ -93,7 +94,7 @@ export class PorterRun {
         if (d > p.range) { gx = target.x; gy = target.y; }
         else if (p.cd <= 0) {
           p.cd = p.role === 'tank' ? 0.8 : 1.1;
-          target.hp -= p.atk; target.hit = 0.12;
+          target.hp -= p.atk; target.hit = 0.12; g.fx.num(target.x, target.y - 70, p.atk, p.role === 'mage' ? 'big' : 'normal');
           if (p.range > 100) this.shots.push({ x: p.x, y: p.y - 60, tx: target.x, ty: target.y - 30, t: 0, col: p.role === 'mage' ? '#b48cff' : '#f0e2a0' });
           g.fx.sfx('imp', target.x, target.y - 28, { s: 0.5, fps: 24, rot: Math.random() * 6 });
           if (target.hp <= 0 && target.alive) this.killMob(target);
@@ -112,21 +113,34 @@ export class PorterRun {
       if (!p.help && p.hp < p.max * 0.35) { p.help = true; p.emote = { text: '!', t: 2.5 }; }
       if (p.help) p.emote = p.emote || { text: '!', t: 1 };
     }
-    // 몬스터
+    // 몬스터: 준비(경고) → 공격 → 회복
     for (const m of alive) {
       m.t += dt; m.hit = Math.max(0, m.hit - dt); m.cd = Math.max(0, m.cd - dt);
+      w.unstick(m, 18);
+      m.st = m.st || 'idle'; m.stt = (m.stt || 0) + dt;
       const targets = this.party.filter((p) => p.hp > 0).concat([me]);
-      const tg = this.near(targets, m.x, m.y, 600);
-      if (!tg) continue;
-      const dx = tg.x - m.x, dy = tg.y - m.y, d = Math.hypot(dx, dy) || 1;
-      if (d > 50 && (m.kind === 'wolf' || (m.t % 1.4) < 0.7)) { w.moveBody(m, dx / d * m.speed * dt, dy / d * m.speed * dt, 18); m.face = dx > 0 ? 1 : -1; }
-      if (d < 56 && m.cd <= 0) {
-        m.cd = 1.2;
-        if (tg === me) {
-          if (me.inv <= 0) { s.hp = Math.max(0, s.hp - Math.round(m.dmg * 0.7)); me.knock = [dx / d * 500, dy / d * 500]; me.inv = 0.8; g.sound.sfx('hurt'); g.view.addShake(4); g.fx.num(me.x, me.y - 140, Math.round(m.dmg * 0.7), 'hurt'); if (s.hp <= 0) { this.dead = true; g.onPorterDeath(); return; } }
-          else g.recordPattern('관찰', 0.4);
-        } else { tg.hp = Math.max(0, tg.hp - m.dmg); }
-      }
+      if (m.st === 'idle') {
+        const tg = this.near(targets, m.x, m.y, 600);
+        if (!tg) continue;
+        const dx = tg.x - m.x, dy = tg.y - m.y, d = Math.hypot(dx, dy) || 1;
+        if (d > 90 && (m.kind === 'wolf' || (m.t % 1.2) < 0.7)) { w.moveBody(m, dx / d * m.speed * dt, dy / d * m.speed * dt, 18); m.face = dx > 0 ? 1 : -1; }
+        if (d < 120 && m.cd <= 0) { m.st = 'wind'; m.stt = 0; m.tg = tg; m.ax = dx / d; m.ay = dy / d; }
+      } else if (m.st === 'wind') {
+        if (m.stt >= 0.55) { m.st = 'atk'; m.stt = 0; m.done = false; }
+      } else if (m.st === 'atk') {
+        w.moveBody(m, m.ax * 680 * dt, m.ay * 680 * dt, 18);
+        if (!m.done) {
+          const tg = m.tg;
+          if (tg && Math.hypot(tg.x - m.x, tg.y - m.y) < 58) {
+            m.done = true;
+            if (tg === me) {
+              if (me.inv <= 0 && me.dash <= 0) { const v = Math.round(m.dmg * 0.7); s.hp = Math.max(0, s.hp - v); me.knock = [m.ax * 500, m.ay * 500]; me.inv = 0.8; g.sound.sfx('hurt'); g.view.addShake(5); g.fx.num(me.x, me.y - 120, v, 'hurt'); g.flashHurt = 0.25; g.fx.sfx('imp', me.x, me.y - 50, { s: 1, fps: 22 }); if (s.hp <= 0) { this.dead = true; g.onPorterDeath(); return; } }
+              else { g.recordPattern('관찰', 0.4); g.fx.num(me.x, me.y - 120, '회피', 'exp'); }
+            } else { tg.hp = Math.max(0, tg.hp - m.dmg); g.fx.num(tg.x, tg.y - 110, m.dmg, 'hurt'); g.fx.sfx('imp', tg.x, tg.y - 50, { s: 0.8, fps: 22 }); }
+          }
+        }
+        if (m.stt >= 0.2) { m.st = 'rec'; m.stt = 0; }
+      } else if (m.st === 'rec') { if (m.stt >= 0.6) { m.st = 'idle'; m.stt = 0; m.cd = 1.4; } }
     }
     // 패턴: 싸움 근처에서의 위치
     const fight = this.near(alive, me.x, me.y, 380);
@@ -175,12 +189,24 @@ export class PorterRun {
       ctx.fillStyle = '#7fd4ff'; ctx.fillRect(-9, -9, 18, 18); ctx.fillStyle = '#e6f8ff'; ctx.fillRect(-9, -9, 7, 7); ctx.strokeStyle = '#1a3a5a'; ctx.lineWidth = 2; ctx.strokeRect(-9, -9, 18, 18);
       ctx.restore();
     } });
+    for (const m of this.mobs) if (m.alive && m.st === 'wind') list.push({ y: m.y - 200, d: () => {
+      const k = Math.min(1, m.stt / 0.55);
+      ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(Math.atan2(m.ay, m.ax));
+      ctx.fillStyle = 'rgba(220,40,40,0.18)'; ctx.fillRect(0, -28, 150, 56); ctx.fillStyle = 'rgba(255,60,40,0.42)'; ctx.fillRect(0, -28, 150 * k, 56);
+      ctx.strokeStyle = 'rgba(255,90,70,0.8)'; ctx.lineWidth = 2; ctx.strokeRect(0, -28, 150, 56); ctx.restore();
+      ctx.fillStyle = '#ff4a3a'; ctx.font = '900 26px system-ui'; ctx.textAlign = 'center'; ctx.fillText('!', m.x, m.y - 90); ctx.textAlign = 'left';
+    } });
     for (const m of this.mobs) if (m.alive) list.push({ y: m.y, d: () => {
       const M = g.A.monsters[m.sprite];
       const f = m.kind === 'wolf' ? M.walk[Math.floor(m.t * 8) % M.walk.length] : M.hop[Math.floor(m.t * 3) % M.hop.length];
       v.shadow(m.x, m.y, 24);
+      ctx.save(); ctx.translate(m.x, m.y);
+      if (m.st === 'wind') ctx.scale(1 + 0.18 * Math.min(1, m.stt / 0.5), 1 - 0.16 * Math.min(1, m.stt / 0.5)); else if (m.st === 'atk') ctx.scale(0.86, 1.14);
+      ctx.translate(-m.x, -m.y);
+      if (m.st === 'wind' && Math.floor(m.stt * 14) % 2 === 0) ctx.filter = 'sepia(1) saturate(6) hue-rotate(-40deg)';
       if (m.hit > 0) { ctx.save(); ctx.filter = 'brightness(3)'; v.sprite(f, m.x, m.y, m.scale, m.kind === 'wolf' && m.face < 0); ctx.restore(); }
       else v.sprite(f, m.x, m.y, m.scale, m.kind === 'wolf' && m.face < 0);
+      ctx.restore();
     } });
     for (const p of this.party) list.push({ y: p.y, d: () => this.drawPerson(p) });
     list.push({ y: this.me.y, d: () => this.drawPerson(this.me) });

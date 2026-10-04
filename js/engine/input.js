@@ -35,8 +35,12 @@ export class Input {
   down(e) {
     try { this.c.setPointerCapture(e.pointerId); } catch (_) {}
     const x = e.clientX, y = e.clientY;
+    for (const b of this.buttons) {
+      if (b.always && Math.hypot(x - b.x, y - b.y) < b.r * 1.2) { this.pressed[b.id] = 0.15; this.btnTouch[e.pointerId] = b.id; this.emit('button', b.id); return; }
+    }
     if (this.mode !== 'field') { this.emit('tap', x, y); return; }
     for (const b of this.buttons) {
+      if (b.locked) continue;
       if (Math.hypot(x - b.x, y - b.y) < b.r * 1.15) { this.pressed[b.id] = 0.15; this.btnTouch[e.pointerId] = b.id; this.emit('button', b.id); return; }
     }
     const W = this.c.clientWidth, lefty = Settings.v.lefty;

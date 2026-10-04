@@ -28,7 +28,7 @@
  "edges": {
   "S": {
    "to": "market",
-   "dc": 0
+   "dc": -10
   }
  },
  "npcs": [

@@ -3,31 +3,31 @@
  "name": "구도심 상가 거리",
  "theme": "street",
  "legend": {
-  "#": "wall",
-  "W": "window",
   "s": "walk",
+  "#": "wall",
   "n": "sign",
   "D": "door",
-  "r": "road",
-  "l": "lane",
+  "i": "lamp",
+  "W": "window",
   "k": "stall",
-  "i": "lamp"
+  "l": "lane",
+  "r": "road"
  },
  "rows": [
-  "WWWWWWWWWWWWWWWWWWWWsssWWWWWWWWWWWWWWWWWWWWW",
-  "####################sss#####################",
-  "########D###########sss#######D#####D#######",
-  "ssssisssssssisssssnsssssssisssssssisssssisss",
-  "ssssssssssssssssssssssssssssssssssssssssssss",
-  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
-  "llllllllllllllllllllllllllllllllllllllllllll",
-  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
-  "ssssssssssssssssssssssssssssssssssssssssssss",
-  "ssssssksssksssksssksssksssksssksssksssksssss",
-  "ssssssssssssssssssssssssssssssssssssssssssss",
-  "###############D############################",
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  "WWWWWWWWWWsssWWWWWWWWWWWWWWWWWWWWWWW",
+  "##########sss#######################",
+  "##########sss#####D####D####D#######",
+  "ssssisssnsssssisssssssssssissssssiss",
+  "ssssssssssssssssssssssssssssssssssss",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "llllllllllllllllllllllllllllllllllll",
+  "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "ssssssssssssssssssssssssssssssssssss",
+  "ssssskssssksssskssssksssskssssksssss",
+  "ssssssssssssssssssssssssssssssssssss",
+  "####################################",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
  ],
  "music": "hub",
  "edges": {
@@ -36,18 +36,18 @@
    "dc": 0
   },
   "E": {
-   "to": "avenue",
-   "dc": 0
+   "to": "plaza",
+   "dc": 3
   },
   "N": {
    "to": "river",
-   "dc": 0
+   "dc": 10
   }
  },
  "doors": [
   {
    "at": [
-    8,
+    28,
     2
    ],
    "to": "office",
@@ -59,12 +59,12 @@
   },
   {
    "at": [
-    30,
+    18,
     2
    ],
    "to": "market",
    "spawn": [
-    30,
+    18,
     3
    ],
    "dir": "D",
@@ -75,12 +75,12 @@
   },
   {
    "at": [
-    36,
+    23,
     2
    ],
    "to": "market",
    "spawn": [
-    36,
+    23,
     3
    ],
    "dir": "D",
@@ -88,33 +88,17 @@
     "flag": "never"
    },
    "locked": "분식집. 오늘은 돈을 아껴야 한다."
-  },
-  {
-   "at": [
-    15,
-    11
-   ],
-   "to": "market",
-   "spawn": [
-    15,
-    10
-   ],
-   "dir": "U",
-   "if": {
-    "flag": "never"
-   },
-   "locked": "뒷골목으로 이어지는 문. 지금은 볼일이 없다."
   }
  ],
  "objects": [
   {
    "at": [
-    18,
+    8,
     3
    ],
    "label": "조사",
    "act": "text",
-   "text": "↑ 강변 공원 · ← 원룸촌 · 중앙 대로 →"
+   "text": "↑ 강변 공원 · ← 원룸촌 · 탑 광장 →"
   }
  ],
  "npcs": [
@@ -131,7 +115,7 @@
   {
    "id": "passerby_a",
    "at": [
-    27,
+    20,
     4
    ],
    "dir": "L",

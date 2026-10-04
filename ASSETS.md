@@ -21,3 +21,17 @@ hurtD hurtR, fall lie getup, lowD lowR, hit down cast win
 
 - 끝이 R인 동작은 오른쪽을 보는 그림이고, 왼쪽은 게임이 좌우 반전해서 쓴다
 - 모든 프레임은 같은 크기 기준으로 그리고, 발이 같은 높이에 오게 한다
+
+## UI 껍데기 (선택)
+
+`data/manifest.json`의 atlases에 `ui` 묶음을 추가하면 아래 이름의 그림이 코드 그림 대신 쓰인다. 없는 이름은 코드 그림이 그대로 나온다.
+각 이름마다 `_sys`를 붙인 버전은 각성 후(시스템창) 화면에 쓰인다.
+
+| 이름 | 쓰임 | 권장 크기 |
+| --- | --- | --- |
+| panel_plain, panel_sys | 모든 창 테두리 (9칸 분할, 모서리 12px) | 64x64 |
+| btn, btn_sys / btn_act, btn_act_sys | 원형 버튼 / 큰 행동 버튼 바탕 | 96x96 |
+| btn_top, btn_top_sys | 왼쪽 위 작은 원형 버튼 바탕 | 48x48 |
+| joy_base(_sys), joy_knob(_sys) | 조이스틱 바탕과 손잡이 | 128x128, 64x64 |
+| icon_menu, icon_map, icon_quest, icon_act, icon_dodge, icon_skill1, icon_potion | 버튼 위 아이콘 | 48x48 |
+| item_아이템id (예: item_ramen) | 가방·상점 아이콘 | 32x32 |

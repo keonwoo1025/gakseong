@@ -32,20 +32,20 @@
    "y": 0
   },
   {
+   "id": "plaza",
+   "name": "탑 광장",
+   "x": 3,
+   "y": 1
+  },
+  {
    "id": "avenue",
    "name": "중앙 대로",
-   "x": 3,
+   "x": 4,
    "y": 1,
    "inside": [
     "assoc",
     "hunter_shop"
    ]
-  },
-  {
-   "id": "plaza",
-   "name": "탑 광장",
-   "x": 4,
-   "y": 1
   }
  ],
  "links": [
@@ -63,11 +63,11 @@
   ],
   [
    "market",
-   "avenue"
+   "plaza"
   ],
   [
-   "avenue",
-   "plaza"
+   "plaza",
+   "avenue"
   ]
  ]
 }

@@ -102,6 +102,7 @@ export class Player {
 
   update(dt) {
     const g = this.g, w = g.world, s = this.s;
+    w.unstick(this, 26);
     this.inv = Math.max(0, this.inv - dt); this.painT = Math.max(0, this.painT - dt); this.chain = Math.max(0, this.chain - dt);
     this.blink -= dt; if (this.blink < -3) this.blink = 0.15;
     const v = g.input.vec(), mag = Math.hypot(v[0], v[1]);

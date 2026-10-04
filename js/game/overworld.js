@@ -2,6 +2,7 @@
 // 지도는 data/town/*.json, 컷신은 data/cutscenes/*.json.
 import { makePerson, makeTiles, SOLID } from './pixel.js';
 import { Settings } from '../engine/settings.js';
+import { frame as hudFrame } from './hud.js';
 
 export const TS = 64;   // 타일 한 칸: 16px 도트 x4
 const PS = 3.2;         // 사람 도트 확대 배율 (키가 타일 약 1.3칸)
@@ -74,7 +75,18 @@ export class Overworld {
     return false;
   }
 
+  unstick(a) {
+    if (!this.solidAt(a.x, a.y, a)) return;
+    for (let d = 8; d < TS * 6; d += 8) {
+      for (let k = 0; k < 16; k++) {
+        const an = k / 16 * Math.PI * 2, x = a.x + Math.cos(an) * d, y = a.y + Math.sin(an) * d;
+        if (!this.solidAt(x, y, a) && this.tileAt(x, y - 10) !== 'door') { a.x = x; a.y = y; return; }
+      }
+    }
+  }
+
   move(a, dx, dy) {
+    if (this.solidAt(a.x, a.y, a)) { this.unstick(a); return; }
     if (!this.solidAt(a.x + dx, a.y, a)) a.x += dx;
     if (!this.solidAt(a.x, a.y + dy, a)) a.y += dy;
   }
@@ -108,6 +120,7 @@ export class Overworld {
 
   control(dt) {
     const g = this.g, p = this.actors.player;
+    this.unstick(p);
     const v = g.input.vec(), mag = Math.hypot(v[0], v[1]);
     if (p.knock) { this.move(p, p.knock[0] * dt, p.knock[1] * dt); p.knock[0] *= 0.85; p.knock[1] *= 0.85; if (Math.hypot(p.knock[0], p.knock[1]) < 20) p.knock = null; }
     if (mag > 0.15 && !p.path) {
@@ -198,6 +211,39 @@ export class Overworld {
     c.y = this.H < hh * 2 ? this.H / 2 : Math.max(hh, Math.min(this.H - hh, c.y));
   }
 
+  // ---------- 목표 안내 ----------
+  guidePoint() {
+    const g = this.g, t = g.state && g.state.objTarget; if (!t || !this.map) return null;
+    const cur = this.map.id, cm = g.citymap;
+    const nodeOf = (id) => cm.nodes.find((n) => n.id === id || (n.inside || []).includes(id));
+    if (cur === t.map) return [(t.at[0] + 0.5) * TS, (t.at[1] + 0.5) * TS];
+    const here = cm.nodes.find((n) => n.id === cur);
+    if (!here) { const d = (this.map.doors || [])[0]; return d ? [(d.at[0] + 0.5) * TS, (d.at[1] + 0.5) * TS] : null; }
+    const goal = nodeOf(t.map); if (!goal) return null;
+    if (goal.id === cur) { const d = (this.map.doors || []).find((o) => o.to === t.map); return d ? [(d.at[0] + 0.5) * TS, (d.at[1] + 0.5) * TS] : null; }
+    const prev = { [cur]: null }, q = [cur];
+    while (q.length) { const x = q.shift(); if (x === goal.id) break; for (const [a, b] of cm.links) { const y = a === x ? b : b === x ? a : null; if (y && !(y in prev)) { prev[y] = x; q.push(y); } } }
+    if (!(goal.id in prev)) return null;
+    let step = goal.id; while (prev[step] !== cur && prev[step] !== null) step = prev[step];
+    const E = this.map.edges || {};
+    for (const k in E) if (E[k].to === step) {
+      const p = this.actors.player;
+      if (k === 'E') return [this.W, p.y]; if (k === 'W') return [0, p.y]; if (k === 'N') return [p.x, 0]; if (k === 'S') return [p.x, this.H];
+    }
+    return null;
+  }
+
+  drawGuide() {
+    const pt = this.guidePoint(), p = this.actors.player; if (!pt || !p || this.cut) return;
+    const dx = pt[0] - p.x, dy = pt[1] - (p.y - 40), d = Math.hypot(dx, dy); if (d < 70) return;
+    const ctx = this.view().ctx, a = Math.atan2(dy, dx), T = performance.now() / 1000, r = 70 + Math.sin(T * 5) * 6;
+    const sys = this.g.awakened && this.g.state && this.g.awakened();
+    ctx.save(); ctx.translate(p.x + Math.cos(a) * r, p.y - 40 + Math.sin(a) * r); ctx.rotate(a);
+    ctx.fillStyle = sys ? 'rgba(127,216,255,0.9)' : 'rgba(255,200,90,0.92)'; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(16, 0); ctx.lineTo(-8, -12); ctx.lineTo(-3, 0); ctx.lineTo(-8, 12); ctx.closePath(); ctx.stroke(); ctx.fill();
+    ctx.restore();
+  }
+
   // ---------- 미니맵 ----------
   buildMinimap() {
     const rows = this.grid.length, cols = this.grid[0].length;
@@ -213,16 +259,18 @@ export class Overworld {
     const ctx = this.view().ctx, c = this.mini;
     const k = Math.min(maxW / c.width, maxH / c.height, 5);
     const w = c.width * k, h = c.height * k, x = x0 - w;
-    ctx.globalAlpha = 0.85; ctx.fillStyle = 'rgba(20,16,12,0.8)'; ctx.fillRect(x - 4, y0 - 4, w + 8, h + 22);
-    ctx.imageSmoothingEnabled = false; ctx.drawImage(c, x, y0, w, h); ctx.globalAlpha = 1;
-    ctx.strokeStyle = '#c9a24a'; ctx.lineWidth = 1.5; ctx.strokeRect(x - 4, y0 - 4, w + 8, h + 22);
+    const T = this.g.hud.T();
+    hudFrame(ctx, x - 4, y0 - 4, w + 8, h + 22, T);
+    ctx.globalAlpha = 0.9; ctx.imageSmoothingEnabled = false; ctx.drawImage(c, x, y0, w, h); ctx.globalAlpha = 1;
     for (const id in this.actors) {
       const a = this.actors[id]; if (!a.visible) continue;
       ctx.fillStyle = id === 'player' ? '#ff4a4a' : '#ffffff';
       const r = id === 'player' ? 3 : 2;
       ctx.fillRect(x + a.x / TS * k - r / 2, y0 + (a.y - 10) / TS * k - r / 2, r, r);
     }
-    ctx.fillStyle = '#f3e3b5'; ctx.font = '600 11px system-ui,sans-serif'; ctx.textAlign = 'right';
+    const gp = this.guidePoint();
+    if (gp && this.g.state.objTarget && this.g.state.objTarget.map === this.map.id) { ctx.fillStyle = Math.floor(performance.now() / 300) % 2 ? '#ffd23f' : '#ff8a3a'; ctx.beginPath(); ctx.arc(x + gp[0] / TS * k, y0 + gp[1] / TS * k, 3.5, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = T.text; ctx.font = '600 11px system-ui,sans-serif'; ctx.textAlign = 'right';
     ctx.fillText(this.map.name, x0, y0 + h + 13); ctx.textAlign = 'left';
   }
 
@@ -276,13 +324,13 @@ export class Overworld {
     for (const m of this.mobs) list.push({ y: m.y, d: () => { const f = m.M.hop[Math.floor(m.t * 3) % m.M.hop.length]; v.shadow(m.x, m.y, 18); v.sprite(f, m.x, m.y, 0.34); } });
     list.sort((a, b) => a.y - b.y).forEach((o) => o.d());
     for (const id in this.actors) { const a = this.actors[id]; if (a.emote && a.visible) this.drawEmote(a); }
+    if (this.g.mode === 'world' && !this.g.talking) this.drawGuide();
     if (this.prompt && !this.cut && this.g.mode === 'world') {
       const p = this.prompt;
       ctx.font = '700 22px system-ui,sans-serif'; ctx.textAlign = 'center';
       const w = ctx.measureText(p.label).width + 28;
-      ctx.fillStyle = 'rgba(20,16,12,0.85)'; ctx.fillRect(p.x - w / 2, p.y - 22, w, 36);
-      ctx.strokeStyle = '#c9a24a'; ctx.lineWidth = 2; ctx.strokeRect(p.x - w / 2, p.y - 22, w, 36);
-      ctx.fillStyle = '#ffe9a8'; ctx.fillText(p.label, p.x, p.y + 4); ctx.textAlign = 'left';
+      const T = this.g.hud.T(); hudFrame(ctx, p.x - w / 2, p.y - 22, w, 36, T);
+      ctx.fillStyle = T.text; ctx.fillText(p.label, p.x, p.y + 4); ctx.textAlign = 'left';
     }
   }
 
@@ -365,7 +413,14 @@ export class Cutscene {
     }
   }
 
+  skip() { this.ff = true; this.wait = 0; if (this.card) this.card.t = this.card.dur; }
+
   update(dt) {
+    if (this.ff) {
+      for (const id in this.ow.actors) { const a = this.ow.actors[id]; if (a.path) { a.x = a.path[0]; a.y = a.path[1]; a.path = null; a.moving = false; } }
+      this.ow.fade = this.ow.fadeTo;
+      if (this.wait > 0) { this.wait = 0; this.next(); return; }
+    }
     if (this.card) { this.card.t += dt; if (this.card.t >= this.card.dur) { this.card = null; this.next(); } return; }
     if (this.wait > 0) { this.wait -= dt; if (this.wait <= 0) this.next(); return; }
     if (this.waitFor && this.waitFor()) { this.waitFor = null; this.next(); }

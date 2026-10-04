@@ -4,30 +4,30 @@
  "theme": "street",
  "legend": {
   "#": "wall",
-  "x": "crate",
-  "W": "window",
   "s": "walk",
-  "V": "screen",
   "n": "sign",
   "D": "door",
   "T": "tree",
-  "i": "lamp"
+  "V": "screen",
+  "i": "lamp",
+  "x": "crate",
+  "W": "window"
  },
  "rows": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "########################################",
-  "#####D########V#######D########D########",
-  "sssissssssisssssssisssssnssisssssssissss",
-  "ssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssss",
-  "sssssssxssssssssTsssxssssssssTsssxssssss",
-  "############D#############D#############",
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "############################",
+  "#####D######V#######D#######",
+  "sssisssssissssssisssssnsisss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssss",
+  "ssssssxsssssssTsssssssssxsss",
+  "#########D########D#########",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
  ],
  "music": "hub",
  "edges": {
@@ -55,7 +55,7 @@
   },
   {
    "at": [
-    12,
+    9,
     11
    ],
    "to": "store",
@@ -67,12 +67,12 @@
   },
   {
    "at": [
-    22,
+    20,
     2
    ],
    "to": "alley",
    "spawn": [
-    22,
+    20,
     3
    ],
    "dir": "D",
@@ -83,28 +83,12 @@
   },
   {
    "at": [
-    31,
-    2
-   ],
-   "to": "alley",
-   "spawn": [
-    31,
-    3
-   ],
-   "dir": "D",
-   "if": {
-    "flag": "never"
-   },
-   "locked": "문이 잠겨 있다."
-  },
-  {
-   "at": [
-    26,
+    18,
     11
    ],
    "to": "alley",
    "spawn": [
-    26,
+    18,
     10
    ],
    "dir": "U",
@@ -117,7 +101,7 @@
  "objects": [
   {
    "at": [
-    14,
+    12,
     2
    ],
    "label": "전광판 보기",
@@ -125,29 +109,19 @@
   },
   {
    "at": [
-    24,
+    22,
     3
    ],
    "label": "조사",
    "act": "text",
-   "text": "← 공장 지대 · 상가 거리 →"
+   "text": "← 공장 지대 · 상가 거리(짐꾼 사무소) · 탑 광장 →"
   }
  ],
  "npcs": [
   {
-   "id": "passerby_b",
-   "at": [
-    18,
-    6
-   ],
-   "dir": "L",
-   "talk": "line",
-   "text": "우리 애가 내년에 열여덟인데, 각성 못 하면 어쩌나 싶어요."
-  },
-  {
    "id": "neighbor",
    "at": [
-    8,
+    7,
     8
    ],
    "dir": "R",
