@@ -6,10 +6,15 @@ export class Gear {
   constructor(g) { this.g = g; }
   get D() { return this.g.gearDef; }
   get s() { return this.g.state; }
-  item(uid) { const o = this.s.gear && this.s.gear[uid]; return o ? Object.assign({ uid, plus: o.plus || 0 }, this.g.items[o.id], { id: o.id }) : null; }
+  item(uid) { const o = this.s.gear && this.s.gear[uid]; return o ? Object.assign({ uid, plus: o.plus || 0 }, this.g.items[o.id], { id: o.id, opt: o.opt || null }) : null; }
+  opt(k) { let v = 0; for (const [slot] of this.D.slots) { const it = this.equipped(slot); if (it && it.opt && it.opt.k === k) v += it.opt.v; } return v; }
   give(id, plus = 0) {
     const s = this.s; s.gear = s.gear || {}; s.gearN = (s.gearN || 0) + 1;
-    const uid = 'g' + s.gearN; s.gear[uid] = { id, plus }; return uid;
+    const uid = 'g' + s.gearN; s.gear[uid] = { id, plus };
+    // 영웅 이상은 고유 옵션 1개
+    const it = this.g.items[id], RO = Object.keys(this.D.rarity);
+    if (it && RO.indexOf(it.rarity) >= 3 && this.D.opts) s.gear[uid].opt = this.D.opts[Math.floor(Math.random() * this.D.opts.length)];
+    return uid;
   }
   isGear(id) { const it = this.g.items[id]; return it && this.D.slots.some(([k]) => k === it.slot); }
   owned() { return Object.keys(this.s.gear || {}); }
@@ -99,8 +104,7 @@ export class Gear {
     const pool = Object.keys(this.g.items).filter((id) => this.isGear(id) && this.g.items[id].rarity === R[ri] && id !== 'dagger_old' && id !== 'cloth_work');
     if (!pool.length) return null;
     const id = pool[Math.floor(Math.random() * pool.length)];
-    this.give(id);
-    return id;
+    return id;   // 바닥에 떨어뜨리고, 주울 때 give
   }
 
   color(r) { return this.D.rarity[r] || '#ccc'; }

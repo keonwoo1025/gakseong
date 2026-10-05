@@ -116,6 +116,14 @@ export class HUD {
   }
 
   // ---------- 모드별 ----------
+  // 버프 표시 (체력바 위 왼쪽)
+  buffChips() {
+    const g = this.g, B = g.state && g.state.buffs; if (!B) return;
+    const ctx = g.view.ctx, N = { atk: '공격↑', def: '방어↑', spd: '이동↑' }; let x = g.view.W / 2 - 150, y = g.view.H - 64;
+    ctx.font = '700 11px system-ui';
+    for (const k in B) { const t = N[k] + ' ' + Math.ceil(B[k].t), w = ctx.measureText(t).width + 12; ctx.fillStyle = 'rgba(10,20,40,0.75)'; ctx.fillRect(x, y, w, 16); ctx.fillStyle = '#9fe0ff'; ctx.fillText(t, x + 6, y + 12); x += w + 4; }
+  }
+
   // 대상 체력·아픈 표정·콤보 (탑·마을 공통)
   combatBits(B) {
     const g = this.g, v = g.view, ctx = v.ctx, T = this.T(), W = v.W;
@@ -144,9 +152,9 @@ export class HUD {
 
   drawWorld() {
     const g = this.g, s = g.state; if (!s) return;
-    this.topInfo(Math.round(s.money).toLocaleString('ko-KR') + '원 · 31층 D-' + Math.max(0, 365 - s.day) + (Settings.v.pk ? ' · PK' : ''));
+    this.topInfo(Math.round(s.money).toLocaleString('ko-KR') + '원 · ' + g.timeName() + ' · 31층 D-' + Math.max(0, 365 - s.day) + (Settings.v.pk ? ' · PK' : ''));
     this.objective();
-    this.combatBits(null);
+    this.combatBits(null); this.buffChips();
     this.bars('world');
     this.drawToast();
   }
@@ -180,7 +188,8 @@ export class HUD {
       ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(x + 8, y + 16, w - 16, 6);
       ctx.fillStyle = B.phase2 ? '#ff4a3a' : '#e8433f'; ctx.fillRect(x + 8, y + 16, (w - 16) * Math.max(0, B.hp / B.d.hp), 6);
     }
-    this.combatBits(B);
+    this.combatBits(B); this.buffChips();
+    if (g.world && g.world.drawMini && g.player) g.world.drawMini(ctx, W - 160, 10, 150, 84, g.player);
     this.bars('field');
     this.drawToast();
   }

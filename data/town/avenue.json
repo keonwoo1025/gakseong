@@ -32,409 +32,206 @@
  ],
  "props": [
   {
-   "obj": "plant",
+   "obj": "tree",
    "at": [
-    3,
-    3
+    4,
+    4
    ]
   },
   {
-   "obj": "plant",
+   "obj": "tree",
+   "at": [
+    9,
+    4
+   ]
+  },
+  {
+   "obj": "lamp",
    "at": [
     11,
-    3
+    4
    ]
   },
   {
-   "obj": "plant",
+   "obj": "tree",
    "at": [
-    20,
-    3
+    19,
+    4
    ]
   },
   {
-   "obj": "plant",
+   "obj": "lamp",
    "at": [
-    28,
-    3
+    21,
+    4
    ]
   },
   {
-   "obj": "plant",
+   "obj": "lamp",
    "at": [
-    34,
-    3
+    26,
+    4
    ]
   },
   {
-   "obj": "plant",
+   "obj": "tree",
    "at": [
-    44,
-    3
+    39,
+    4
    ]
   },
   {
-   "obj": "sign",
+   "obj": "tree",
    "at": [
-    18,
+    4,
+    11
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    6,
     11
    ]
   },
   {
    "obj": "tree",
    "at": [
-    5,
-    12
-   ]
-  },
-  {
-   "obj": "tree",
-   "at": [
-    14,
-    12
-   ]
-  },
-  {
-   "obj": "tree",
-   "at": [
-    23,
-    12
-   ]
-  },
-  {
-   "obj": "tree",
-   "at": [
-    32,
-    12
-   ]
-  },
-  {
-   "obj": "tree",
-   "at": [
-    40,
-    12
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    0,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    1,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    2,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    3,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    4,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    5,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    6,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    7,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    8,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
     9,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    10,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    11,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    12,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    13,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     14,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    15,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     16,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    17,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    18,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     19,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    20,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     21,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    22,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    23,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     24,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    25,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     26,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    27,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    28,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     29,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    30,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     31,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    32,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    33,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     34,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    35,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     36,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    37,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    38,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     39,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    40,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     41,
-    13
+    11
    ]
   },
   {
-   "obj": "fence",
+   "obj": "planter",
    "at": [
-    42,
-    13
+    2,
+    3
    ]
   },
   {
-   "obj": "fence",
+   "obj": "vending",
+   "at": [
+    12,
+    3
+   ]
+  },
+  {
+   "obj": "plant2",
+   "at": [
+    17,
+    3
+   ]
+  },
+  {
+   "obj": "aboard",
+   "at": [
+    22,
+    3
+   ]
+  },
+  {
+   "obj": "planter",
+   "at": [
+    27,
+    3
+   ]
+  },
+  {
+   "obj": "signal",
+   "at": [
+    2,
+    4
+   ]
+  },
+  {
+   "obj": "signal",
    "at": [
     43,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    44,
-    13
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    45,
-    13
+    11
    ]
   }
  ],

@@ -30,66 +30,115 @@
  ],
  "props": [
   {
-   "obj": "screen",
-   "at": [
-    12,
-    2
-   ]
-  },
-  {
-   "obj": "lamp",
+   "obj": "ac",
    "at": [
     3,
     3
    ]
   },
   {
-   "obj": "lamp",
+   "obj": "recycle",
    "at": [
-    9,
+    8,
     3
    ]
   },
   {
-   "obj": "lamp",
+   "obj": "bike",
    "at": [
-    16,
+    14,
     3
    ]
   },
   {
-   "obj": "sign",
+   "obj": "mailbox",
    "at": [
-    22,
+    17,
     3
    ]
   },
   {
-   "obj": "lamp",
+   "obj": "ac",
    "at": [
-    24,
+    23,
     3
    ]
   },
   {
-   "obj": "crate",
+   "obj": "planter",
+   "at": [
+    25,
+    3
+   ]
+  },
+  {
+   "obj": "trash",
+   "at": [
+    3,
+    10
+   ]
+  },
+  {
+   "obj": "boxes",
    "at": [
     6,
     10
    ]
   },
   {
-   "obj": "tree",
+   "obj": "planter",
    "at": [
-    14,
+    13,
     10
    ]
   },
   {
-   "obj": "crate",
+   "obj": "ac",
+   "at": [
+    15,
+    10
+   ]
+  },
+  {
+   "obj": "recycle",
+   "at": [
+    21,
+    10
+   ]
+  },
+  {
+   "obj": "bike",
    "at": [
     24,
     10
+   ]
+  },
+  {
+   "obj": "pole",
+   "at": [
+    13,
+    4
+   ]
+  },
+  {
+   "obj": "pole",
+   "at": [
+    22,
+    4
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    16,
+    9
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    25,
+    9
    ]
   }
  ],

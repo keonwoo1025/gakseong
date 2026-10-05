@@ -111,5 +111,190 @@
    "cd": 1.5,
    "dmg": 1.2
   }
+ },
+ "검사": {
+  "role": "melee",
+  "party": "tank",
+  "weapon": "sword",
+  "item": "sword_iron",
+  "reach": 1.1,
+  "skills": [
+   {
+    "name": "찌르기 연타",
+    "kind": "hit",
+    "power": 1.6,
+    "cd": 5
+   },
+   {
+    "name": "돌진 베기",
+    "kind": "dash",
+    "power": 1.4,
+    "cd": 8
+   },
+   {
+    "name": "검기",
+    "kind": "wave",
+    "power": 2.2,
+    "cd": 12,
+    "minRank": "C"
+   }
+  ],
+  "basic": true,
+  "hidden": []
+ },
+ "전사": {
+  "role": "tank",
+  "party": "tank",
+  "weapon": "blade",
+  "item": "blade_1",
+  "reach": 1.05,
+  "skills": [
+   {
+    "name": "내려찍기",
+    "kind": "hit",
+    "power": 1.8,
+    "cd": 6
+   },
+   {
+    "name": "도발",
+    "kind": "taunt",
+    "power": 0,
+    "cd": 10
+   },
+   {
+    "name": "버티기",
+    "kind": "guard",
+    "power": 0.5,
+    "cd": 14,
+    "minRank": "C"
+   }
+  ],
+  "basic": true,
+  "hidden": []
+ },
+ "궁수": {
+  "role": "ranged",
+  "party": "bow",
+  "weapon": "bow",
+  "item": "bow_1",
+  "reach": 3.2,
+  "skills": [
+   {
+    "name": "조준 사격",
+    "kind": "hit",
+    "power": 1.7,
+    "cd": 5
+   },
+   {
+    "name": "뒤로 뛰며 쏘기",
+    "kind": "retreat",
+    "power": 1.2,
+    "cd": 9
+   },
+   {
+    "name": "연속 사격",
+    "kind": "multi",
+    "power": 0.8,
+    "n": 3,
+    "cd": 12,
+    "minRank": "C"
+   }
+  ],
+  "basic": true,
+  "hidden": []
+ },
+ "마법사": {
+  "role": "caster",
+  "party": "mage",
+  "weapon": "staff",
+  "item": "staff_1",
+  "reach": 2.8,
+  "skills": [
+   {
+    "name": "화염구",
+    "kind": "hit",
+    "power": 1.9,
+    "cd": 6
+   },
+   {
+    "name": "냉기 장막",
+    "kind": "slow",
+    "power": 0.8,
+    "cd": 10
+   },
+   {
+    "name": "폭발",
+    "kind": "wave",
+    "power": 2.4,
+    "cd": 14,
+    "minRank": "C"
+   }
+  ],
+  "basic": true,
+  "hidden": []
+ },
+ "성직자": {
+  "role": "healer",
+  "party": "heal",
+  "weapon": "staff",
+  "item": "staff_1",
+  "reach": 2.4,
+  "skills": [
+   {
+    "name": "치유",
+    "kind": "heal",
+    "power": 0.3,
+    "cd": 8
+   },
+   {
+    "name": "빛의 일격",
+    "kind": "hit",
+    "power": 1.4,
+    "cd": 6
+   },
+   {
+    "name": "보호막",
+    "kind": "guard",
+    "power": 0.4,
+    "cd": 15,
+    "minRank": "C"
+   }
+  ],
+  "basic": true,
+  "hidden": []
+ },
+ "도적": {
+  "role": "assassin",
+  "party": "tank",
+  "weapon": "dagger",
+  "item": "dagger_1",
+  "reach": 0.95,
+  "skills": [
+   {
+    "name": "급소 찌르기",
+    "kind": "hit",
+    "power": 2.0,
+    "cd": 6
+   },
+   {
+    "name": "그림자 이동",
+    "kind": "dash",
+    "power": 1.2,
+    "cd": 8
+   },
+   {
+    "name": "독날",
+    "kind": "dot",
+    "power": 0.5,
+    "cd": 12,
+    "minRank": "C"
+   }
+  ],
+  "basic": true,
+  "hidden": []
+ },
+ "_히든": {
+  "_설명": "히든 직업 자리: 기본 직업의 속성·스킬 특화형(예: 마법사 → 빙결술사). 길드장 작업 때 채운다",
+  "list": []
  }
 }

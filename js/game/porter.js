@@ -1,6 +1,6 @@
 // 짐꾼 원정: 들꽃 파티가 알아서 싸우고, 나는 따라다니며 마정석을 줍고, 다친 동료를 돕고, 공격을 피한다.
 // 직접 공격은 할 수 없다. 행동이 그대로 행동 패턴으로 기록된다.
-import { World } from './world.js';
+import { MazeWorld } from './maze.js';
 import { makePerson } from './pixel.js';
 import { NavGrid, steer } from './path.js';
 import { framesFor, drawPerson as drawP } from './people.js';
@@ -17,10 +17,11 @@ export class PorterRun {
   constructor(g, floor, onGoal) {
     this.g = g; this.floor = floor; this.onGoal = onGoal;
     const map = Object.assign({}, g.mapTemplate, { seed: floor.seed });
-    this.world = new World(g.A, map);
+    this.world = new MazeWorld(g.A, Object.assign(map, { tint: null }), { slotRows: 2, slotCols: 3, biome: g.biomeOf('숲') });   // 짐꾼 원정도 미로형
     const sx = this.world.spawn.x, sy = this.world.spawn.y;
     this.me = { x: sx, y: sy + 120, dir: 'U', t: 0, moving: false, fr: framesFor(g, 'player', g.playerLook()), dash: 0, inv: 0, knock: null };
-    this.party = PARTY.map((p, i) => ({ ...p, look: g.lookOf(p.id), fr: framesFor(g, p.id, g.lookOf(p.id)), x: sx - 90 + i * 60, y: sy, dir: 'U', t: 0, moving: false, hp: p.max, cd: Math.random(), emote: null, help: false }));
+    // 파티원 역할·사거리는 직업 데이터(data/jobs.json)에서
+    this.party = PARTY.map((p0) => { const J = g.jobs[(g.npcById[p0.id] || {}).job]; return J ? { ...p0, role: J.party, range: J.reach > 1.5 ? Math.round(J.reach * 85) : 70 } : p0; }).map((p, i) => ({ ...p, look: g.lookOf(p.id), fr: framesFor(g, p.id, g.lookOf(p.id)), x: sx - 90 + i * 60, y: sy, dir: 'U', t: 0, moving: false, hp: p.max, cd: Math.random(), emote: null, help: false }));
     this.mobs = [];
     for (const sp of floor.spawns) for (let i = 0; i < sp.count; i++) this.mobs.push(this.makeMob(sp.type));
     this.drops = []; this.shots = []; this.kills = 0; this.goal = 3 + Math.ceil(floor.n / 3); this.done = false; this.shards = 0;

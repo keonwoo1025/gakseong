@@ -27,157 +27,73 @@
  ],
  "props": [
   {
-   "obj": "screen",
-   "at": [
-    4,
-    1
-   ]
-  },
-  {
    "obj": "tree",
-   "at": [
-    2,
-    7
-   ]
-  },
-  {
-   "obj": "tree",
-   "at": [
-    9,
-    7
-   ]
-  },
-  {
-   "obj": "tree",
-   "at": [
-    16,
-    7
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    0,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    1,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    2,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    3,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    4,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
    "at": [
     5,
-    8
+    3
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    6,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    7,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     8,
-    8
+    3
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    9,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    10,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "tree",
    "at": [
     11,
-    8
+    3
    ]
   },
   {
-   "obj": "fence",
-   "at": [
-    12,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    13,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    14,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
-   "at": [
-    15,
-    8
-   ]
-  },
-  {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
     16,
-    8
+    3
    ]
   },
   {
-   "obj": "fence",
+   "obj": "lamp",
    "at": [
-    17,
-    8
+    3,
+    7
+   ]
+  },
+  {
+   "obj": "sakura",
+   "at": [
+    6,
+    7
+   ]
+  },
+  {
+   "obj": "lamp",
+   "at": [
+    12,
+    7
+   ]
+  },
+  {
+   "obj": "sakura",
+   "at": [
+    15,
+    7
+   ]
+  },
+  {
+   "obj": "vending",
+   "at": [
+    7,
+    2
+   ]
+  },
+  {
+   "obj": "trash",
+   "at": [
+    11,
+    2
    ]
   }
  ],

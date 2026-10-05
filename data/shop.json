@@ -2,6 +2,12 @@
  "sell": [
   "potion",
   "return_stone",
+  "mana_potion",
+  "potion_atk",
+  "potion_def",
+  "potion_spd",
+  "antidote",
+  "elixir",
   "sword_iron",
   "sword_steel",
   "sword_ore",

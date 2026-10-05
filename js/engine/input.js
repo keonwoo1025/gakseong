@@ -27,9 +27,9 @@ export class Input {
   reset() { this.joy.id = null; this.swipe.id = null; this.pressed = {}; this.btnTouch = {}; }
 
   joyBase() {
-    const W = this.c.clientWidth, H = this.c.clientHeight, r = Settings.joyRadius();
-    const x = Settings.v.lefty ? W - r - 34 : r + 34;
-    return { x, y: H - r - 28, r };
+    const W = this.c.clientWidth, H = this.c.clientHeight, r = Settings.joyRadius() * (Settings.v.joyScale || 100) / 100, o = Settings.v.joyPos || [0, 0];
+    const x = (Settings.v.lefty ? W - r - 34 : r + 34) + o[0];
+    return { x, y: H - r - 28 + o[1], r };
   }
 
   down(e) {

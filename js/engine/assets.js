@@ -10,7 +10,7 @@ const MODES = {
   portraits: 'center',
   tiles: 'none',
   ui: 'center',
-  chars: 'feet', mobs: 'feet', port2: 'center', fx2: 'center', ttiles: 'none', bld: 'bottom', ftiles: 'none', fprops: 'bottom',
+  chars: 'feet', mobs: 'feet', port2: 'center', fx2: 'center', ttiles: 'none', bld: 'bottom', ftiles: 'none', fprops: 'bottom', town2: 'none', tower2: 'none',
 };
 
 function computeAnchor(o, mode) {

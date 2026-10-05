@@ -210,5 +210,51 @@
   "top": "#2a3a5a",
   "bottom": "#2a2a30",
   "accent": "#c9a24a"
+ },
+ "god": {
+  "skin": "#ffffff",
+  "hair": "#ffffff",
+  "hairStyle": "bald",
+  "top": "#f2f4ff",
+  "bottom": "#e8ecff",
+  "shoes": "#ffffff"
+ },
+ "npc_m1": {
+  "skin": "#f2cfb1",
+  "hair": "#22202a",
+  "hairStyle": "short",
+  "top": "#3a4a6a"
+ },
+ "npc_m2": {
+  "skin": "#e8c4a4",
+  "hair": "#4a3426",
+  "hairStyle": "spiky",
+  "top": "#6a5a48"
+ },
+ "npc_m3": {
+  "skin": "#d9ad88",
+  "hair": "#2e2420",
+  "hairStyle": "buzz",
+  "top": "#2b2b33",
+  "glasses": true
+ },
+ "npc_f1": {
+  "skin": "#f6dcc8",
+  "hair": "#22202a",
+  "hairStyle": "long",
+  "top": "#c85a6a"
+ },
+ "npc_f2": {
+  "skin": "#f2cfb1",
+  "hair": "#6a4a30",
+  "hairStyle": "bob",
+  "top": "#4a7ab0"
+ },
+ "npc_f3": {
+  "skin": "#e8c4a4",
+  "hair": "#3a3a42",
+  "hairStyle": "ponytail",
+  "top": "#3a6a4a",
+  "glasses": true
  }
 }

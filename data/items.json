@@ -4,20 +4,23 @@
   "slot": "use",
   "heal": 60,
   "price": 5000,
-  "rarity": "일반"
+  "rarity": "일반",
+  "cat": "med"
  },
  "return_stone": {
   "name": "귀환석",
   "slot": "use",
   "price": 30000,
   "rarity": "일반",
-  "desc": "탑에서 도시로 돌아온다. 보스와 균열 안에서는 쓸 수 없다"
+  "desc": "탑 안에서 쓰면 탑 광장으로 돌아온다",
+  "cat": "magic"
  },
  "mana_shard": {
   "name": "마정석 조각",
   "slot": "material",
   "sell": 2000,
-  "rarity": "일반"
+  "rarity": "일반",
+  "cat": "shard"
  },
  "ramen": {
   "name": "컵라면",
@@ -25,14 +28,16 @@
   "heal": 15,
   "price": 1500,
   "rarity": "일반",
-  "desc": "싸고 따뜻하다"
+  "desc": "싸고 따뜻하다",
+  "cat": "food"
  },
  "painkiller": {
   "name": "진통제",
   "slot": "use",
   "heal": 30,
   "price": 3000,
-  "rarity": "일반"
+  "rarity": "일반",
+  "cat": "med"
  },
  "first_aid": {
   "name": "구급상자",
@@ -40,7 +45,8 @@
   "heal": 50,
   "price": 8000,
   "rarity": "일반",
-  "desc": "원정 중 다친 파티원에게 건넬 수 있다"
+  "desc": "원정 중 다친 파티원에게 건넬 수 있다",
+  "cat": "med"
  },
  "sword_iron": {
   "name": "철검",
@@ -551,5 +557,92 @@
   "hp": 180,
   "rarity": "전설",
   "drop": true
+ },
+ "coffee": {
+  "name": "캔커피",
+  "slot": "use",
+  "heal": 10,
+  "price": 1500,
+  "rarity": "일반",
+  "cat": "drink",
+  "desc": "선물로도 무난하다"
+ },
+ "chocolate": {
+  "name": "초콜릿",
+  "slot": "use",
+  "heal": 8,
+  "price": 2000,
+  "rarity": "일반",
+  "cat": "sweet",
+  "desc": "단 걸 좋아하는 사람에게"
+ },
+ "flowers": {
+  "name": "꽃다발",
+  "slot": "gift",
+  "price": 15000,
+  "rarity": "일반",
+  "cat": "flower",
+  "desc": "선물용"
+ },
+ "potion_atk": {
+  "name": "공격 강화제",
+  "slot": "use",
+  "buff": "atk",
+  "k": 0.2,
+  "t": 60,
+  "price": 8000,
+  "rarity": "고급",
+  "cat": "med",
+  "desc": "60초 동안 공격력 +20%"
+ },
+ "potion_def": {
+  "name": "방어 강화제",
+  "slot": "use",
+  "buff": "def",
+  "k": 0.2,
+  "t": 60,
+  "price": 8000,
+  "rarity": "고급",
+  "cat": "med",
+  "desc": "60초 동안 받는 피해 -20%"
+ },
+ "potion_spd": {
+  "name": "신속 강화제",
+  "slot": "use",
+  "buff": "spd",
+  "k": 0.2,
+  "t": 60,
+  "price": 6000,
+  "rarity": "고급",
+  "cat": "med",
+  "desc": "60초 동안 이동 속도 +20%"
+ },
+ "antidote": {
+  "name": "해독제",
+  "slot": "use",
+  "cure": true,
+  "price": 3000,
+  "rarity": "일반",
+  "cat": "med",
+  "desc": "출혈·독 같은 상태이상을 없앤다"
+ },
+ "mana_potion": {
+  "name": "마력 물약",
+  "slot": "use",
+  "mp": 50,
+  "price": 5000,
+  "rarity": "일반",
+  "cat": "med",
+  "desc": "MP 50 회복"
+ },
+ "elixir": {
+  "name": "엘릭서",
+  "slot": "use",
+  "heal": 9999,
+  "mp": 999,
+  "price": 60000,
+  "rarity": "희귀",
+  "cat": "magic",
+  "desc": "체력과 MP를 모두 회복"
  }
 }

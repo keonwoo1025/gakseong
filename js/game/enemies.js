@@ -49,12 +49,17 @@ export class Enemies {
   // 몬스터 공격: 준비(경고) → 공격(돌진) → 타격 → 회복
   update(dt) {
     const g = this.g, p = g.player, w = g.world;
+    if (g.allies) g.allies.update(dt);
+    if (w.reveal && p) w.reveal(p.x, p.y);
     for (const e of this.list) {
-      if (!e.alive) { e.dead -= dt; if (e.dead < -3.5 && !e.noRespawn) Object.assign(e, this.make(e.type)); continue; }
+      if (!e.alive) { e.dead -= dt; if (e.dead < (w.maze ? -18 : -3.5) && !e.noRespawn) Object.assign(e, this.make(e.type)); continue; }
+      // 보스방에 들어오면 보스가 깨어나고 문이 닫힌다
+      if (e.dormant) { if (w.roomAt && w.roomAt(p.x, p.y) === w.boss) { e.dormant = false; w.locked = true; g.boss = e; g.hud.say(e.d.name, 2.6); g.sound.play('boss'); g.view.addShake(10); } continue; }
       e.t += dt; e.hit = Math.max(0, e.hit - dt); e.cd = Math.max(0, e.cd - dt);
       w.unstick(e, 18);
       if (e.slowT > 0) e.slowT -= dt; else e.slowK = 1;
       if (e.rootT > 0) e.rootT -= dt;
+      if (e.bleed) { const b = e.bleed; b.t -= dt; b.acc += dt; if (b.acc >= 0.5) { b.acc = 0; this.damage(e, Math.max(1, Math.round(b.dps * 0.5)), 0, 0, 0, 0); } if (b.t <= 0 || !e.alive) e.bleed = null; if (!e.alive) continue; }
       const spd = e.d.speed * (e.slowK || 1);
       if (e.stun > 0) { e.stun -= dt; e.st = 'idle'; w.moveBody(e, e.kx * dt, e.ky * dt, 18); e.kx *= 0.86; e.ky *= 0.86; continue; }
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
@@ -64,13 +69,24 @@ export class Enemies {
       const range = wolf ? 150 : 110, wind = boss ? 0.75 : wolf ? 0.5 : 0.6; e.windT = wind;
       e.st = e.st || 'idle'; e.stt = (e.stt || 0) + dt;
       if (e.st === 'idle') {
-        const chase = d < 520 && alive;
-        if (chase && d > range * 0.8) {
+        const chase = d < (w.maze ? 640 : 520) && alive;
+        // 체력이 적으면 잠깐 물러난다 (보스 제외)
+        if (!boss && !e.fled && e.hp < e.d.hp * 0.25) { e.fled = true; e.fleeT = 1.6; }
+        if (e.fleeT > 0) { e.fleeT -= dt; w.moveBody(e, -dx / d * spd * 1.2 * dt, -dy / d * spd * 1.2 * dt, 18); e.face = dx > 0 ? -1 : 1; continue; }
+        // 한꺼번에 덤비지 않고 번갈아: 이미 둘이 공격 중이면 주위를 돈다
+        const busy = !boss && this.list.filter((o) => o !== e && o.alive && (o.st === 'wind' || o.st === 'atk')).length >= 2;
+        if (e.flank == null) e.flank = (Math.random() - 0.5) * 1.2;
+        if (chase && busy && d < range * 2.2) {
+          const s2 = e.flank >= 0 ? 1 : -1; w.moveBody(e, (-dy / d * s2 * 0.8 + (d < range * 1.5 ? -dx / d : 0)) * spd * dt, (dx / d * s2 * 0.8 + (d < range * 1.5 ? -dy / d : 0)) * spd * dt, 18);
+          e.face = dx > 0 ? 1 : -1;
+        } else if (chase && d > range * 0.8) {
           const hop = wolf || (e.t % 1.2) < 0.7;
-          if (hop) w.moveBody(e, dx / d * spd * dt, dy / d * spd * dt, 18);
+          // 멀리서는 옆으로 돌아 들어온다
+          const an = Math.atan2(dy, dx) + (d > 220 ? e.flank : 0);
+          if (hop) w.moveBody(e, Math.cos(an) * spd * dt, Math.sin(an) * spd * dt, 18);
           e.face = dx > 0 ? 1 : -1;
         } else if (!chase) w.moveBody(e, Math.cos(e.t * 0.5) * 30 * dt, Math.sin(e.t * 0.7) * 30 * dt, 18);
-        if (chase && d < range && e.cd <= 0) { e.st = 'wind'; e.stt = 0; e.ax = dx / d; e.ay = dy / d; e.face = dx > 0 ? 1 : -1; }
+        if (chase && !busy && d < range && e.cd <= 0) { e.st = 'wind'; e.stt = 0; e.ax = dx / d; e.ay = dy / d; e.face = dx > 0 ? 1 : -1; }
       } else if (e.st === 'wind') {
         // 준비 동작: 몸을 움츠리고 붉게 깜빡이며 바닥에 공격 범위 표시
         if (e.stt >= wind) { e.st = 'atk'; e.stt = 0; e.hitDone = false; g.sound.sfx('slash'); }
@@ -205,6 +221,8 @@ export class Enemies {
   }
 
   collect(list) {
+    if (this.g.allies) for (const a of this.g.allies.list) list.push({ y: a.y, d: () => this.g.allies.draw(a) });
+    for (const d of this.g.drops || []) list.push({ y: d.y, d: () => this.g.drawDrop(d) });
     const v = this.g.view, ctx = v.ctx;
     for (const h of this.hazards) list.push({ y: h.y - 300, d: () => {
       const k = Math.min(1, h.t / h.life); ctx.save(); ctx.fillStyle = 'rgba(176,74,255,0.2)'; ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r, h.r * 0.55, 0, 0, Math.PI * 2); ctx.fill();
@@ -232,6 +250,7 @@ export class Enemies {
         else if (e.st === 'wind' && Math.floor(e.stt * 14) % 2 === 0) { ctx.filter = 'sepia(1) saturate(6) hue-rotate(-40deg) brightness(1.1)'; v.sprite(f, e.x, e.y, s, flip, a); }
         else v.sprite(f, e.x, e.y, s, flip, a);
         ctx.restore();
+        if (e.bleed) { ctx.font = '700 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('🩸', e.x + 30, e.y - 80 * e.d.scale / 0.5); ctx.textAlign = 'left'; }
         if (e.stun > 0.25) { ctx.fillStyle = '#ffe9a8'; ctx.font = '700 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('✦ ✦', e.x, e.y - 90 * e.d.scale / 0.5); ctx.textAlign = 'left'; }
         if (e.alive && e.hp < e.d.hp) {
           const top = e.y - (e.d.kind === 'wolf' ? 84 : 66) * (e.d.scale / (e.d.kind === 'wolf' ? 0.55 : 0.46));

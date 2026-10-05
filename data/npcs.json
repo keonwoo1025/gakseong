@@ -16,13 +16,15 @@
   "id": "jihoon",
   "name": "차지훈",
   "role": "회사 선배, 이후 헌터",
-  "rank": "C"
+  "rank": "C",
+  "job": "검사"
  },
  {
   "id": "harin",
   "name": "윤하린",
   "role": "회사 후배, 이후 치유사",
-  "rank": "D"
+  "rank": "D",
+  "job": "성직자"
  },
  {
   "id": "oh",
@@ -34,25 +36,29 @@
   "id": "taesung",
   "name": "강태성",
   "role": "들꽃 파티 리더",
-  "rank": "C"
+  "rank": "C",
+  "job": "전사"
  },
  {
   "id": "yuna",
   "name": "오유나",
   "role": "들꽃 파티 성직자",
-  "rank": "D"
+  "rank": "D",
+  "job": "성직자"
  },
  {
   "id": "hyun",
   "name": "최현",
   "role": "들꽃 파티 궁수",
-  "rank": "D"
+  "rank": "D",
+  "job": "궁수"
  },
  {
   "id": "eunji",
   "name": "노은지",
   "role": "들꽃 파티 마법사",
-  "rank": "D"
+  "rank": "D",
+  "job": "마법사"
  },
  {
   "id": "wooseok",
@@ -109,7 +115,8 @@
   "name": "관리 요원",
   "role": "협회 출입 관리",
   "fixed": "행인",
-  "rank": "D"
+  "rank": "D",
+  "job": "전사"
  },
  {
   "id": "passerby_a",

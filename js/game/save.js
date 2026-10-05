@@ -34,6 +34,7 @@ export function newState(family, given, gender) {
     pattern: { 공격: 0, 수호: 0, 관찰: 0, 탐구: 0, 구조: 0, 은밀: 0 },
     karma: 0, infamy: 0, pk: 0,
     folk: [], folkInit: {}, folkDue: [], deadNpc: {},
+    time: 0, gifted: {}, vars: {},
     flags: {},
     aff: {},
     kills: 0,

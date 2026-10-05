@@ -8,6 +8,125 @@
    "music": "story"
   },
   {
+   "map": "floor10",
+   "at": [
+    7,
+    10
+   ],
+   "dir": "U"
+  },
+  {
+   "spawn": {
+    "id": "taesung",
+    "at": [
+     7,
+     8
+    ],
+    "dir": "U"
+   }
+  },
+  {
+   "spawn": {
+    "id": "yuna",
+    "at": [
+     6,
+     9
+    ],
+    "dir": "U"
+   }
+  },
+  {
+   "spawn": {
+    "id": "hyun",
+    "at": [
+     8,
+     9
+    ],
+    "dir": "U"
+   }
+  },
+  {
+   "spawn": {
+    "id": "eunji",
+    "at": [
+     7,
+     9
+    ],
+    "dir": "U"
+   }
+  },
+  {
+   "card": "10층\n보스방 앞",
+   "dur": 2
+  },
+  {
+   "say": "taesung",
+   "text": "여기까지 왔으면 반은 끝났어. 짐은 문 옆에 내려놔."
+  },
+  {
+   "move": "taesung",
+   "to": [
+    7,
+    3
+   ],
+   "nowait": true
+  },
+  {
+   "move": "hyun",
+   "to": [
+    9,
+    4
+   ],
+   "nowait": true
+  },
+  {
+   "move": "eunji",
+   "to": [
+    5,
+    4
+   ],
+   "nowait": true
+  },
+  {
+   "move": "yuna",
+   "to": [
+    7,
+    5
+   ],
+   "nowait": true
+  },
+  {
+   "move": "player",
+   "to": [
+    7,
+    7
+   ]
+  },
+  {
+   "say": "eunji",
+   "text": "보스 패턴은 지난번이랑 같겠죠?"
+  },
+  {
+   "say": "yuna",
+   "text": "같아도 방심하지 마. 한 번에 끝내자."
+  },
+  {
+   "wait": 0.6
+  },
+  {
+   "say": "hyun",
+   "text": "…잠깐. 바닥 봐."
+  },
+  {
+   "sfx": "heavy"
+  },
+  {
+   "shake": 10
+  },
+  {
+   "rune": true
+  },
+  {
    "text": "10층. 들꽃 파티의 짐을 지고 보스방 앞에 섰을 때, 바닥의 문양이 붉게 빛났다."
   },
   {
@@ -19,11 +138,129 @@
    "text": "모두 뒤로! 짐꾼부터 내보내!"
   },
   {
-   "text": "문이 닫힌다. 하나씩, 쓰러진다."
+   "boss": {
+    "kind": "rift",
+    "at": [
+     7,
+     1
+    ],
+    "s": 2.1
+   }
+  },
+  {
+   "sfx": "heavy"
+  },
+  {
+   "shake": 14
+  },
+  {
+   "text": "보스방 문이 안쪽에서 부서진다. 이 층의 보스가 아니다."
+  },
+  {
+   "say": "eunji",
+   "text": "저거… 등급 측정이 안 돼요. 이레귤러예요!"
+  },
+  {
+   "say": "taesung",
+   "text": "모두 뒤로! 짐꾼부터 내보내!"
+  },
+  {
+   "emote": "player",
+   "mark": "!",
+   "t": 1
+  },
+  {
+   "bossMove": [
+    8,
+    3
+   ],
+   "t": 0.4
+  },
+  {
+   "bossAtk": "hyun"
+  },
+  {
+   "wait": 0.6
+  },
+  {
+   "bossMove": [
+    5,
+    3
+   ],
+   "t": 0.4
+  },
+  {
+   "bossAtk": "eunji"
+  },
+  {
+   "wait": 0.6
+  },
+  {
+   "say": "taesung",
+   "text": "버텨! 문 쪽으로 가!"
+  },
+  {
+   "bossMove": [
+    7,
+    4
+   ],
+   "t": 0.3
+  },
+  {
+   "bossAtk": "taesung"
+  },
+  {
+   "wait": 0.8
   },
   {
    "say": "yuna",
    "text": "살아서… 돌아가는 거예요. 짐꾼이잖아요."
+  },
+  {
+   "bossMove": [
+    7,
+    5
+   ],
+   "t": 0.3
+  },
+  {
+   "bossAtk": "yuna"
+  },
+  {
+   "wait": 0.8
+  },
+  {
+   "text": "괴물이 고개를 돌린다. 발밑의 문양이 갈라지며, 몸이 아래로 떨어진다."
+  },
+  {
+   "shake": 10
+  },
+  {
+   "bossGone": true
+  },
+  {
+   "fade": "out"
+  },
+  {
+   "map": "rift",
+   "at": [
+    4,
+    4
+   ],
+   "dir": "U"
+  },
+  {
+   "spawn": {
+    "id": "god",
+    "at": [
+     4,
+     2
+    ],
+    "dir": "D"
+   }
+  },
+  {
+   "fade": "in"
   },
   {
    "text": "시간이 멈춘다. 흰 빛으로 된 사람의 형상이 서 있다. 얼굴이 없다."

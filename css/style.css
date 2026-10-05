@@ -184,3 +184,17 @@ body.sys .eqc.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
 .qrow.on{border-color:var(--gold);background:rgba(201,162,74,0.22)}
 body.sys .qrow.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
 .qrow small{font-size:9px;color:var(--ink-dim)}.qrow i{font-style:normal;font-size:10px;color:var(--ink-dim)}
+
+/* 등급: 전설·신화는 은은하게 빛남 */
+.rglow{animation:rglow 1.6s ease-in-out infinite}
+@keyframes rglow{50%{box-shadow:0 0 10px currentColor, inset 0 0 6px rgba(255,180,80,.35)}}
+/* 스킬 트리 */
+.sktree{display:flex;gap:10px;flex:1;min-width:0}
+.skcol{display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:0}
+.skcol>small{font-size:9px;margin:2px 0}
+.sknode{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:3px 7px;min-height:0;height:28px;border-radius:6px;font-size:11px}
+.sknode span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sknode small{font-size:9px;opacity:.8;white-space:nowrap}
+.sknode.got{border-color:#7fd8ff}.sknode.lock{opacity:.45}.sknode.on{background:rgba(92,200,255,.22)}
+.skline{display:block;width:2px;height:6px;background:rgba(127,216,255,.5);margin:0 auto}
+.strow button[data-slot]{min-width:28px;padding:2px 6px}.strow button[data-slot].on{background:rgba(92,200,255,.35)}
+.editbar input[type=range]{width:120px}

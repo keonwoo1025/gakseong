@@ -5,7 +5,7 @@ import { Settings } from '../engine/settings.js';
 import { frame as hudFrame } from './hud.js';
 import { findPath } from './path.js';
 import { framesFor, drawPerson } from './people.js';
-import { Character, lying } from './character.js';
+import { Character, lying, drawWeapon } from './character.js';
 import { TownFolk } from './townfolk.js';
 
 export const TS = 96;   // 타일 한 칸: 16px 도트 x6 (탑 전투와 같은 크기 기준)
@@ -53,6 +53,7 @@ export class Overworld {
     for (const n of m.npcs || []) {
       if (n.if && !this.g.check(n.if)) continue;
       if (this.g.state && this.g.state.deadNpc && this.g.state.deadNpc[n.id]) continue;
+      if (n.hours && this.g.state && !n.hours.includes(this.g.state.time || 0)) continue;   // 일과: 이 시간대엔 없음
       const a = this.makeActor(n.id, this.g.lookOf(n.id));
       a.x = (n.at[0] + 0.5) * TS; a.y = (n.at[1] + 0.8) * TS; a.dir = n.dir || 'D'; a.npc = n;
       this.actors[n.id] = a;
@@ -83,6 +84,8 @@ export class Overworld {
       const o = this.prop[y][x], oc = o ? ((O.objects[o] || {}).solid ?? 1) : 0;
       return Math.max(oc, O.ground[t] ?? 0);
     }));
+    // 두 칸짜리 오브젝트(버스 정류장·노점 등)는 오른쪽 칸도 막는다
+    for (const o of m.props || []) { const d = O.objects[o.obj]; if (d && d.span === 2 && this.col[o.at[1]] && o.at[0] + 1 < this.col[0].length) this.col[o.at[1]][o.at[0] + 1] = Math.max(this.col[o.at[1]][o.at[0] + 1], d.solid ?? 1); }
     if (m.collision) m.collision.forEach((r, y) => [...r].forEach((ch, x) => { if (ch >= '0' && ch <= '3' && this.col[y]) this.col[y][x] = Number(ch); }));
     const F = (this.g.state && this.g.state.flags) || {};
     this.items = (m.items || []).filter((it) => !F['item_' + it.key]);
@@ -115,16 +118,26 @@ export class Overworld {
     const T = this.g.A.ttiles; if (!T) return;
     const ok = (k) => T[k] && T[k].w && !T[k].missing;
     const out = !!(m.edges && Object.keys(m.edges).length);
-    const fac = /factory/.test(m.id) && !out;
+    const fac = /factory/.test(m.id) && !out, tower = m.theme === 'porter' || m.theme === 'rift';
     const OBJ = new Set(['tree', 'fence', 'lamp', 'sign', 'bench', 'stall', 'crate', 'desk', 'chair', 'bed', 'shelf', 'counter', 'sofa', 'plant', 'fridge', 'board', 'screen', 'machine', 'belt', 'crate_m', 'pillar', 'planter', 'barrier', 'booth']);
     const map = out
-      ? { walk: 'walk', road: 'road', lane: 'lane', grass: 'grass', sand: 'sand', water: 'water', wall: 'wall', window: 'window', door: 'door', floor: m.id === 'plaza' ? 'plaza' : 'walk', tree: 'tree', fence: 'fence', lamp: 'lamp', sign: 'sign', bench: 'bench', stall: 'stall', crate: 'crate', pillar: 'pillar', plant: 'planter' }
+      ? { walk: 'walk', road: 'road', lane: 'lane', grass: 'grass', sand: 'sand', water: 'water', wall: 'wall', window: 'window', door: 'door', floor: m.id === 'plaza' ? 'plaza' : 'walk', tree: 'planter', fence: 'barrier', crate: 'crate_m', pillar: 'pillar', plant: 'planter' }
+      : tower ? { floor: 'plaza2', wall: 'wall_t', door: 'wall_t', pillar: 'pillar' }
       : fac ? { floor: 'floor_f', tile: 'floor_f', wall: 'wall_m', window: 'wall_m', door: 'door_m', exit: 'door_m', machine: 'machine', belt: 'belt', crate: 'crate_m', desk: 'desk', chair: 'chair', shelf: 'shelf', board: 'board', screen: 'screen', plant: 'plant' }
-      : { wood: 'wood', tile: 'tile', rug: 'rug', floor: 'tile', wall: 'wall_in', window: 'window_in', door: 'door_in', exit: 'door_in', desk: 'desk', chair: 'chair', bed: 'bed', shelf: 'shelf', counter: 'counter', sofa: 'sofa', plant: 'plant', fridge: 'fridge', board: 'board', screen: 'screen', crate: 'crate' };
-    const used = new Set(this.grid.flat().concat(this.prop.flat().filter(Boolean)));
+      : { wood: 'wood', tile: 'tile', rug: 'rug', floor: 'tile', wall: 'wall_in', window: 'window_in', door: 'door_in', exit: 'door_in', desk: 'desk', chair: 'chair', bed: 'bed', shelf: 'shelf', counter: 'counter', sofa: 'sofa', plant: 'plant', fridge: 'fridge', board: 'board', screen: 'screen', crate: 'crate_m' };
+    // 새 마을 그림(town2): 바닥과 오브젝트. 오브젝트는 크기대로(키 큰 것·두 칸짜리) 캐릭터와 앞뒤 정렬해서 그린다
+    const T2 = this.g.A.town2, ok2 = (k) => T2 && T2[k] && T2[k].w && !T2[k].missing;
+    this.propArt = {};
+    if (T2) for (const row of this.prop) for (const k of row) { const a = k && ((this.g.objects.objects[k] || {}).art || k); if (k && ok2(a)) this.propArt[k] = T2[a]; }
+    const G2 = out ? { walk: 'walk', road: 'road', lane: 'lane', grass: 'grass', sand: 'sand', water: 'water', shore: 'shore_u', floor: m.id === 'plaza' ? 'plaza' : 'walk' } : {};
+    for (const n of new Set(this.grid.flat())) if (G2[n] && ok2(G2[n])) { const c = document.createElement('canvas'); c.width = c.height = 64; c.getContext('2d').drawImage(T2[G2[n]].im, 0, 0, 64, 64); this.tiles[n] = c; }
+    const used = new Set(this.grid.flat().concat(this.prop.flat().filter(Boolean)).filter((n) => !(G2[n] && ok2(G2[n])) && !this.propArt[n]));
     const baseName = out ? (m.id === 'plaza' ? 'floor' : 'walk') : ['wood', 'tile', 'floor'].find((k) => used.has(k)) || 'floor';
     const baseKey = map[baseName];
-    const can = (k, under) => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); if (under) x.drawImage(under, 0, 0, 64, 64); const o = T[k]; x.drawImage(o.im, 0, 0, 64, 64); return c; };
+    // 위쪽 절반만 멀쩡한 바닥 그림(잘못 잘린 칸)은 위 절반을 두 번 이어 붙여 쓴다
+    const HALF = { walk: 1, road: 1, sand: 1, water: 1 };
+    const half = (k, k2) => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.drawImage(T[k].im, 0, 0, 64, 32, 0, 0, 64, 32); x.drawImage(T[k2 || k].im, 0, 0, 64, 32, 0, 32, 64, 32); return c; };
+    const can = (k, under) => { if (HALF[k]) return half(k); if (k === 'lane') return half('lane', 'road'); const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); if (under) x.drawImage(under, 0, 0, 64, 64); const o = T[k]; x.drawImage(o.im, 0, 0, 64, 64); return c; };
     const base = ok(baseKey) ? can(baseKey) : this.tiles[baseName];
     for (const name of used) {
       const k = map[name]; if (!k || !ok(k)) continue;
@@ -136,14 +149,16 @@ export class Overworld {
   drawBuildings() {
     const B = this.g.A.bld, m = this.map; if (!B || !this.outdoor) return;
     const ok = (k) => B[k] && B[k].w && !B[k].missing, ctx = this.view().ctx;
-    const pick = { room: 'apartment', store: 'conv', office: 'agency', assoc: 'assoc', hunter_shop: 'restaurant', factory_office: 'factory', factory_floor: 'factory' };
+    // 그림 속 문 위치(가로 비율)를 실제 문 칸에 맞춘다
+    const DOOR = { apartment: 0.27, agency: 0.24, conv: 0.68, restaurant: 0.25, guild: 0.5, factory: 0.5, warehouse: 0.5 };
+    const pick = { room: 'apartment', store: 'conv', office: 'agency', assoc: 'guild', hunter_shop: 'restaurant', factory_office: 'warehouse', factory_floor: 'warehouse' };
     let i = 0;
     for (const d of m.doors || []) {
       if (d.at[1] > this.grid.length / 2) continue;
-      const k = pick[d.to] || (m.id === 'avenue' ? 'guild' : ['warehouse', 'restaurant'][i++ % 2]);
+      const k = pick[d.to] || (m.id === 'avenue' ? 'factory' : ['warehouse', 'restaurant'][i++ % 2]);
       if (!ok(k)) continue;
       const f = B[k], s = 4.4 * TS / f.w;
-      ctx.drawImage(f.im, (d.at[0] + 0.5) * TS - f.w * s / 2, (d.at[1] + 1) * TS - f.h * s, f.w * s, f.h * s);
+      ctx.drawImage(f.im, (d.at[0] + 0.5) * TS - f.w * s * (DOOR[k] || 0.5), (d.at[1] + 1) * TS - f.h * s, f.w * s, f.h * s);
     }
     if (ok('gate')) {
       let c0 = 1e9, c1 = -1, r1 = -1;
@@ -205,6 +220,7 @@ export class Overworld {
     else if (g.mode === 'world') this.control(dt);
     this.updateMobs(dt);
     if (!this.cut) this.folk.update(dt);
+    const CB = this.cutBoss; if (CB) { CB.atk = Math.max(0, CB.atk - dt); if (CB.tx != null) { const dx = CB.tx - CB.x, dy = CB.ty - CB.y, d = Math.hypot(dx, dy); if (d > 4) { const k = Math.min(1, dt * 900 / d); CB.x += dx * k; CB.y += dy * k; if (Math.abs(dx) > 2) CB.dir = dx < 0 ? -1 : 1; } } }
     const tgt = typeof this.camTarget === 'string' ? this.actors[this.camTarget] || p : { x: this.camTarget[0], y: this.camTarget[1] };
     this.follow(tgt, dt);
     this.flash = this.flash.filter((f) => (f.t -= dt) > 0);
@@ -409,7 +425,7 @@ export class Overworld {
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
       const t = this.tiles[this.grid[r][c]];
       if (t) ctx.drawImage(t, c * TS, r * TS, TS + 0.5, TS + 0.5);
-      const pr = this.prop[r][c] && this.tiles[this.prop[r][c]];
+      const pr = this.prop[r][c] && !(this.propArt && this.propArt[this.prop[r][c]]) && this.tiles[this.prop[r][c]];
       if (pr) ctx.drawImage(pr, c * TS, r * TS, TS + 0.5, TS + 0.5);
     }
     for (const it of this.items || []) {
@@ -425,11 +441,27 @@ export class Overworld {
       ctx.fillStyle = `rgba(150,110,255,${0.18 + Math.sin(T * 3) * 0.08})`; ctx.beginPath(); ctx.ellipse(x, y, 120 * K, 60 * K, 0, 0, Math.PI * 2); ctx.fill();
     }
     this.drawBuildings();
+    for (const dc of this.map.decals || []) {
+      const T = this.g.A.ttiles, f = T && T[dc.art]; const x = (dc.at[0] + 0.5) * TS, y = (dc.at[1] + 0.5) * TS, w = TS * 3;
+      ctx.save(); ctx.globalAlpha = this.runeOn ? 0.75 + Math.sin(performance.now() / 120) * 0.25 : 0.25;
+      if (this.runeOn) ctx.filter = 'sepia(1) saturate(8) hue-rotate(-40deg)';
+      if (f && f.w) ctx.drawImage(f.im, x - w / 2, y - w / 2, w, w); ctx.restore();
+    }
     if (this.g.portal) this.drawPortal(this.g.portal);
     if (this.g.fx) this.g.fx.draw(true);
     const list = [];
+    if (this.propArt) {
+      const v0 = this.view(), cx0 = Math.max(0, Math.floor((v0.cam.x - v0.W / v0.G / 2) / TS) - 2), cx1 = Math.min(this.grid[0].length - 1, Math.ceil((v0.cam.x + v0.W / v0.G / 2) / TS) + 2);
+      const cy0 = Math.max(0, Math.floor((v0.cam.y - v0.H / v0.G / 2) / TS) - 1), cy1 = Math.min(this.grid.length - 1, Math.ceil((v0.cam.y + v0.H / v0.G / 2) / TS) + 3);
+      for (let r = cy0; r <= cy1; r++) for (let c = cx0; c <= cx1; c++) {
+        const f = this.prop[r][c] && this.propArt[this.prop[r][c]]; if (!f) continue;
+        const w = f.w / 64 * TS, h = f.h / 64 * TS, x = w > TS * 1.5 ? c * TS : c * TS + (TS - w) / 2, y = (r + 1) * TS - h;
+        list.push({ y: (r + 1) * TS - 2, d: () => ctx.drawImage(f.im, x, y, w, h) });
+      }
+    }
     for (const id in this.actors) {
       const a = this.actors[id]; if (!a.visible) continue;
+      if (a.isPlayer && this.cutBoss && !list.boss) { list.boss = 1; const B = this.cutBoss; list.push({ y: B.y, d: () => this.drawCutBoss(B) }); }
       if (a.isPlayer) { if (this.cut || a.path || (a.route && a.route.length)) { if (a.state === 'attack' || a.state === 'dodge' || a.state === 'dash') a.state = 'idle'; } a.collect(list); continue; }
       list.push({ y: a.y, d: () => this.drawActor(a) });
     }
@@ -449,7 +481,7 @@ export class Overworld {
 
   drawActor(a) {
     const v = this.view(), ctx = v.ctx;
-    if (!a.alive || a.ko) {
+    if (!a.alive || a.ko || a.downed) {
       const k = a.alive ? 1 : Math.min(1, (2.2 - a.dead) * 4), al = a.alive ? 1 : Math.min(1, a.dead);
       lying(ctx, a, () => drawPerson(v, { ...a, moving: false }, CH, al, PS), k);
       if (a.ko) { ctx.fillStyle = '#ffe9a8'; ctx.font = '700 22px system-ui'; ctx.textAlign = 'center'; ctx.fillText('✦ ✦', a.x, a.y - 40); ctx.textAlign = 'left'; }
@@ -458,7 +490,15 @@ export class Overworld {
     let ox = 0;
     if (a.st === 'wind' && Math.floor(a.stt * 14) % 2 === 0) ctx.filter = 'sepia(1) saturate(6) hue-rotate(-40deg) brightness(1.1)';
     if (a.hit > 0) { ctx.filter = 'brightness(2.4)'; ox = (Math.random() - 0.5) * 6; }
-    drawPerson(v, ox ? { ...a, x: a.x + ox } : a, CH, 1, PS);
+    // 공격 모션: 준비 때 뒤로 젖히고, 공격 때 앞으로 내딛으며 휘두른다
+    const DVv = { D: [0, 1], U: [0, -1], R: [1, 0], L: [-1, 0] }[a.dir] || [0, 1], base = { D: Math.PI / 2, U: -Math.PI / 2, R: 0, L: Math.PI }[a.dir] || 0;
+    const lean = a.st === 'wind' ? -7 : a.st === 'atk' ? 12 : 0;
+    a.swing = a.st === 'wind' ? base - 1.8 : a.st === 'atk' ? base + 0.6 : null;
+    const w = a.equip && a.equip.weapon, ch = ox || lean ? { ...a, x: a.x + ox + DVv[0] * lean, y: a.y + DVv[1] * lean } : a;
+    if (a.st === 'atk' && !w) { ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(ch.x + DVv[0] * 40, ch.y - 60 + DVv[1] * 20, 26, base - 1, base + 1); ctx.stroke(); ctx.restore(); }
+    if (w) drawWeapon(this.g, ctx, ch, w, CH, true);
+    drawPerson(v, ch, CH, 1, PS);
+    if (w) drawWeapon(this.g, ctx, ch, w, CH, false);
     ctx.filter = 'none';
     if (a.folk && a.hp < a.d.hp) {
       const top = a.y - CH - 14;
@@ -472,6 +512,14 @@ export class Overworld {
     const ctx = this.view().ctx, T = performance.now() / 1000, x = a.x, y = a.y - CH - 36 + Math.sin(T * 4) * 5;
     ctx.font = '900 44px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 6; ctx.strokeStyle = '#1a1420';
     ctx.fillStyle = m === '!' ? '#ffd23f' : '#7fd8ff'; ctx.strokeText(m, x, y); ctx.fillText(m, x, y); ctx.textAlign = 'left';
+  }
+
+  drawCutBoss(B) {
+    const M = this.g.A.mobs && this.g.A.mobs[B.kind]; if (!M) return;
+    const T = performance.now() / 1000, arr = B.atk > 0 && M.atk && M.atk.length ? M.atk : M.move && M.move.length ? M.move : M.idle;
+    const f = arr[Math.floor(T * 8) % arr.length]; const v = this.view();
+    v.shadow(B.x, B.y, 60 * B.s);
+    v.ctx.filter = 'brightness(0.55) sepia(1) saturate(4) hue-rotate(-30deg)'; v.sprite(f, B.x, B.y, B.s, B.dir < 0); v.ctx.filter = 'none';
   }
 
   drawSay(a) {
@@ -502,6 +550,9 @@ export class Overworld {
 
   drawOverlay() {
     const v = this.view(), ctx = v.ctx;
+    // 시간대: 저녁은 주황빛, 밤은 어둡게 (실내는 약하게)
+    const tm = this.g.state ? this.g.state.time || 0 : 0;
+    if (tm >= 2 && this.map && this.map.id !== 'rift') { ctx.fillStyle = tm === 2 ? `rgba(255,120,40,${this.outdoor ? 0.13 : 0.06})` : `rgba(10,20,60,${this.outdoor ? 0.42 : 0.16})`; ctx.fillRect(0, 0, v.W, v.H); }
     if (this.flash.length) { ctx.fillStyle = 'rgba(220,40,40,0.18)'; ctx.fillRect(0, 0, v.W, v.H); }
     if (this.fade > 0.01) { ctx.fillStyle = `rgba(0,0,0,${this.fade})`; ctx.fillRect(0, 0, v.W, v.H); }
     if (this.cut && this.cut.card) {
@@ -545,6 +596,13 @@ export class Cutscene {
       if (s.stop) { g.sound.stopMusic(); continue; }
       if (s.sfx) { g.sound.sfx(s.sfx); continue; }
       if (s.shake) { g.view.addShake(s.shake); continue; }
+      if (s.fall) { const a = ow.actors[s.fall]; if (a) { a.downed = true; a.emote = null; g.sound.sfx('hurt'); } continue; }
+      if (s.rune !== undefined) { ow.runeOn = !!s.rune; continue; }
+      // 컷신용 큰 몬스터 (mobs 그림): 등장·이동·공격·퇴장
+      if (s.boss) { ow.cutBoss = { kind: s.boss.kind, x: (s.boss.at[0] + 0.5) * TS, y: (s.boss.at[1] + 0.8) * TS, s: s.boss.s || 2, t: 0, atk: 0, dir: 1 }; continue; }
+      if (s.bossMove) { const B = ow.cutBoss; if (B) { B.tx = (s.bossMove[0] + 0.5) * TS; B.ty = (s.bossMove[1] + 0.8) * TS; } this.wait = s.t || 0.4; return; }
+      if (s.bossAtk) { const B = ow.cutBoss, a = ow.actors[s.bossAtk]; if (B) B.atk = 0.5; if (a) { B && (B.dir = a.x < B.x ? -1 : 1); a.downed = true; a.emote = null; } g.sound.sfx('heavy'); g.view.addShake(10); g.fx && a && g.fx.sfx('imp', a.x, a.y - 50, { s: 1.6, fps: 18 }); continue; }
+      if (s.bossGone) { ow.cutBoss = null; continue; }
       if (s.flag) { g.state.flags[s.flag] = true; continue; }
       if (s.objective !== undefined) { g.state.objective = s.objective; continue; }
       if (s.portal !== undefined) { g.portal = s.portal; continue; }

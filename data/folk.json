@@ -162,13 +162,17 @@
  "hairM": [
   "short",
   "short",
-  "short",
-  "bald"
+  "buzz",
+  "spiky",
+  "bald",
+  "ponytail"
  ],
  "hairF": [
   "long",
   "bob",
   "bun",
+  "ponytail",
+  "short",
   "long"
  ],
  "top": [
@@ -195,5 +199,96 @@
   "#e8e4dc",
   "#4a3a30",
   "#2a2a3a"
- ]
+ ],
+ "outfits": [
+  "shirt",
+  "hoodie",
+  "suit",
+  "work",
+  "hunter",
+  "dress"
+ ],
+ "outfitM": [
+  "shirt",
+  "hoodie",
+  "suit",
+  "work",
+  "hunter"
+ ],
+ "glasses": 0.18,
+ "roles": {
+  "walker": 60,
+  "hunter": 35
+ },
+ "schedule": {
+  "walker": [
+   1,
+   1,
+   1,
+   0.3
+  ],
+  "hunter": [
+   0.7,
+   1,
+   1,
+   0.6
+  ],
+  "merchant": [
+   1,
+   1,
+   1,
+   0
+  ],
+  "guard": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "guard": {
+  "at": 3,
+  "fine": 50000,
+  "refuse": 5
+ },
+ "chat": [
+  [
+   "요즘 탑 소식 들었어요?",
+   "31층 얘기요? 다들 그 얘기뿐이네요."
+  ],
+  [
+   "오늘 좀 덥지 않아?",
+   "그러게, 벌써 여름 같아."
+  ],
+  [
+   "어제 포탈 경보 울렸던 거 알아?",
+   "응, 별일 없어서 다행이지."
+  ],
+  [
+   "점심 뭐 먹을래요?",
+   "저기 분식집 어때요?"
+  ],
+  [
+   "요즘 마정석 값 또 올랐대.",
+   "헌터들만 좋겠네."
+  ],
+  [
+   "저 사람 헌터인가?",
+   "장비 보니까 그런 것 같은데."
+  ]
+ ],
+ "poi": {
+  "bench": "sit",
+  "lbench": "sit",
+  "vending": "use",
+  "cart": "use",
+  "stall": "use",
+  "newsstand": "use",
+  "shelter": "wait",
+  "cafe": "sit",
+  "terrace": "sit",
+  "fountain": "look",
+  "clock": "look",
+  "phone": "use"
+ }
 }

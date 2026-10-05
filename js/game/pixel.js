@@ -72,6 +72,20 @@ function drawPerson(x, look, dir, step) {
       if (hs === 'bob') R(hair, 4, 5, 3, 5);
     }
   }
+  parts(R, look, dir, step, hair, top, bot);
+}
+
+// 파츠: 옷 종류(셔츠·후드·정장·작업복·헌터복·원피스), 안경, 추가 머리(포니테일·삐죽머리)
+function parts(R, look, dir, step, hair, top, bot) {
+  const o = look.outfit || 'shirt', side = dir === 'R', hs = look.hairStyle;
+  if (o === 'hoodie') { if (dir === 'U') R(shade(top, 0.85), 4, 8, 8, 3); else if (side) R(shade(top, 0.8), 4, 10, 3, 3); else { R(shade(top, 0.8), 4, 11, 8, 1); R('#e8e4dc', 6, 13, 1, 2); R('#e8e4dc', 9, 13, 1, 2); } }
+  if (o === 'suit') { if (dir === 'D') { R('#e8e4dc', 7, 12, 2, 3); R('#5a2a3a', 7, 13, 1, 3); } else if (side) R('#e8e4dc', 9, 12, 1, 2); }
+  if (o === 'work') { if (side) R(bot, 7, 12, 1, 5); else { R(bot, 5, 12, 1, 5); R(bot, 10, 12, 1, 5); } }
+  if (o === 'hunter') { const m = '#6a6a78'; if (side) R(m, 6, 12, 3, 2); else { R(m, 3, 12, 2, 2); R(m, 11, 12, 2, 2); R('#4a3a2a', 4, 16, 8, 1); } }
+  if (o === 'dress') { if (side) R(top, 5, 17, 6, 3); else { R(top, 4, 17, 8, 3); R(shade(top, 0.85), 4, 19, 8, 1); } }
+  if (look.glasses && dir !== 'U') { const c = '#3a3a44'; if (side) R(c, 9, 6, 3, 1); else { R(c, 5, 6, 3, 1); R(c, 9, 6, 3, 1); R(c, 8, 7, 1, 1); } }
+  if (hs === 'ponytail') { if (dir === 'U') R(hair, 7, 8, 2, 6); else if (side) R(hair, 3, 4, 2, 6); else R(hair, 12, 4, 1, 3); }
+  if (hs === 'spiky') { if (side) { R(hair, 6, 0, 1, 1); R(hair, 9, 0, 1, 1); } else { R(hair, 5, 0, 1, 1); R(hair, 8, 0, 1, 1); R(hair, 10, 0, 1, 1); } }
 }
 
 export function makePerson(look) {

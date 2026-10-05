@@ -3,7 +3,7 @@
  "objects": {
   "tree": {
    "name": "나무",
-   "solid": 1,
+   "solid": 3,
    "art": "tree"
   },
   "fence": {
@@ -29,7 +29,8 @@
   "stall": {
    "name": "노점",
    "solid": 1,
-   "art": "stall"
+   "art": "stall",
+   "span": 2
   },
   "crate": {
    "name": "상자",
@@ -100,12 +101,197 @@
    "name": "기둥",
    "solid": 1,
    "art": "pillar"
+  },
+  "trash": {
+   "name": "쓰레기통",
+   "art": "trash",
+   "solid": 3
+  },
+  "recycle": {
+   "name": "분리수거함",
+   "art": "recycle",
+   "solid": 3
+  },
+  "boxes": {
+   "name": "상자 더미",
+   "art": "boxes",
+   "solid": 3
+  },
+  "hydrant": {
+   "name": "소화전",
+   "art": "hydrant",
+   "solid": 3
+  },
+  "mailbox": {
+   "name": "우체통",
+   "art": "mailbox",
+   "solid": 3
+  },
+  "planter": {
+   "name": "planter",
+   "art": "planter",
+   "solid": 3
+  },
+  "ac": {
+   "name": "실외기",
+   "art": "ac",
+   "solid": 3
+  },
+  "cafe": {
+   "name": "카페 테이블",
+   "art": "cafe",
+   "solid": 3
+  },
+  "cone": {
+   "name": "라바콘",
+   "art": "cone",
+   "solid": 3
+  },
+  "cart": {
+   "name": "포장마차",
+   "art": "cart",
+   "solid": 1
+  },
+  "bike": {
+   "name": "자전거",
+   "art": "bike",
+   "solid": 3
+  },
+  "newsstand": {
+   "name": "가판대",
+   "art": "newsstand",
+   "solid": 1
+  },
+  "railing": {
+   "name": "난간",
+   "art": "railing",
+   "solid": 3
+  },
+  "sakura": {
+   "name": "벚나무",
+   "art": "sakura",
+   "solid": 3
+  },
+  "pole": {
+   "name": "전봇대",
+   "art": "pole",
+   "solid": 3
+  },
+  "vending": {
+   "name": "자판기",
+   "art": "vending",
+   "solid": 1
+  },
+  "signal": {
+   "name": "신호등",
+   "art": "signal",
+   "solid": 3
+  },
+  "busstop": {
+   "name": "버스 정류장 표지",
+   "art": "busstop",
+   "solid": 3
+  },
+  "aboard": {
+   "name": "입간판",
+   "art": "aboard",
+   "solid": 3
+  },
+  "adcol": {
+   "name": "광고탑",
+   "art": "adcol",
+   "solid": 1
+  },
+  "phone": {
+   "name": "공중전화",
+   "art": "phone",
+   "solid": 1
+  },
+  "bollard": {
+   "name": "볼라드 조명",
+   "art": "bollard",
+   "solid": 3
+  },
+  "plant2": {
+   "name": "큰 화분",
+   "art": "plant2",
+   "solid": 3
+  },
+  "clock": {
+   "name": "시계탑",
+   "art": "clock",
+   "solid": 3
+  },
+  "pine": {
+   "name": "소나무",
+   "art": "pine",
+   "solid": 1
+  },
+  "flag": {
+   "name": "깃대",
+   "art": "flag",
+   "solid": 3
+  },
+  "shelter": {
+   "name": "버스 정류장",
+   "art": "shelter",
+   "solid": 1,
+   "span": 2
+  },
+  "flowerbed": {
+   "name": "화단",
+   "art": "flowerbed",
+   "solid": 3,
+   "span": 2
+  },
+  "lfence": {
+   "name": "긴 울타리",
+   "art": "lfence",
+   "solid": 3,
+   "span": 2
+  },
+  "bikerack": {
+   "name": "자전거 거치대",
+   "art": "bikerack",
+   "solid": 3,
+   "span": 2
+  },
+  "terrace": {
+   "name": "카페 테라스",
+   "art": "terrace",
+   "solid": 3,
+   "span": 2
+  },
+  "stonewall": {
+   "name": "돌담",
+   "art": "stonewall",
+   "solid": 1,
+   "span": 2
+  },
+  "barrier": {
+   "name": "공사 차단대",
+   "art": "barrier",
+   "solid": 3,
+   "span": 2
+  },
+  "pipes": {
+   "name": "공사 자재",
+   "art": "pipes",
+   "solid": 3,
+   "span": 2
+  },
+  "fountain": {
+   "name": "분수",
+   "art": "fountain",
+   "solid": 1,
+   "span": 2
   }
  },
  "ground": {
   "wall": 1,
   "window": 1,
   "water": 2,
-  "void": 1
+  "void": 1,
+  "shore": 0
  }
 }
