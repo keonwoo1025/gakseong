@@ -75,7 +75,9 @@ export class Skills {
   // 스킬 이펙트 자리: assets 의 fx 묶음에 같은 이름(예: geomgang)이 생기면 그 그림을, 없으면 코드 이펙트를 쓴다
   vfx(name, x, y, o, fallback) {
     const fx = this.g.fx, frames = name && fx.frames(name);
-    if (frames && frames.length && !frames[0].missing) fx.sfx(name, x, y, Object.assign({ fps: 16, s: 2 }, o));
+    // 새 스킬 그림(128px)은 천천히, 크게 재생해서 눈에 보이게
+    const big = this.g.A.fx3 && this.g.A.fx3[name];
+    if (frames && frames.length && !frames[0].missing) fx.sfx(name, x, y, Object.assign({ fps: 16, s: 2 }, o, big ? { fps: Math.min((o && o.fps) || 16, 10), s: Math.max(2.2, ((o && o.s) || 2) * 1.2) } : {}));
     else if (fallback) fallback();
   }
 
@@ -146,7 +148,9 @@ export class Skills {
       for (let k = 0; k < sk.shots; k++) this.later(k * sk.time / sk.shots, () => {
         const e = this.target(sk.range); if (!e) return;
         const a2 = Math.atan2(e.y - p.y, e.x - p.x);
-        g.fx.beam(p.x, p.y - 50, a2, Math.hypot(e.x - p.x, e.y - p.y), 8, col);
+        if (g.fx.frames('arrow_fly')) g.fx.proj('arrow_fly', p.x + Math.cos(a2) * 30, p.y - 55, e.x, e.y - 50, 1700, { s: 0.85, then: 'arrow_hit', thenS: 0.7 });
+        else g.fx.beam(p.x, p.y - 50, a2, Math.hypot(e.x - p.x, e.y - p.y), 8, col);
+        p.dir = Math.abs(Math.cos(a2)) > Math.abs(Math.sin(a2)) ? (Math.cos(a2) > 0 ? 'R' : 'L') : Math.sin(a2) > 0 ? 'D' : 'U'; p.state = 'attack'; p.t = 0;
         this.hit(e, sk.dmg, sk, L, { kb: 60, stun: 0.05 });
       });
     } else if (K === 'rain') {

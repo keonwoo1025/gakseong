@@ -174,7 +174,7 @@ export class Player extends Character {
       const vv = DV[this.dir];
       // 활·지팡이: 쏘면서 움직일 수 있다 (카이팅)
       if (st.ranged) { const v = g.input.vec(), mag = Math.hypot(v[0], v[1]); if (mag > 0.15) { const sp = 200 * g.moveMult(); w.moveBody(this, v[0] * sp * dt, v[1] * sp * dt, 26); this.wf += sp * dt; } }
-      if (st.aura && !this.auraDone) { this.auraDone = true; g.fx.sfx('aura', this.x, this.y - 40, { s: 1.4, fps: 18, ground: true }); }
+      if (st.aura && !this.auraDone) { this.auraDone = true; }
       if (f <= st.hit && f >= st.hit - 1) w.moveBody(this, vv[0] * st.lunge * fps * dt / 1.5, vv[1] * st.lunge * fps * dt / 1.5, 26);
       if (!this.hitDone && f >= st.hit) {
         this.hitDone = true;
@@ -196,12 +196,12 @@ export class Player extends Character {
         } else {
           // 무기 종류별 평타 이펙트 (천마는 전용 이펙트 유지)
           const AT = { sword: 'atk_sword', blade: 'atk_blade', spear: 'atk_spear', dagger: 'atk_dagger', gauntlet: 'atk_punch', fist: 'atk_punch' }[st.wtype];
-          const useNew = AT && g.fx.frames(AT) && !(cm.startsWith('cm_') && st.wtype === 'sword');
+          const useNew = AT && g.fx.frames(AT);
           const dirA = Math.atan2(vv[1], vv[0]), flipN = (this.stage % 2) === 1;
           if (useNew) g.fx.sfx(AT, this.x + vv[0] * 60, this.y + vv[1] * 40 - 55, { s: st.fxs * (st.wtype === 'spear' ? 1.2 : 0.95), fps: 26, rot: dirA, flip: false, a: 1, sy: flipN ? -1 : 1 });
           else g.fx.sfx(wset, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
         }
-        if (st.ring) g.fx.sfx('ring', this.x + vv[0] * 60, this.y + vv[1] * 45, { s: 2.8, fps: 16, ground: true });
+        if (st.ring && g.fx.frames('crit')) g.fx.sfx('crit', this.x + vv[0] * 70, this.y + vv[1] * 45 - 50, { s: 1.1, fps: 18 });   // 마지막 타: 옛 고리 대신 강타 섬광
         let any = false;
         for (const e of g.enemies.list) {
           if (!e.alive) continue;

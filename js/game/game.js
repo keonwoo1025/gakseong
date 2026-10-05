@@ -10,7 +10,7 @@ import { Enemies } from './enemies.js';
 import { FX } from './fx.js';
 import { HUD } from './hud.js';
 import { Dialogue } from './dialogue.js';
-import { fmt } from './korean.js';
+import { fmt , josa } from './korean.js';
 import { Overworld } from './overworld.js';
 import { PorterRun } from './porter.js';
 import { makePortrait } from './pixel.js';
@@ -57,9 +57,9 @@ export class Game {
       if (id === 'skip') { if (this.ow.cut) this.ow.cut.skip(); return; }
       if (this.talking || this.menuOpen || (this.mode === 'world' && this.ow.cut)) return;
       if (id === 'skip') { if (this.ow.cut) this.ow.cut.skip(); return; }
-      if (id === 'menu') return this.openMenu('status');
-      if (id === 'map') return this.openMenu('map');
-      if (id === 'quest') return this.openMenu('quest');
+      if (id === 'menu') return this.openMenu(this.lastTab || 'status');
+      if (id === 'map') return this.openMap();
+      if (id === 'quest') return this.toggleQuestPanel();
       const fight = (this.mode === 'field' || this.mode === 'world') && this.player;
       if (id === 'pk' && this.mode === 'world') { Settings.v.pk = !Settings.v.pk; Settings.save(); this.toast(Settings.v.pk ? 'PK 켜짐 · 사람도 공격한다' : 'PK 꺼짐'); return; }
       if (id === 'act') {
@@ -222,7 +222,8 @@ export class Game {
     return null;
   }
 
-  onItem(id) { this.quests.sync(); this.events.fire('item', { item: id }); }
+  onItem(id) {
+    if (this.state) this.state.newItem = true; this.quests.sync(); this.events.fire('item', { item: id }); }
   onMapLoaded(m) { if (!this.state) return; if (this.state.flags.introDone && !this.ow.cut) setTimeout(() => this.save(), 300); this.quests.on('go', { map: m.id }); setTimeout(() => this.events.fire('enter', { map: m.id }), 50); }
   gainExp(n) {
     const s = this.state; s.exp += n;
@@ -528,7 +529,7 @@ export class Game {
       s.stats = { str: 5, dex: 5, int: 5, vit: 5 };
       s.unlocked = 1; s.cleared = {};
       s.sk = { p: [1, 0, 0, 0, 0], a: [1, 0, 0, 0] }; s.skp = 0;
-      if (!s.equip.weapon) { const w = this.gear.owned().find((u) => this.gear.item(u).slot === 'weapon'); if (w) s.equip.weapon = w; }
+      { const L = (this.gearDef.jobWeapons || {})[s.job]; let w = this.gear.owned().find((u) => { const it = this.gear.item(u); return it.slot === 'weapon' && (!L || L.includes(it.type)); }); if (!w && L) w = this.gear.give(L[0] + '_1'); if (w) s.equip.weapon = w; }
       this.player = null; if (this.mode === 'world') { const p0 = this.ow.actors.player; const np = this.townPlayer(); if (p0) { np.x = p0.x; np.y = p0.y; np.dir = p0.dir; this.ow.actors.player = np; } }
       s.hp = this.maxHp(); s.mp = this.maxMp();
       if (name === 'grantLegend') return;
@@ -627,15 +628,27 @@ export class Game {
     if (!['world', 'porter', 'field'].includes(this.mode)) return;
     this.menuOpen = true; this.input.reset();
     // 버튼을 누른 손가락이 떼어질 때 생기는 클릭이 창의 다른 탭을 누르지 않게 잠깐 막는다
-    this.ov.style.pointerEvents = 'none'; clearTimeout(this.ovT); this.ovT = setTimeout(() => (this.ov.style.pointerEvents = ''), 400);
+    this.guardClicks();
     this.menuTab = tab; this.bagSel = this.bagSel || null; this.bagPage = this.bagPage || 0;
     this.renderMenu();
   }
 
+  // 창을 연 직후 0.45초 동안은 손가락을 뗄 때 생기는 클릭을 막는다 (다른 탭이 눌리던 문제)
+  guardClicks() {
+    this.ovGuard = performance.now() + 450;
+    if (this.guardOn) return; this.guardOn = true;
+    for (const t of ['click', 'pointerup', 'pointerdown', 'touchend']) this.ov.addEventListener(t, (e) => { if (performance.now() < this.ovGuard) { e.stopPropagation(); e.preventDefault(); } }, true);
+  }
+
   renderMenu(msg = '') {
     const s = this.state, tab = this.menuTab;
-    const tabs = [['status', '상태'], ['gear', '장비'], ['bag', '가방'], ['skill', '스킬'], ['quest', '퀘스트'], ['map', '지도'], ['settings', '시스템']];
+    let tab2 = tab; if (tab === 'gear' || tab === 'bag') tab2 = this.menuTab = 'inv'; if (tab === 'map') tab2 = this.menuTab = 'status';
+    this.lastTab = tab2;
+    const dot = { status: this.awakened() && s.pts > 0, inv: !!s.newItem, skill: this.awakened() && (s.skp || 0) > 0 };
+    if (tab2 === 'inv') s.newItem = false;
+    const tabs = [['status', '👤', '상태'], ['inv', '🎒', '인벤토리'], ['skill', '✦', '스킬'], ['quest', '❗', '퀘스트'], ['settings', '⚙', '시스템']];
     let body = '';
+    if (tab2 === 'inv') body = this.menuInv();
     if (tab === 'bag') body = this.menuBag();
     if (tab === 'gear') body = this.menuGear();
     if (tab === 'status') body = this.menuStatus();
@@ -644,7 +657,7 @@ export class Game {
     if (tab === 'skill') body = this.menuSkill();
     if (tab === 'settings') body = this.menuSettings();
     this.ov.innerHTML = `<div class="screen"><div class="panel">
-      <div class="ptop">${tabs.map(([k, n]) => `<button class="tab ${tab === k ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}
+      <div class="ptop">${tabs.map(([k, ic, n]) => `<button class="tab ${tab2 === k ? 'on' : ''}" data-t="${k}"><span class="ti">${ic}</span>${n}${dot[k] ? '<i class="tdot"></i>' : ''}</button>`).join('')}
 <button class="x" id="close">✕</button></div>
       <div class="pbody">${body}</div>
       ${msg ? `<div class="pmsg">${esc(msg)}</div>` : ''}
@@ -652,10 +665,160 @@ export class Game {
     this.ov.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { this.menuTab = b.dataset.t; this.sound.sfx('select'); this.renderMenu(); }));
     const sv = this.ov.querySelector('#sv'); if (sv) sv.onclick = () => { this.save(); this.renderMenu('저장했어요'); };
     this.ov.querySelector('#close').onclick = () => this.closeMenu();
-    this.bindMenu(tab);
+    this.bindMenu(tab2);
+    // 창 바깥(어두운 곳)을 누르면 닫기
+    const scr = this.ov.querySelector('.screen'); if (scr) scr.onclick = (e) => { if (e.target === scr) this.closeMenu(); };
   }
 
   closeMenu() { this.menuOpen = false; this.pend = {}; this.skPend = {}; this.restoreButtons(); }
+
+  // ---------- 인벤토리 (장비 + 가방 통합) ----------
+  invEntries() {
+    const s = this.state, G = this.gear, RO = Object.keys(this.gearDef.rarity), f = this.invFilter || 'all';
+    const out = [];
+    for (const u of G.owned()) { const it = G.item(u); if (!it) continue; const cat = it.slot === 'weapon' ? 'weapon' : 'armor'; out.push({ key: 'g:' + u, it, cat, n: 1, ord: Number(u.slice(1)) }); }
+    let o = 0; for (const id in s.inv) { if (!(s.inv[id] > 0) || !this.items[id]) continue; const it = this.items[id]; const cat = it.slot === 'use' || it.slot === 'gift' ? 'use' : 'mat'; out.push({ key: 'i:' + id, it, cat, n: s.inv[id], ord: o++ }); }
+    const list = out.filter((e) => f === 'all' || e.cat === f);
+    if ((this.invSort || 'rare') === 'rare') list.sort((a, b) => RO.indexOf(b.it.rarity) - RO.indexOf(a.it.rarity) || b.ord - a.ord);
+    else list.sort((a, b) => b.ord - a.ord);
+    return list;
+  }
+  // 장비 한 개의 능력치 (강화 반영)
+  gearStats(it) {
+    if (!it) return {}; const k = 1 + this.gearDef.enhance.perLevel * (it.plus || 0), o = {};
+    for (const n of ['atk', 'hp', 'def']) if (it[n]) o[n] = Math.round(it[n] * k);
+    for (const n of ['eva', 'move', 'atkPct']) if (it[n]) o[n] = it[n];
+    return o;
+  }
+  menuInv() {
+    const s = this.state, G = this.gear, D = this.gearDef;
+    const list = this.invEntries(), per = 12, pages = Math.max(1, Math.ceil(list.length / per));
+    this.invPage = Math.min(this.invPage || 0, pages - 1);
+    if (!this.invSel || !list.some((e) => e.key === this.invSel)) this.invSel = list[0] ? list[0].key : null;
+    const eqs = D.slots.map(([k, n]) => {
+      const u = s.equip[k], it = u && G.item(u), lock = !G.canEquip(k);
+      return `<button class="eqc ${u && 'g:' + u === this.invSel ? 'on' : ''}" ${u ? `data-iv="g:${u}"` : 'disabled'}><span class="ic">${it ? this.icon(it.id) : lock ? '🔒' : '·'}</span><span><small>${n}</small>${it ? `<i style="color:${G.color(it.rarity)}">${esc(it.name)}${it.plus ? ' +' + it.plus : ''}</i>` : `<i class="dim">${lock ? '각성 후' : '없음'}</i>`}</span></button>`;
+    }).join('');
+    const F = [['all', '전체'], ['weapon', '무기'], ['armor', '방어구'], ['use', '소모품'], ['mat', '재료']];
+    const filt = F.map(([k, n]) => `<button class="fl ${(this.invFilter || 'all') === k ? 'on' : ''}" data-fl="${k}">${n}</button>`).join('') + `<button class="fl srt" data-srt="1">${(this.invSort || 'rare') === 'rare' ? '등급순' : '최근순'}</button>`;
+    const cells = Array.from({ length: per }, (_, i) => {
+      const e = list[this.invPage * per + i]; if (!e) return '<div class="slot empty"></div>';
+      const worn = e.key[0] === 'g' && Object.values(s.equip).includes(e.key.slice(2));
+      return `<button class="slot ${e.key === this.invSel ? 'on' : ''} ${this.rClass(e.it.rarity)}" data-iv="${e.key}" style="${this.rStyle(e.it.rarity)}"><span class="ic">${this.icon(e.it.id || e.key.slice(2))}</span><span class="ct">${worn ? 'E' : e.n > 1 ? '×' + e.n : e.it.plus ? '+' + e.it.plus : ''}</span></button>`;
+    }).join('');
+    const pager = pages > 1 ? `<div class="pager"><button data-ivp="-1">◀</button><span>${this.invPage + 1}/${pages}</span><button data-ivp="1">▶</button></div>` : '';
+    let det = '<p class="dim">비어 있어요.</p>';
+    const sel = list.find((e) => e.key === this.invSel);
+    if (sel && sel.key[0] === 'g') {
+      const it = G.item(sel.key.slice(2)), on = s.equip[it.slot] === it.uid, can = G.canEquip(it.slot, it);
+      const cur = !on && s.equip[it.slot] ? G.item(s.equip[it.slot]) : null;
+      const a = this.gearStats(it), b = this.gearStats(cur), NM = { atk: '공격', hp: '체력', def: '방어', eva: '회피', move: '이동', atkPct: '피해' };
+      const keys = [...new Set([...Object.keys(a), ...Object.keys(b)])];
+      const pct = (n, v) => (['eva', 'move', 'atkPct'].includes(n) ? Math.round(v * 100) + '%' : v);
+      const cmp = keys.map((n) => { const d = (a[n] || 0) - (b[n] || 0); return `<span>${NM[n]} ${pct(n, a[n] || 0)}${!on && d ? ` <b class="${d > 0 ? 'up' : 'dn'}">${d > 0 ? '▲' : '▼'}${pct(n, Math.abs(d))}</b>` : ''}</span>`; }).join('');
+      const why = !can ? `<p class="warn">${it.jobOnly && it.jobOnly !== s.job ? esc(it.jobOnly) + ' 전용' : !this.awakened() ? '각성 전에는 옷만 바꿀 수 있다' : esc(josa(s.job, '은')) + ' ' + esc(((D.jobWeapons || {})[s.job] || []).map((t) => D.types[t].name).join('·')) + '만 쓸 수 있다'}</p>` : '';
+      let enh = '';
+      if (this.awakened() && (it.atk || it.hp || it.def) && it.plus < D.enhance.max) { const c = G.enhanceCost(it); enh = `<button data-enh="${it.uid}" ${this.mode === 'world' ? '' : 'disabled'}>강화 +${it.plus + 1} · ${Math.round(D.enhance.rate[it.plus] * 100)}%</button><p class="dim sm">${won(c.money)} · 조각 ${c.shard}${this.mode === 'world' ? '' : ' · 마을에서만'}</p>`; }
+      det = `<div class="dh"><span class="big">${this.icon(it.id)}</span><span>${this.rname(it, it.plus)}<small class="dim">${esc(it.rarity)} · ${esc(it.type ? D.types[it.type].name : (D.slots.find(([k]) => k === it.slot) || [, ''])[1])}${on ? ' · 착용 중' : ''}</small></span></div>
+        <div class="cmp">${cmp}</div>${it.elem ? `<p class="dim sm">${esc(D.elems[it.elem])}</p>` : ''}${it.opt ? `<p class="sm" style="color:${G.color(it.rarity)}">옵션: ${esc(it.opt.name)}</p>` : ''}${why}
+        <div class="strow">${can ? (on ? `<button data-uneq="${it.slot}">해제</button>` : `<button class="primary" data-equ="${it.uid}">장착</button>`) : ''}${enh ? '' : ''}</div>${enh}<p class="dim sm">두 번 누르면 바로 장착·해제</p>`;
+    } else if (sel) {
+      const id = sel.key.slice(2), it = this.items[id];
+      let act = '';
+      if (it.slot === 'use') act = `<button class="primary" data-use="${id}">사용</button>` + (id !== 'return_stone' ? `<button data-quick="${id}" ${s.quickItem === id ? 'disabled' : ''}>${s.quickItem === id ? '빠른 사용 중' : '빠른 사용 지정'}</button>` : '');
+      if (it.cat && this.mode === 'world' && this.ow.prompt && this.ow.prompt.kind === 'npc') act += `<button data-gift="${id}">${esc(this.npcName(this.ow.prompt.a.npc.id))}에게 선물</button>`;
+      det = `<div class="dh"><span class="big">${this.icon(id)}</span><span>${this.rname(it)} ×${s.inv[id]}<small class="dim">${esc(it.rarity || '')}</small></span></div><p class="sm">${esc(this.itemInfo(it))}</p><p class="dim sm">${esc(it.desc || '')}</p><div class="strow">${act}</div>${it.slot === 'use' ? '<p class="dim sm">두 번 누르면 바로 사용</p>' : ''}`;
+    }
+    const sum = `<p class="dim sm">공격 ${this.awakened() ? this.atkPower() : '-'} · 체력 ${this.maxHp()} · 방어 +${G.stat('def')}</p>`;
+    return `<div class="inv"><div class="invL"><div class="eqs2">${eqs}</div>${sum}</div><div class="invM"><div class="flt">${filt}</div><div class="grid g4">${cells}</div>${pager}</div><div class="invR detail">${det}</div></div>`;
+  }
+  bindInv() {
+    const s = this.state;
+    this.ov.querySelectorAll('[data-iv]').forEach((b) => (b.onclick = () => {
+      const k = b.dataset.iv, now = performance.now();
+      if (k === this.invSel && now - (this.invTap || 0) < 420) {   // 두 번 누르면 바로
+        if (k[0] === 'g') { const it = this.gear.item(k.slice(2)); if (s.equip[it.slot] === it.uid) this.gear.unequip(it.slot); else this.gear.equip(it.uid); s.hp = Math.min(s.hp, this.maxHp()); this.sound.sfx('select'); }
+        else { const m = this.useItem(k.slice(2)); if (m) return this.renderMenu(m); }
+      }
+      this.invSel = k; this.invTap = now; this.renderMenu();
+    }));
+    this.ov.querySelectorAll('[data-fl]').forEach((b) => (b.onclick = () => { this.invFilter = b.dataset.fl; this.invPage = 0; this.renderMenu(); }));
+    const sr = this.ov.querySelector('[data-srt]'); if (sr) sr.onclick = () => { this.invSort = (this.invSort || 'rare') === 'rare' ? 'new' : 'rare'; this.renderMenu(); };
+    this.ov.querySelectorAll('[data-ivp]').forEach((b) => (b.onclick = () => { this.invPage = Math.max(0, (this.invPage || 0) + Number(b.dataset.ivp)); this.renderMenu(); }));
+  }
+
+  // ---------- 지도 전용 화면 (한성특별시 ↔ 대한민국, 끌어서 이동·확대) ----------
+  openMap() {
+    if (this.talking || (this.mode === 'world' && this.ow.cut)) return;
+    this.menuOpen = true; this.input.reset(); this.guardClicks();
+    this.mapView = this.mapView || { k: 1, x: 0, y: 0, region: 'city' };
+    const V = this.mapView;
+    this.ov.innerHTML = `<div class="screen mapscr"><div class="mapbar"><div class="seg"><button data-rg="city" class="${V.region === 'city' ? 'on' : ''}">한성특별시</button><button data-rg="korea" class="${V.region === 'korea' ? 'on' : ''}">대한민국</button></div><span id="mapinfo" class="dim">끌어서 이동 · 두 손가락이나 휠로 확대</span><button class="x" id="mclose">✕</button></div><canvas id="mapcv"></canvas></div>`;
+    const cv = this.ov.querySelector('#mapcv'), DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const fit = () => { cv.width = cv.clientWidth * DPR; cv.height = cv.clientHeight * DPR; };
+    fit();
+    const base = document.createElement('canvas'); base.width = 640; base.height = 360;
+    const paint = () => { const x = base.getContext('2d'); x.clearRect(0, 0, 1280, 720); if (V.region === 'city') this.drawCityMap(base, 640, 360); else this.drawKoreaMap(x, 640, 360); draw(); };
+    const draw = () => {
+      const x = cv.getContext('2d'), W = cv.width, H = cv.height, sc = Math.min(W / 640, H / 360) * V.k;
+      x.fillStyle = '#0a1426'; x.fillRect(0, 0, W, H);
+      x.setTransform(sc, 0, 0, sc, W / 2 + V.x * DPR - 320 * sc, H / 2 + V.y * DPR - 180 * sc); x.drawImage(base, 0, 0); x.setTransform(1, 0, 0, 1, 0, 0);
+    };
+    const pts = new Map(); let last = null;
+    cv.onpointerdown = (e) => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); last = null; };
+    cv.onpointermove = (e) => {
+      if (!pts.has(e.pointerId)) return; const p0 = pts.get(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
+      if (pts.size === 1) { V.x += e.clientX - p0[0]; V.y += e.clientY - p0[1]; }
+      else { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (last) V.k = Math.max(0.8, Math.min(4, V.k * d / last)); last = d; }
+      draw();
+    };
+    cv.onpointerup = cv.onpointercancel = (e) => { pts.delete(e.pointerId); last = null; };
+    cv.onwheel = (e) => { e.preventDefault(); V.k = Math.max(0.8, Math.min(4, V.k * (e.deltaY < 0 ? 1.15 : 0.87))); draw(); };
+    this.ov.querySelectorAll('[data-rg]').forEach((b) => (b.onclick = () => { V.region = b.dataset.rg; V.k = 1; V.x = V.y = 0; this.openMap(); }));
+    this.ov.querySelector('#mclose').onclick = () => this.closeMenu();
+    paint();
+  }
+  // 전국 지도: 그림(ui koreamap)이 오면 교체, 지금은 코드로 그린 반도와 도시. 1부에서는 한성만 열림
+  drawKoreaMap(x, W, H) {
+    const bg = this.A.ui && this.A.ui.koreamap;
+    x.fillStyle = '#123050'; x.fillRect(0, 0, W, H);
+    if (bg && bg.im && !bg.missing) x.drawImage(bg.im, 0, 0, W, H);
+    else {
+      const L = [[0.36,0.05],[0.47,0.03],[0.57,0.1],[0.66,0.2],[0.7,0.34],[0.71,0.5],[0.69,0.66],[0.63,0.8],[0.55,0.86],[0.45,0.88],[0.38,0.84],[0.34,0.74],[0.31,0.6],[0.33,0.46],[0.29,0.36],[0.32,0.24]];
+      x.fillStyle = '#4f7a46'; x.strokeStyle = '#2c4a2a'; x.lineWidth = 3; x.beginPath(); L.forEach(([a, b], i) => (i ? x.lineTo(a * W, b * H) : x.moveTo(a * W, b * H))); x.closePath(); x.fill(); x.stroke();
+      x.beginPath(); x.ellipse(0.4 * W, 0.97 * H, 0.05 * W, 0.022 * H, 0, 0, Math.PI * 2); x.fill(); x.stroke();
+    }
+    const C = [['한성특별시', 0.4, 0.22, true], ['인천', 0.33, 0.24], ['수원', 0.41, 0.3], ['춘천', 0.5, 0.17], ['강릉', 0.64, 0.2], ['청주', 0.47, 0.4], ['대전', 0.44, 0.48], ['전주', 0.4, 0.6], ['광주', 0.38, 0.73], ['대구', 0.58, 0.58], ['울산', 0.67, 0.66], ['부산', 0.63, 0.76], ['제주', 0.4, 0.97]];
+    x.textAlign = 'center'; x.font = '700 11px system-ui';
+    for (const [n, a, b, open] of C) {
+      const px = a * W, py = b * H;
+      x.fillStyle = open ? '#ff4a4a' : 'rgba(200,210,220,0.6)'; x.beginPath(); x.arc(px, py, open ? 6 : 4, 0, Math.PI * 2); x.fill();
+      x.lineWidth = 3; x.strokeStyle = '#0a1426'; const t = open ? n + ' (현재)' : n + ' · 잠김'; x.strokeText(t, px, py - 9); x.fillStyle = open ? '#fff' : '#9fb0c0'; x.fillText(t, px, py - 9);
+    }
+    x.textAlign = 'left';
+  }
+
+  // ---------- 퀘스트 패널 (게임 화면 옆에 작게, 다시 누르면 닫힘) ----------
+  toggleQuestPanel() {
+    const old = document.getElementById('qpanel'); if (old) { old.remove(); clearInterval(this.qpT); return; }
+    const el = document.createElement('div'); el.id = 'qpanel'; el.className = 'qpanel ' + (document.body.classList.contains('sys') ? 'sys' : '');
+    (this.ov.parentElement || document.body).appendChild(el);
+    const render = () => {
+      const s = this.state; if (!s) return;
+      const D = this.questDef, ids = Object.keys(s.quests || {}).filter((id) => s.quests[id].st === 'active' && D[id]);
+      let html = `<div class="qh"><b>퀘스트</b><button class="x" id="qclose">✕</button></div>`;
+      if (!this.awakened() || !ids.length) html += `<p class="sm">▶ ${esc(s.objective || '지금 할 일이 없다')}</p>`;
+      for (const id of ids) {
+        const d = D[id], q = s.quests[id], st = d.stages[q.stage];
+        const goals = st.goals.map((G, k) => { const [a, b] = this.quests.goal(id, k); return `<span class="${a >= b ? 'dim' : ''}">· ${esc(this.questGoalText(G))} ${b > 1 ? a + '/' + b : a >= b ? '✔' : ''}</span>`; }).join('');
+        html += `<button class="qi ${s.track === id ? 'on' : ''}" data-qt="${id}"><b>${d.type === 'main' ? '[메인] ' : ''}${esc(d.title)}</b><small>${esc(this.quests.ready(id) && d.giver ? this.npcName(d.giver) + '에게 보고' : st.text)}</small>${goals}${s.track === id ? '<em>추적 중</em>' : ''}</button>`;
+      }
+      el.innerHTML = html;
+      el.querySelector('#qclose').onclick = () => this.toggleQuestPanel();
+      el.querySelectorAll('[data-qt]').forEach((b) => (b.onclick = () => { s.track = b.dataset.qt; this.quests.sync(); this.sound.sfx('select'); render(); }));
+    };
+    render(); this.qpT = setInterval(render, 1000);
+  }
 
   menuBag() {
     const s = this.state;
@@ -737,7 +900,7 @@ export class Game {
     return `<div class="stwrap">${left}<div class="stright">
       <div class="big3"><div>공격력<b>${att}</b></div><div>피해 감소<b>${def}%</b></div><div>회피율<b>${Math.round(this.playerEva() * 100)}%</b></div></div>
       <div class="stats5">${stats}</div>
-      <div class="strow"><span style="flex:1">남은 포인트 <b>${s.pts - used}</b> · ★ 주 스탯 · 소문 ${s.rumor.toFixed(1)}</span><button id="preset" ${used ? '' : 'disabled'}>되돌리기</button><button class="primary" id="apply" ${used ? '' : 'disabled'}>적용</button></div>
+      <div class="strow"><span style="flex:1">남은 포인트 <b>${s.pts - used}</b> · ★ 주 스탯 · 소문 ${s.rumor.toFixed(1)}</span><button id="preset" ${used ? '' : 'disabled'}>되돌리기</button><button id="autodist" ${s.pts ? '' : 'disabled'}>추천 분배</button><button class="primary" id="apply" ${used ? '' : 'disabled'}>적용</button></div>
     </div></div>`;
   }
 
@@ -828,7 +991,7 @@ export class Game {
       const j = m.indexOf(ai); if (j >= 0) m[j] = m[i]; m[i] = ai; this.worldButtons(); this.renderMenu(`${i + 1}번 칸에 놓았다`);
     }));
     const gf = this.ov.querySelector('[data-gift]'); if (gf) gf.onclick = () => { const m = this.giveGift(gf.dataset.gift); if (m) this.renderMenu(m); };
-    if (tab === 'bag') {
+    if (tab === 'bag' || tab === 'inv') {
       this.ov.querySelectorAll('[data-b]').forEach((b) => (b.onclick = () => { this.bagSel = b.dataset.b; this.renderMenu(); }));
       this.ov.querySelectorAll('[data-pg]').forEach((b) => (b.onclick = () => { this.bagPage = Math.max(0, this.bagPage + Number(b.dataset.pg)); this.renderMenu(); }));
       const u = this.ov.querySelector('[data-use]'); if (u) u.onclick = () => { const id = u.dataset.use, it = this.items[id]; const m = this.useItem(id); if (this.menuOpen) this.renderMenu(m || it.name + ' 사용'); };
@@ -856,13 +1019,27 @@ export class Game {
     this.ov.querySelectorAll('[data-qp]').forEach((b) => (b.onclick = () => { this.questPage = Math.max(0, (this.questPage || 0) + Number(b.dataset.qp)); this.renderMenu(); }));
     const tr = this.ov.querySelector('[data-track]'); if (tr) tr.onclick = () => { s.track = tr.dataset.track; this.quests.sync(); this.renderMenu('추적합니다'); };
     if (tab === 'map') this.drawCityMap();
+    if (tab === 'inv') this.bindInv();
+    this.bindHold();
+  }
+
+  // 스탯 +와 스킬 +: 길게 누르면 계속 오른다. 추천 분배
+  bindHold() {
+    const s = this.state;
+    const hold = (sel, fn) => this.ov.querySelectorAll(sel).forEach((b) => { let t = null, iv = null; b.onpointerdown = () => { t = setTimeout(() => { iv = setInterval(() => { if (!fn(b)) { clearInterval(iv); this.renderMenu(); } }, 70); }, 380); }; b.onpointerup = b.onpointerleave = () => { clearTimeout(t); if (iv) { clearInterval(iv); iv = null; this.renderMenu(); } }; });
+    hold('[data-k]', (b) => { const pd = this.pend || (this.pend = {}); const used = Object.values(pd).reduce((a, c) => a + c, 0); if (s.pts - used <= 0) return false; pd[b.dataset.k] = (pd[b.dataset.k] || 0) + 1; return true; });
+    const au = this.ov.querySelector('#autodist'); if (au) au.onclick = () => {
+      const pd = (this.pend = {}), main = (this.jobs[s.job] || {}).main || ['str'], keys = ['str', 'dex', 'int', 'vit']; let n = s.pts;
+      const w = keys.map((k) => (k === main[0] ? 5 : main.includes(k) ? 3 : k === 'vit' ? 2 : 0)); const sum = w.reduce((a, b) => a + b, 0) || 1;
+      keys.forEach((k, i) => { pd[k] = Math.floor(s.pts * w[i] / sum); n -= pd[k]; }); pd[main[0]] = (pd[main[0]] || 0) + n; this.renderMenu('추천대로 분배했다 · 적용을 누르면 확정');
+    };
+    const su = this.ov.querySelector('[data-skup]'); if (su) { let t = null; su.onpointerdown = () => { t = setTimeout(() => { t = 'max'; const k = su.dataset.skup; this.skPend = this.skPend || {}; for (let i = 0; i < 20; i++) { const used = Object.values(this.skPend).reduce((a, c) => a + c, 0); const cur = (k[0] === 'a' ? s.sk.a : s.sk.p)[Number(k.slice(1))] + (this.skPend[k] || 0); const mx = k[0] === 'a' ? 10 : 5; if ((s.skp || 0) - used <= 0 || cur >= mx) break; this.skPend[k] = (this.skPend[k] || 0) + 1; } this.renderMenu('가능한 만큼 올렸다'); }, 450); }; su.onpointerup = () => { if (t !== 'max') clearTimeout(t); }; }
   }
 
   drawCityMap() {
-    const cv = this.ov.querySelector('#cmap'); if (!cv) return;
-    const wrap = cv.parentElement, W = wrap.clientWidth, H = wrap.clientHeight, D = Math.min(window.devicePixelRatio || 1, 2);
-    cv.width = W * D; cv.height = H * D; cv.style.width = W + 'px'; cv.style.height = H + 'px';
-    const x = cv.getContext('2d'); x.scale(D, D);
+    const ext = arguments[0], cv = ext || this.ov.querySelector('#cmap'); if (!cv) return;
+    let W, H, D = 1; if (ext) { W = arguments[1]; H = arguments[2]; } else { const wrap = cv.parentElement; W = wrap.clientWidth; H = wrap.clientHeight; D = Math.min(window.devicePixelRatio || 1, 2); cv.width = W * D; cv.height = H * D; cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
+    const x = cv.getContext('2d'); x.save(); x.scale(D, D);
     const s = this.state, cm = this.citymap, cur = this.ow.map ? this.ow.map.id : null;
     const nodeOf = (id) => cm.nodes.find((n) => n.id === id || (n.inside || []).includes(id));
     const here = this.mode === 'world' ? nodeOf(cur) : cm.nodes.find((n) => n.id === 'plaza');
@@ -896,6 +1073,7 @@ export class Game {
     x.textAlign = 'left'; x.font = '700 12px system-ui'; x.fillStyle = '#fff'; x.strokeStyle = '#000'; x.lineWidth = 3;
     x.strokeText('한성특별시', 10, 18); x.fillText('한성특별시', 10, 18);
     x.font = '600 10px system-ui'; x.strokeText('🔻 현재 위치  ⭐ 목표', 10, H - 8); x.fillText('🔻 현재 위치  ⭐ 목표', 10, H - 8);
+    x.restore();
   }
 
 
@@ -916,10 +1094,10 @@ export class Game {
 
   startExpedition() {
     const s = this.state;
-    const start = Math.min(10, s.porterDepth + 1);
     this.dayShards = 0;
-    if (start >= 10) { this.startRift(); return; }
-    this.expFloors = [start, start + 1, start + 2].filter((n) => n <= 9);
+    if (s.porterDepth >= 9) { this.startRift(); return; }
+    // 원정은 한 번: 7·8·9층을 연달아 오르고 10층 사건으로
+    this.expFloors = [7, 8, 9];
     this.startPorterFloor(this.expFloors.shift());
   }
 
@@ -946,7 +1124,8 @@ export class Game {
       return;
     }
     const lead = { speaker: this.npcName('taesung'), portrait: this.portraitKey('taesung') };
-    this.runLine({ ...lead, text: n >= 9 ? '9층까지 왔다. 다음엔 10층 보스방 앞까지 간다. 일당 두 배.' : '오늘은 여기까지. 수고했다.' }, () => this.endExpedition());
+    if (n >= 9) { this.runLine({ ...lead, text: '9층까지 정리했다. 이대로 10층 보스방 앞까지 간다. 일당은 두 배다.' }, () => this.startRift()); return; }
+    this.runLine({ ...lead, text: '오늘은 여기까지. 수고했다.' }, () => this.endExpedition());
   }
 
   endExpedition() {
@@ -966,9 +1145,12 @@ export class Game {
     });
   }
 
+  // 짐꾼 시절에는 죽지 않는다: 쓰러졌다가 일어난다 (파티도 마찬가지)
   onPorterDeath() {
-    this.state.dead = true; Save.wipe(); this.sound.stopMusic(); this.sound.sfx('death');
-    setTimeout(() => this.showEnd(), 2200);
+    const s = this.state, P = this.porter; if (!P) return;
+    s.hp = Math.max(1, Math.round(this.maxHp() * 0.5)); P.dead = false; P.me.inv = 2.5;
+    for (const m of P.party) if (m.hp <= 0) m.hp = Math.round((m.max || 100) * 0.5);
+    this.view.addShake(6); this.toast('정신을 잃을 뻔했다… 다시 일어선다');
   }
 
   startRift() {
@@ -1235,6 +1417,10 @@ export class Game {
 
   onPlayerDeath() {
     if (this.eventSafe && this.eventFightCb) { this.state.hp = 1; this.player.state = 'idle'; this.player.inv = 2; this.toast('아직 쓰러질 수 없다'); return; }
+    if (!this.awakened()) {   // 각성 전에는 죽지 않는다: 원룸에서 깨어난다
+      const s = this.state; s.hp = Math.round(this.maxHp() * 0.5); this.player.state = 'idle'; this.player.inv = 2;
+      this.ow.load('room', null).then(() => this.runLine({ text: '정신을 차려 보니 원룸이었다. 온몸이 쑤신다.' })); return;
+    }
     this.state.dead = true; Save.wipe(); this.sound.stopMusic(); this.sound.sfx('death'); setTimeout(() => this.showEnd(), 2600); }
 
   showEnd() {

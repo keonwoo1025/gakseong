@@ -322,7 +322,7 @@ export class TownFolk {
       if (this.useSkill(a, p, dx, dy, d, reach)) return;
       if (d < reach && a.cd <= 0) { a.st = 'wind'; a.stt = 0; a.ax = dx / d; a.ay = dy / d; a.moving = false; a.mult = 1; }
     } else if (a.st === 'wind') {
-      if (a.stt >= a.windT) { a.st = 'atk'; a.stt = 0; a.hitDone = false; g.sound.sfx('slash'); if (a.ranged) g.fx.beam(a.x, a.y - 60, Math.atan2(p.y - a.y, p.x - a.x), d, a.job === '궁수' ? 4 : 9, a.job === '궁수' ? '#e8f4ff' : '#9fd0ff'); }
+      if (a.stt >= a.windT) { a.st = 'atk'; a.stt = 0; a.hitDone = false; g.sound.sfx('slash'); this.atkFx(a, p); if (a.ranged) g.fx.beam(a.x, a.y - 60, Math.atan2(p.y - a.y, p.x - a.x), d, a.job === '궁수' ? 4 : 9, a.job === '궁수' ? '#e8f4ff' : '#9fd0ff'); }
     } else if (a.st === 'atk') {
       if (!a.ranged) this.ow.move(a, a.ax * (a.dashK || 500) * dt, a.ay * (a.dashK || 500) * dt);
       if (!a.hitDone && Math.hypot(p.x - a.x, p.y - a.y) < reach * 1.1) { a.hitDone = true; this.hitPlayer(a, p, a.d.damage * (a.mult || 1)); }
@@ -330,6 +330,14 @@ export class TownFolk {
     } else if (a.st === 'rec') {
       if (a.stt >= 0.5) { a.st = 'idle'; a.stt = 0; a.cd = 1.2; }
     }
+  }
+
+  // NPC 공격 이펙트: 들고 있는 무기 종류대로
+  atkFx(a, p) {
+    const g = this.g, t = (a.equip.weapon || {}).type || 'fist', ang = Math.atan2(p.y - a.y, p.x - a.x);
+    if (t === 'bow' || t === 'staff') { if (g.fx.frames(t === 'bow' ? 'arrow_fly' : 'bolt')) g.fx.proj(t === 'bow' ? 'arrow_fly' : 'bolt', a.x, a.y - 60, p.x, p.y - 55, 1300, { s: 0.75, then: t === 'bow' ? 'arrow_hit' : 'el_magic', thenS: 0.7 }); return; }
+    const AT = { sword: 'atk_sword', blade: 'atk_blade', spear: 'atk_spear', dagger: 'atk_dagger', gauntlet: 'atk_punch', fist: 'atk_punch' }[t] || 'atk_punch';
+    g.fx.sfx(AT, a.x + Math.cos(ang) * 55, a.y - 55 + Math.sin(ang) * 30, { s: 0.8, fps: 24, rot: ang });
   }
 
   hitPlayer(a, p, dmg) {

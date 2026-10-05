@@ -204,3 +204,41 @@ body.sys .qrow.on{border-color:#7fd8ff;background:rgba(92,200,255,0.2)}
 .eqc{height:32px!important;padding:2px 4px!important;gap:3px!important}
 .eqc .ic{font-size:15px}.eqc .ic img{max-height:24px;max-width:24px}
 .eqc small{font-size:8px!important}.eqc i{font-size:10px}
+
+/* 탭: 아이콘 + 글자, 빨간 점 */
+.ptop .tab{position:relative;display:flex;align-items:center;justify-content:center;gap:4px;min-height:34px}
+.ptop .tab .ti{font-size:13px}
+.tdot{position:absolute;top:3px;right:5px;width:8px;height:8px;border-radius:50%;background:#ff4a4a;box-shadow:0 0 4px #ff4a4a}
+/* 인벤토리 3단 */
+.inv{display:flex;gap:6px;width:100%;height:100%;min-height:0}
+.invL{flex:0 0 28%;display:flex;flex-direction:column;gap:4px;min-width:0}
+.eqs2{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.invM{flex:0 0 40%;display:flex;flex-direction:column;gap:4px;min-width:0}
+.invR{flex:1;min-width:0;overflow:hidden}
+.flt{display:flex;gap:2px;flex-wrap:nowrap}
+.flt .fl{flex:1;padding:2px 0;font-size:10px;min-height:24px;border-radius:5px}
+.flt .fl.on{background:rgba(92,200,255,.3);border-color:#7fd8ff}
+.flt .srt{flex:1.3}
+.grid.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.grid.g4 .slot{height:52px;min-height:0;padding:2px;position:relative}
+.grid.g4 .slot .ic img{max-height:40px;max-width:40px}
+.grid.g4 .slot .ct{position:absolute;right:3px;bottom:1px;font-size:10px;font-weight:700}
+.dh{display:flex;gap:8px;align-items:center}.dh .big{font-size:30px}.dh .big img{max-height:44px;max-width:44px}
+.dh>span:last-child{display:flex;flex-direction:column;min-width:0}
+.cmp{display:flex;flex-wrap:wrap;gap:2px 8px;font-size:11px;margin:4px 0}
+.cmp .up{color:#5ad65a}.cmp .dn{color:#ff6a6a}
+.sm{font-size:11px;margin:2px 0}.warn{color:#ff8a6a;font-size:11px;margin:2px 0}
+.invR .strow button{min-height:34px}
+/* 지도 전용 화면 */
+.mapscr{flex-direction:column;padding:0!important;background:#0a1426}
+.mapbar{display:flex;align-items:center;gap:8px;padding:6px 10px;width:100%;box-sizing:border-box}
+.mapbar .seg button{min-height:34px;padding:0 12px}.mapbar .seg button.on{background:rgba(92,200,255,.35)}
+.mapbar #mapinfo{flex:1;font-size:11px}
+#mapcv{flex:1;width:100%;min-height:0;touch-action:none;display:block}
+/* 퀘스트 패널 */
+.qpanel{position:absolute;right:10px;top:104px;width:min(46vw,300px);max-height:55vh;overflow:auto;background:rgba(10,20,40,.88);border:1px solid #7fd8ff;border-radius:8px;padding:6px 8px;color:#e8f4ff;z-index:20;font-size:12px}
+.qpanel .qh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.qpanel .x{min-width:30px;min-height:30px}
+.qpanel .qi{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;margin:3px 0;padding:5px 7px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid rgba(127,216,255,.3);color:inherit;font-size:12px}
+.qpanel .qi.on{border-color:#ffd23f}.qpanel .qi small{opacity:.85}.qpanel .qi span{font-size:11px}.qpanel .qi em{font-style:normal;color:#ffd23f;font-size:10px}
+.mapbar .seg button{white-space:nowrap}

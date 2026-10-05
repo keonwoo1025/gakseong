@@ -33,7 +33,7 @@ export class Allies {
           a.moving = false;
           if (a.cd <= 0) {
             a.cd = 1.1; best.lastAlly = true;
-            if (a.reach > w.TW * 1.5) g.fx.beam(a.x, a.y - 60, Math.atan2(dy, dx), d, 5, '#ffe9b0');
+            { const t = a.equip.weapon.type, ang = Math.atan2(dy, dx); if (t === 'bow' || t === 'staff') g.fx.proj(t === 'bow' ? 'arrow_fly' : 'bolt', a.x, a.y - 60, best.x, best.y - 50, 1300, { s: 0.7 }); else g.fx.sfx({ sword: 'atk_sword', blade: 'atk_blade', spear: 'atk_spear', dagger: 'atk_dagger' }[t] || 'atk_punch', a.x + Math.cos(ang) * 55, a.y - 55 + Math.sin(ang) * 30, { s: 0.8, fps: 24, rot: ang }); }
             g.enemies.damage(best, Math.round(a.dmg * (0.85 + Math.random() * 0.3)), dx / d * 120, dy / d * 120, 0, 0.05);
           }
         }

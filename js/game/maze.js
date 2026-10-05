@@ -113,8 +113,10 @@ export class MazeWorld {
 
   moveBody(o, dx, dy, r) {
     if (this.solid(o.x, o.y, r)) { this.unstick(o, r); return; }
+    const x0 = o.x, y0 = o.y;
     if (!this.solid(o.x + dx, o.y, r)) o.x += dx;
     if (!this.solid(o.x, o.y + dy, r)) o.y += dy;
+    if (o.x === x0 && o.y === y0 && (dx || dy)) { for (const k of [1, -1]) { const nx = o.x - dy * k * 0.7 + dx * 0.3, ny = o.y + dx * k * 0.7 + dy * 0.3; if (!this.solid(nx, ny, r)) { o.x = nx; o.y = ny; break; } } }
   }
 
   // 몬스터 자리: 시작 방·보스방 밖, 플레이어에게서 멀리

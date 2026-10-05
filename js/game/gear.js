@@ -20,11 +20,13 @@ export class Gear {
   owned() { return Object.keys(this.s.gear || {}); }
   count(id) { return this.owned().filter((u) => this.s.gear[u].id === id).length; }
   // 각성 전에는 옷만
-  canEquip(slot, it) { if (it && it.jobOnly && this.s.job !== it.jobOnly) return false; return this.g.awakened() || slot === 'outfit'; }
+  // 전설직마다 쓸 수 있는 무기 종류 (gear.json jobWeapons)
+  weaponOk(it) { const L = (this.D.jobWeapons || {})[this.s.job]; return !it || it.slot !== 'weapon' || !L || L.includes(it.type); }
+  canEquip(slot, it) { if (it && it.jobOnly && this.s.job !== it.jobOnly) return false; if (it && this.g.awakened() && !this.weaponOk(it)) return false; return this.g.awakened() || slot === 'outfit'; }
   // 에고 무기: 함께 싸운 횟수로 1~4단계
   egoStage(uid) { const o = this.s.gear[uid], N = this.D.ego.need; let st = 1; for (let i = 0; i < N.length; i++) if ((o.ego || 0) >= N[i]) st = i + 1; return st; }
   egoStageOf(id) { const u = this.owned().find((x) => this.s.gear[x].id === id); return u ? this.egoStage(u) : 1; }
-  equipped(slot) { const u = this.s.equip[slot]; if (!u) return null; if (!this.canEquip(slot)) return null; return this.item(u); }
+  equipped(slot) { const u = this.s.equip[slot]; if (!u) return null; if (!this.canEquip(slot)) return null; const it = this.item(u); return it && this.weaponOk(it) ? it : null; }
   equip(uid) { const it = this.item(uid); if (!it || !this.canEquip(it.slot, it)) return false; this.s.equip[it.slot] = uid; return true; }
   unequip(slot) { delete this.s.equip[slot]; }
 

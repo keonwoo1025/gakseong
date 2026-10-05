@@ -7,10 +7,10 @@ import { framesFor, drawPerson as drawP } from './people.js';
 
 const PS = 4.2;
 const PARTY = [
-  { id: 'taesung', role: 'tank', atk: 9, range: 70, max: 160 },
-  { id: 'yuna', role: 'heal', atk: 4, range: 70, max: 90 },
-  { id: 'hyun', role: 'bow', atk: 8, range: 260, max: 100 },
-  { id: 'eunji', role: 'mage', atk: 11, range: 240, max: 90 },
+  { id: 'taesung', role: 'tank', atk: 14, range: 70, max: 160 },
+  { id: 'yuna', role: 'heal', atk: 6, range: 70, max: 90 },
+  { id: 'hyun', role: 'bow', atk: 13, range: 260, max: 100 },
+  { id: 'eunji', role: 'mage', atk: 18, range: 240, max: 90 },
 ];
 
 export class PorterRun {
@@ -24,7 +24,7 @@ export class PorterRun {
     this.party = PARTY.map((p0) => { const J = g.jobs[(g.npcById[p0.id] || {}).job]; return J ? { ...p0, role: J.party, range: J.reach > 1.5 ? Math.round(J.reach * 85) : 70 } : p0; }).map((p, i) => ({ ...p, look: g.lookOf(p.id), fr: framesFor(g, p.id, g.lookOf(p.id)), x: sx - 90 + i * 60, y: sy, dir: 'U', t: 0, moving: false, hp: p.max, cd: Math.random(), emote: null, help: false }));
     this.mobs = [];
     for (const sp of floor.spawns) for (let i = 0; i < sp.count; i++) this.mobs.push(this.makeMob(sp.type));
-    this.drops = []; this.shots = []; this.kills = 0; this.goal = 3 + Math.ceil(floor.n / 3); this.done = false; this.shards = 0;
+    this.drops = []; this.shots = []; this.kills = 0; this.goal = 2 + Math.ceil(floor.n / 4); this.done = false; this.shards = 0;
     this.prompt = null;
     this.nav = new NavGrid(this.world);
     this.party.forEach((p) => (p.id2 = p.id)); this.me.id2 = 'me';
@@ -195,7 +195,7 @@ export class PorterRun {
     this.prompt = best;
     // 목표
     if (!this.done && this.kills >= this.goal) { this.done = true; setTimeout(() => this.onGoal && this.onGoal(), 900); }
-    if (this.party.every((p) => p.hp <= 0) && !this.dead) { this.dead = true; g.onPorterDeath(); }
+    if (this.party.every((p) => p.hp <= 0) && !this.dead) g.onPorterDeath();
   }
 
   killMob(m) {

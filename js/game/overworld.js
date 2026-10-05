@@ -173,7 +173,12 @@ export class Overworld {
     const sc = Math.floor(a.x / TS), sr = Math.floor((a.y - 15) / TS);
     const p = findPath(cols, rows, (c, r) => this.col[r][c] > 0, sc, sr, to[0], to[1], 3000);
     if (!p || p.length < 3) return null;
-    return p.slice(1, -1).map(([c, r]) => [(c + 0.5) * TS, (r + 0.8) * TS]);
+    // 경로 펴기: 직선으로 갈 수 있는 칸은 건너뛰어 지그재그(빙글빙글 도는 문제)를 없앤다
+    const los = (a1, b1) => { const n = Math.ceil(Math.hypot(b1[0] - a1[0], b1[1] - a1[1]) * 4); for (let i = 1; i < n; i++) { const t = i / n, x = a1[0] + (b1[0] - a1[0]) * t + 0.5, y = a1[1] + (b1[1] - a1[1]) * t + 0.5; for (const [ox, oy] of [[-0.3, 0], [0.3, 0], [0, -0.2], [0, 0.2]]) { const c = Math.floor(x + ox), r = Math.floor(y + oy); if (!this.col[r] || this.col[r][c] > 0) return false; } } return true; };
+    const out = [p[0]]; let i = 0;
+    while (i < p.length - 1) { let j = p.length - 1; while (j > i + 1 && !los(p[i], p[j])) j--; out.push(p[j]); i = j; }
+    if (out.length < 2) return null;
+    return out.slice(1, -1).concat([p[p.length - 1]]).slice(0, -1).map(([c, r]) => [(c + 0.5) * TS, (r + 0.8) * TS]);
   }
 
   unstick(a) {
@@ -188,8 +193,14 @@ export class Overworld {
 
   move(a, dx, dy) {
     if (this.solidAt(a.x, a.y, a)) { this.unstick(a); return; }
+    const x0 = a.x, y0 = a.y;
     if (!this.solidAt(a.x + dx, a.y, a)) a.x += dx;
     if (!this.solidAt(a.x, a.y + dy, a)) a.y += dy;
+    // 모서리에 걸리면 옆으로 미끄러져 비켜 간다
+    if (a.x === x0 && a.y === y0 && (dx || dy)) {
+      const L = Math.hypot(dx, dy), px = -dy / L * L, py = dx / L * L;
+      for (const k of [1, -1]) { if (!this.solidAt(a.x + px * k * 0.7 + dx * 0.3, a.y + py * k * 0.7 + dy * 0.3, a)) { a.x += px * k * 0.7 + dx * 0.3; a.y += py * k * 0.7 + dy * 0.3; break; } }
+    }
   }
 
   // ---------- 매 프레임 ----------
@@ -249,10 +260,12 @@ export class Overworld {
     if (here === 'door' || here === 'exit') {
       const c = Math.floor(p.x / TS), r = Math.floor((p.y - 15) / TS);
       const d = (this.map.doors || []).find((o) => o.at[0] === c && o.at[1] === r);
-      if (d && !this.transit) {
-        if (d.if && !g.check(d.if)) { if (!this.blocked) { this.blocked = true; g.toast(d.locked || '지금은 갈 수 없다'); p.y -= DIRV[p.dir][1] * 45; p.x -= DIRV[p.dir][0] * 45; setTimeout(() => (this.blocked = false), 800); } }
-        else this.goto(d.to, d.spawn, d.dir);
-      }
+      const shut = !d || (d.if && !g.check(d.if));
+      if (shut && !this.blocked && !this.transit) {
+        this.blocked = true; p.state = 'idle';
+        const back = () => { p.path = [p.x - DIRV[p.dir][0] * TS * 0.9, p.y - DIRV[p.dir][1] * TS * 0.9 + (DIRV[p.dir][1] < 0 ? TS * 0.3 : 0)]; setTimeout(() => (this.blocked = false), 900); };
+        g.runLine({ text: (d && d.locked) || '문이 잠겨 있다.' }, back);
+      } else if (d && !shut && !this.transit) this.goto(d.to, d.spawn, d.dir);
     }
     // 밟기 트리거 (이벤트 DB)
     if (g.events.fire('step', { c: Math.floor(p.x / TS), r: Math.floor((p.y - 15) / TS) })) return;
@@ -541,6 +554,12 @@ export class Overworld {
 
   drawPortal(pt) {
     const ctx = this.view().ctx, T = performance.now() / 1000, x = (pt[0] + 0.5) * TS, y = (pt[1] + 0.5) * TS;
+    const art = this.g.A.tower2 && this.g.A.tower2.portal;
+    if (art && art.w && !art.missing) {   // 포탈(게이트): 보랏빛으로 맥동
+      const k = 1 + Math.sin(T * 3) * 0.06; ctx.save(); ctx.filter = 'hue-rotate(70deg) saturate(1.6)'; ctx.globalAlpha = 0.9;
+      ctx.drawImage(art.im, x - TS * 1.3 * k, y - TS * 0.8 * k, TS * 2.6 * k, TS * 1.6 * k); ctx.restore();
+      ctx.fillStyle = 'rgba(40,0,70,0.55)'; ctx.beginPath(); ctx.ellipse(x, y, TS * 0.7, TS * 0.35, 0, 0, Math.PI * 2); ctx.fill();
+    }
     for (let i = 0; i < 4; i++) {
       ctx.strokeStyle = `rgba(${150 + i * 25},70,255,${0.7 - i * 0.12})`; ctx.lineWidth = 6 - i;
       ctx.beginPath(); ctx.ellipse(x, y, (52 + i * 9 + Math.sin(T * 4 + i) * 5) * K, (82 + i * 8) * K, 0, 0, Math.PI * 2); ctx.stroke();
