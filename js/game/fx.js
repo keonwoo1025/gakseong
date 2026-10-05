@@ -3,7 +3,17 @@
 export class FX {
   constructor(A, view) { this.A = A; this.v = view; this.list = []; this.nums = []; }
 
-  frames(set) { const n = this.A.fx2 && this.A.fx2[set]; return n && n.length && !n[0].missing ? n : this.A.fx[set]; }
+  // 새 이펙트(fx3) 우선, 옛 이름은 새 그림으로 연결
+  frames(set) {
+    const A3 = this.A.fx3, k = ({ imp: 'hit', dust: 'rolldust' })[set] || set, m = A3 && A3[k];
+    if (m && m.length && !m[0].missing) return m;
+    const n = this.A.fx2 && this.A.fx2[set]; return n && n.length && !n[0].missing ? n : this.A.fx[set];
+  }
+  // 날아가는 이펙트: 도착하면 then 이펙트
+  proj(set, x0, y0, x1, y1, speed, o = {}) {
+    const d = Math.hypot(x1 - x0, y1 - y0) || 1, life = d / speed;
+    this.sfx(set, x0, y0, Object.assign({ fps: 18, s: 0.8 }, o, { vx: (x1 - x0) / life, vy: (y1 - y0) / life, life, rot: Math.atan2(y1 - y0, x1 - x0), loop: true }));
+  }
 
   sfx(set, x, y, o = {}) {
     const frames = this.frames(set);
@@ -23,8 +33,9 @@ export class FX {
 
   update(dt) {
     if (this.beams) { for (const b of this.beams) b.t += dt; this.beams = this.beams.filter((b) => b.t < 0.38); }
-    for (const f of this.list) f.t += dt;
-    this.list = this.list.filter((f) => f.t < f.n / f.fps);
+    for (const f of this.list) { f.t += dt; if (f.vx != null) { f.x += f.vx * dt; f.y += f.vy * dt; } }
+    for (const f of this.list) if (f.life != null && f.t >= f.life && !f.done) { f.done = true; if (f.then) this.sfx(f.then, f.x, f.y, { s: f.thenS || 0.9, fps: 20 }); }
+    this.list = this.list.filter((f) => (f.life != null ? f.t < f.life : f.t < f.n / f.fps));
     for (const n of this.nums) n.t += dt;
     this.nums = this.nums.filter((n) => n.t < 0.95);
   }
@@ -43,13 +54,14 @@ export class FX {
     for (const f of this.list) {
       if (f.ghost || !!f.ground !== ground) continue;
       const arr = this.frames(f.set); if (!arr) continue;
-      const fr = arr[Math.min(arr.length - 1, Math.floor(f.t * f.fps))];
+      const fr = arr[f.loop ? Math.floor(f.t * f.fps) % arr.length : Math.min(arr.length - 1, Math.floor(f.t * f.fps))];
       if (!fr || !fr.w) continue;
       ctx.save();
       ctx.globalAlpha = f.a;
       ctx.translate(Math.round(f.x), Math.round(f.y));
       ctx.rotate(f.rot);
       if (f.flip) ctx.scale(-1, 1);
+      if (f.sy < 0) ctx.scale(1, -1);
       ctx.drawImage(fr.im, -fr.w * f.s / 2, -fr.h * f.s / 2, fr.w * f.s, fr.h * f.s);
       ctx.restore();
     }

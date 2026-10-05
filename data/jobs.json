@@ -116,7 +116,7 @@
   "role": "melee",
   "party": "tank",
   "weapon": "sword",
-  "item": "sword_iron",
+  "item": "sword_1",
   "reach": 1.1,
   "skills": [
    {

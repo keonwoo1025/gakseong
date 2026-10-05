@@ -37,10 +37,10 @@ export class Enemies {
     const g = this.g;
     g.target = { e, t: 3 };
     e.hp -= v; e.hit = 0.15; e.kx += kx; e.ky += ky; e.stun = Math.max(e.stun || 0, stun);
-    g.fx.sfx('imp', e.x, e.y - 28, { s: big === 2 ? 1.3 : big >= 1 ? 0.95 : 0.7, fps: 22, rot: Math.random() * 6.28 });
+    g.fx.sfx(big === 2 ? 'crit' : 'imp', e.x, e.y - 40, { s: big === 2 ? 1.2 : big >= 1 ? 0.95 : 0.75, fps: 22 });
     g.fx.num(e.x, e.y - 70, v, big === 2 ? 'huge' : big >= 1 ? 'big' : 'normal');
     if (e.hp <= 0 && e.alive) {
-      e.alive = false; e.dead = 0.6;
+      e.alive = false; e.dead = 0.6; g.fx.sfx('defeat', e.x, e.y - 40, { s: 1.1 * (e.d.scale || 1) / 0.5 > 2 ? 2 : 1.1, fps: 14 });
       g.onKill(e); if (g.sk) g.sk.onKill(e);
       if (e.d.variant === 'mutant') this.hazards.push({ x: e.x, y: e.y, r: 130, t: 0, life: 0.9, dmg: e.d.damage * 1.5, col: '#b04aff' });
     }
@@ -59,8 +59,9 @@ export class Enemies {
       w.unstick(e, 18);
       if (e.slowT > 0) e.slowT -= dt; else e.slowK = 1;
       if (e.rootT > 0) e.rootT -= dt;
+      if (e.frost > 0) e.frost -= dt;
       if (e.bleed) { const b = e.bleed; b.t -= dt; b.acc += dt; if (b.acc >= 0.5) { b.acc = 0; this.damage(e, Math.max(1, Math.round(b.dps * 0.5)), 0, 0, 0, 0); } if (b.t <= 0 || !e.alive) e.bleed = null; if (!e.alive) continue; }
-      const spd = e.d.speed * (e.slowK || 1);
+      const spd = e.d.speed * (e.slowK || 1) * (e.frost > 0 ? 0.55 : 1);
       if (e.stun > 0) { e.stun -= dt; e.st = 'idle'; w.moveBody(e, e.kx * dt, e.ky * dt, 18); e.kx *= 0.86; e.ky *= 0.86; continue; }
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
       const alive = p.state !== 'dead';
@@ -100,8 +101,8 @@ export class Enemies {
             const sinceHit = performance.now() / 1000 - p.lastHitT;
             const facing = (p.lastHitDir[0] * (e.x - p.x) + p.lastHitDir[1] * (e.y - p.y)) > 0;
             if (sinceHit < 0.22 && facing) { g.parry(e); }
-            else if (p.inv > 0 || p.state === 'dodge' || p.state === 'dash') { g.recordPattern('관찰', 0.3); g.fx.num(p.x, p.y - 120, '회피', 'exp'); }
-            else if (Math.random() < g.playerEva()) { g.fx.num(p.x, p.y - 120, '회피', 'exp'); g.sound.sfx('dodge'); }
+            else if (p.inv > 0 || p.state === 'dodge' || p.state === 'dash') { g.recordPattern('관찰', 0.3); g.fx.num(p.x, p.y - 120, '회피', 'exp'); g.fx.sfx('miss', p.x, p.y - 60, { s: 0.9, fps: 20 }); }
+            else if (Math.random() < g.playerEva()) { g.fx.num(p.x, p.y - 120, '회피', 'exp'); g.sound.sfx('dodge'); g.fx.sfx('miss', p.x, p.y - 60, { s: 0.9, fps: 20 }); }
             else {
               p.hurt(e.d.damage, e.ax, e.ay);
               g.fx.sfx(e.d.kind === 'wolf' ? 'bite' : 'claw', p.x, p.y - 50, { s: 1.1, fps: 22 });
@@ -250,7 +251,8 @@ export class Enemies {
         else if (e.st === 'wind' && Math.floor(e.stt * 14) % 2 === 0) { ctx.filter = 'sepia(1) saturate(6) hue-rotate(-40deg) brightness(1.1)'; v.sprite(f, e.x, e.y, s, flip, a); }
         else v.sprite(f, e.x, e.y, s, flip, a);
         ctx.restore();
-        if (e.bleed) { ctx.font = '700 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('🩸', e.x + 30, e.y - 80 * e.d.scale / 0.5); ctx.textAlign = 'left'; }
+        { const A3 = this.g.A.fx3, ic = []; if (e.bleed) ic.push(e.burnFx ? 'st_burn' : 'st_bleed'); if (e.frost > 0) ic.push('st_slow'); if (e.stun > 0.25) ic.push('st_stun');
+          ic.forEach((k, i) => { const f = A3 && A3[k] && A3[k][0]; if (f && f.w) ctx.drawImage(f.im, e.x - ic.length * 13 + i * 26, e.y - 118 * (e.d.scale || 0.5) / 0.5 - 14, 24, 24); }); }
         if (e.stun > 0.25) { ctx.fillStyle = '#ffe9a8'; ctx.font = '700 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('✦ ✦', e.x, e.y - 90 * e.d.scale / 0.5); ctx.textAlign = 'left'; }
         if (e.alive && e.hp < e.d.hp) {
           const top = e.y - (e.d.kind === 'wolf' ? 84 : 66) * (e.d.scale / (e.d.kind === 'wolf' ? 0.55 : 0.46));

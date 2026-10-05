@@ -188,8 +188,8 @@ export class Game {
     const y = d.y - 18 + Math.sin(T * 3 + d.x) * 4;
     if (it.rarity && it.rarity !== '일반') { const gr = ctx.createLinearGradient(0, d.y - 140, 0, d.y); gr.addColorStop(0, col + '00'); gr.addColorStop(1, col + '99'); ctx.fillStyle = gr; ctx.fillRect(d.x - 8, d.y - 140, 16, 140); }
     v.shadow(d.x, d.y, 16);
-    const ic = this.A.ui && this.A.ui['item_' + d.id];
-    if (ic && ic.w && !ic.missing) ctx.drawImage(ic.im, d.x - 22, y - 22, 44, 44);
+    const ic = (this.A.items2 && this.A.items2[d.id]) || (this.A.ui && this.A.ui['item_' + d.id]);
+    if (ic && ic.w && !ic.missing) { const k = 48 / Math.max(ic.w, ic.h); ctx.drawImage(ic.im, d.x - ic.w * k / 2, y + 22 - ic.h * k, ic.w * k, ic.h * k); }
     else { ctx.font = '30px system-ui'; ctx.textAlign = 'center'; ctx.fillText(this.icon(d.id), d.x, y + 10); }
     ctx.font = '700 20px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = '#000'; ctx.strokeText(it.name || '', d.x, y - 28); ctx.fillStyle = col; ctx.fillText(it.name || '', d.x, y - 28); ctx.textAlign = 'left';
   }
@@ -200,7 +200,19 @@ export class Game {
     const s = this.state, it = this.items[id]; if (!it || !(s.inv[id] > 0)) return '없다';
     if (id === 'return_stone') { if (this.mode !== 'field' || this.eventFightCb) return '탑 안에서만 쓸 수 있다'; s.inv[id]--; this.closeMenu(); this.drops = []; this.backToPlaza(); return null; }
     if (it.buff) { s.buffs = s.buffs || {}; s.buffs[it.buff] = { k: it.k, t: it.t }; }
-    else if (it.cure) { if (this.enemies) {} s.debuffs = {}; }
+    else if (it.cure) { s.debuffs = {}; }
+    else if (it.smoke || it.flash || it.blast) {
+      if (this.mode !== 'field' || !this.enemies) return '탑 안에서만 쓸 수 있다';
+      const p = this.player;
+      for (const e of this.enemies.list) {
+        if (!e.alive) continue; const d = Math.hypot(e.x - p.x, e.y - p.y);
+        if (it.smoke) { e.cd = Math.max(e.cd || 0, 3); }
+        if (it.flash && d < 320) e.stun = Math.max(e.stun || 0, 2);
+        if (it.blast && d < 300) this.enemies.damage(e, Math.round(this.atkPower() * 4), (e.x - p.x) / (d || 1) * 300, (e.y - p.y) / (d || 1) * 300, 1, 0.3);
+      }
+      if (it.smoke) p.inv = Math.max(p.inv || 0, 1.5);
+      this.fx.sfx(it.blast ? 'imp' : 'spark', p.x, p.y - 50, { s: 2.2, fps: 18 }); this.view.addShake(it.blast ? 10 : 4);
+    }
     else if (it.heal || it.mp) { if ((!it.heal || s.hp >= this.maxHp()) && (!it.mp || (s.mp || 0) >= this.maxMp())) return '이미 가득하다'; if (it.heal) s.hp = Math.min(this.maxHp(), s.hp + it.heal); if (it.mp) s.mp = Math.min(this.maxMp(), (s.mp || 0) + it.mp); }
     else return '쓸 수 없는 물건이다';
     s.inv[id]--;
@@ -249,7 +261,7 @@ export class Game {
     e.hitDone = true; e.st = 'rec'; e.stt = -0.6; e.stun = 1.1;
     const dx = e.x - p.x, dy = e.y - p.y, d = Math.hypot(dx, dy) || 1;
     e.kx += dx / d * 420; e.ky += dy / d * 420;
-    this.fx.sfx('imp', (e.x + p.x) / 2, (e.y + p.y) / 2 - 50, { s: 2.2, fps: 18 });
+    this.fx.sfx('parry', (e.x + p.x) / 2, (e.y + p.y) / 2 - 50, { s: 1.6, fps: 18 });
     this.fx.sfx('ring', (e.x + p.x) / 2, (e.y + p.y) / 2, { s: 3, fps: 18, ground: true });
     this.fx.num((e.x + p.x) / 2, (e.y + p.y) / 2 - 110, 'PARRY', 'parry');
     this.sound.sfx('parry'); this.hitstop = 0.14; this.view.addShake(6); this.flashParry = 0.18;
@@ -358,6 +370,8 @@ export class Game {
     if (!st) { this.showTitle(); return; }
     this.state = st; this.portraits = {}; this.ow.actors = {};
     this.migrateStats(st); this.player = null;
+    for (const u in st.gear || {}) if (!this.items[st.gear[u].id]) { delete st.gear[u]; for (const k in st.equip) if (st.equip[k] === u) delete st.equip[k]; }
+    for (const k in st.inv) if (!this.items[k]) delete st.inv[k];
     this.enterWorldMode();
     if (!st.flags.introDone) { this.ow.play('prologue'); return; }
     const gone = { street: 'alley' };
@@ -536,6 +550,9 @@ export class Game {
 
   // ---------- 상점 ----------
   icon(id) {
+    // 새 아이템 그림(items2): 에고 무기는 현재 단계 그림
+    const I2 = this.A.items2, key = this.items[id] && this.items[id].ego ? id + '_' + this.gear.egoStageOf(id) : id;
+    if (I2 && I2[key] && I2[key].w && !I2[key].missing) { this.iconCache = this.iconCache || {}; if (!this.iconCache[key]) this.iconCache[key] = I2[key].im.toDataURL(); return `<img class="uiimg ii2" src="${this.iconCache[key]}" alt="">`; }
     const sk = this.A.ui && this.A.ui['item_' + id];
     if (sk && sk.im) { this.iconCache = this.iconCache || {}; if (!this.iconCache[id]) this.iconCache[id] = sk.im.toDataURL(); return `<img class="uiimg" src="${this.iconCache[id]}" alt="">`; }
     const it = this.items[id] || {};
@@ -553,6 +570,10 @@ export class Game {
     if (it.move) o.push(`이동 +${Math.round(it.move * 100)}%`);
     if (it.atkPct) o.push(`피해 +${Math.round(it.atkPct * 100)}%`);
     if (it.heal) o.push(`회복 ${it.heal}`);
+    if (it.mp) o.push(`MP ${it.mp}`);
+    if (it.sell && it.slot === 'material') o.push(`판매 ${it.sell.toLocaleString('ko-KR')}원`);
+    if (it.elem) o.push(this.gearDef.elems[it.elem]);
+    if (it.jobOnly) o.push(it.jobOnly + ' 전용');
     return o.join(' · ');
   }
   rStyle(r) { return r && r !== '일반' ? `border-color:${this.gear.color(r)};` : ''; }
@@ -571,7 +592,8 @@ export class Game {
       const gear = this.gear.isGear(sel), have = gear ? this.gear.count(sel) : s.inv[sel] || 0;
       const grid = pageIds.map((id) => `<button class="slot ${id === sel ? 'on' : ''} ${this.rClass(this.items[id].rarity)}" data-s="${id}" style="${this.rStyle(this.items[id].rarity)}"><span class="ic">${this.icon(id)}</span><span class="nm">${esc(this.items[id].name)}</span><span class="ct">${won(this.items[id].price)}</span></button>`).join('');
       const shard = s.inv.mana_shard || 0;
-      const sell = title === '헌터 상점' ? `<button data-sell="1" ${shard ? '' : 'disabled'}>마정석 조각 ${shard}개 팔기</button>` : '';
+      const mats = Object.keys(s.inv).filter((k) => s.inv[k] > 0 && this.items[k] && this.items[k].sell), worth = mats.reduce((a, k) => a + s.inv[k] * this.items[k].sell, 0);
+      const sell = title === '헌터 상점' ? `<button data-sell="1" ${worth ? '' : 'disabled'}>재료·마정석 모두 팔기 ${won(worth)}</button>` : '';
       this.ov.innerHTML = `<div class="screen"><div class="panel">
         <div class="ptop"><b>${esc(title)}</b><span>${won(s.money)}</span><button class="x" id="close">✕</button></div>
         <div class="pbody"><div class="left"><div class="grid">${grid}</div>${pager}</div>
@@ -581,7 +603,7 @@ export class Game {
       this.ov.querySelectorAll('[data-s]').forEach((b) => (b.onclick = () => { sel = b.dataset.s; msg = ''; render(); }));
       this.ov.querySelector('#buy').onclick = () => { if (s.money >= it.price) { s.money -= it.price; if (gear) this.gear.give(sel); else s.inv[sel] = (s.inv[sel] || 0) + 1; this.onItem(sel); this.sound.sfx('select'); msg = it.name + ' 구입'; render(); } };
       this.ov.querySelectorAll('[data-pg]').forEach((b) => (b.onclick = () => { page = (page + Number(b.dataset.pg) + pages) % pages; render(); }));
-      const sb = this.ov.querySelector('[data-sell]'); if (sb) sb.onclick = () => { s.money += shard * this.items.mana_shard.sell; s.inv.mana_shard = 0; msg = '팔았어요'; render(); };
+      const sb = this.ov.querySelector('[data-sell]'); if (sb) sb.onclick = () => { for (const k of mats) { s.money += s.inv[k] * this.items[k].sell; s.inv[k] = 0; } msg = '팔았어요'; this.sound.sfx('select'); render(); };
       this.ov.querySelector('#close').onclick = () => this.closeMenu();
     };
     render();
@@ -1166,6 +1188,11 @@ export class Game {
     const drop = (id) => (this.drops = this.drops || []).push({ id, x: e.x + (Math.random() - 0.5) * 60, y: e.y + (Math.random() - 0.5) * 30, t: 0 });
     if (e.d.drop) for (const id in e.d.drop) if (Math.random() < e.d.drop[id]) drop(id);
     const gd = this.gear.rollDrop(e); if (gd) drop(gd);
+    // 보스: 아주 낮은 확률로 에고 무기, 20층부터 자기 전설직 전용 장비
+    if (e.d.boss && this.floor) {
+      if (Math.random() < 0.02) { const eg = ['ego_sword', 'ego_dagger', 'ego_staff', 'ego_gauntlet'].filter((k) => !this.gear.count(k)); if (eg.length) drop(eg[Math.floor(Math.random() * eg.length)]); }
+      if (this.floor.n >= 20 && Math.random() < 0.05) { const lj = Object.keys(this.items).filter((k) => this.items[k].jobOnly === s.job && !this.gear.count(k)); if (lj.length) drop(lj[Math.floor(Math.random() * lj.length)]); }
+    }
     s.rumor += 0.02;
     if (!e.lastAlly) this.gainExp(e.d.exp);
     if (e === this.boss) { this.clearFloor(); return; }

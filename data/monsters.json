@@ -13,7 +13,10 @@
    600
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "slime_jelly": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.03,
   "sheet": "slime",
@@ -33,7 +36,10 @@
    700
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "slime_jelly": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.05,
   "sheet": "slime",
@@ -54,7 +60,10 @@
    900
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "slime_jelly": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.06,
   "sheet": "slime",
@@ -75,7 +84,11 @@
    2000
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "wolf_fang": 0.35,
+   "wolf_pelt": 0.2,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.12,
   "sheet": "wolf",
@@ -96,7 +109,14 @@
    25000
   ],
   "drop": {
-   "mana_shard": 1
+   "mana_shard": 1,
+   "wolf_fang": 0.35,
+   "wolf_pelt": 0.2,
+   "stone_s": 0.25,
+   "bone_frag": 0.08,
+   "boss_core": 0.6,
+   "stone_l": 0.5,
+   "magic_dust": 0.5
   },
   "eva": 0.08,
   "patterns": [
@@ -153,7 +173,15 @@
    0,
    0
   ],
-  "drop": {},
+  "drop": {
+   "wolf_fang": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08,
+   "boss_core": 0.6,
+   "stone_l": 0.5,
+   "magic_dust": 0.5,
+   "rift_frag": 1
+  },
   "patterns": [
    {
     "id": "bite",
@@ -191,7 +219,11 @@
    600
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "slime_jelly": 0.35,
+   "mush_cap": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.04,
   "sheet": "mushroom",
@@ -211,7 +243,11 @@
    600
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "slime_jelly": 0.35,
+   "toad_skin": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.03,
   "sheet": "toad",
@@ -231,7 +267,11 @@
    600
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "slime_jelly": 0.35,
+   "treant_bark": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0,
   "sheet": "treant",
@@ -251,7 +291,11 @@
    2000
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "wolf_fang": 0.35,
+   "bee_sting": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.15,
   "sheet": "bee",
@@ -271,7 +315,11 @@
    2000
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "wolf_fang": 0.35,
+   "bat_wing": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.18,
   "sheet": "bat",
@@ -291,7 +339,11 @@
    2000
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "wolf_fang": 0.35,
+   "spider_silk": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.1,
   "sheet": "spider",
@@ -311,7 +363,11 @@
    2000
   ],
   "drop": {
-   "mana_shard": 0.25
+   "mana_shard": 0.25,
+   "wolf_fang": 0.35,
+   "bug_shell": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08
   },
   "eva": 0.08,
   "sheet": "bug",
@@ -332,7 +388,14 @@
    25000
   ],
   "drop": {
-   "mana_shard": 1
+   "mana_shard": 1,
+   "wolf_fang": 0.35,
+   "stag_antler": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08,
+   "boss_core": 0.6,
+   "stone_l": 0.5,
+   "magic_dust": 0.5
   },
   "eva": 0.08,
   "patterns": [
@@ -381,7 +444,15 @@
    0,
    0
   ],
-  "drop": {},
+  "drop": {
+   "wolf_fang": 0.35,
+   "stone_s": 0.25,
+   "bone_frag": 0.08,
+   "boss_core": 0.6,
+   "stone_l": 0.5,
+   "magic_dust": 0.5,
+   "rift_frag": 1
+  },
   "patterns": [
    {
     "id": "bite",

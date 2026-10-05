@@ -20,9 +20,12 @@ export class Gear {
   owned() { return Object.keys(this.s.gear || {}); }
   count(id) { return this.owned().filter((u) => this.s.gear[u].id === id).length; }
   // 각성 전에는 옷만
-  canEquip(slot) { return this.g.awakened() || slot === 'outfit'; }
+  canEquip(slot, it) { if (it && it.jobOnly && this.s.job !== it.jobOnly) return false; return this.g.awakened() || slot === 'outfit'; }
+  // 에고 무기: 함께 싸운 횟수로 1~4단계
+  egoStage(uid) { const o = this.s.gear[uid], N = this.D.ego.need; let st = 1; for (let i = 0; i < N.length; i++) if ((o.ego || 0) >= N[i]) st = i + 1; return st; }
+  egoStageOf(id) { const u = this.owned().find((x) => this.s.gear[x].id === id); return u ? this.egoStage(u) : 1; }
   equipped(slot) { const u = this.s.equip[slot]; if (!u) return null; if (!this.canEquip(slot)) return null; return this.item(u); }
-  equip(uid) { const it = this.item(uid); if (!it || !this.canEquip(it.slot)) return false; this.s.equip[it.slot] = uid; return true; }
+  equip(uid) { const it = this.item(uid); if (!it || !this.canEquip(it.slot, it)) return false; this.s.equip[it.slot] = uid; return true; }
   unequip(slot) { delete this.s.equip[slot]; }
 
   // 능력치 합: 공격·체력·방어는 강화 1단계마다 +8%
@@ -30,7 +33,8 @@ export class Gear {
     let v = 0;
     for (const [slot] of this.D.slots) {
       const it = this.equipped(slot); if (!it || !it[k]) continue;
-      v += ['atk', 'hp', 'def'].includes(k) ? it[k] * (1 + this.D.enhance.perLevel * it.plus) : it[k];
+      const eg = it.ego && k === 'atk' ? this.D.ego.mult[this.egoStage(it.uid) - 1] : 1;
+      v += ['atk', 'hp', 'def'].includes(k) ? it[k] * eg * (1 + this.D.enhance.perLevel * it.plus) : it[k];
     }
     return k === 'atk' || k === 'hp' || k === 'def' ? Math.round(v) : v;
   }
@@ -44,6 +48,13 @@ export class Gear {
   masteryNeed(lv) { return Math.round(this.D.mastery.need * Math.pow(lv + 1, 1.5)); }
   gainMastery() {
     const type = this.weaponType(); if (type === 'fist' && !this.g.awakened()) return;
+    const w = this.equipped('weapon');
+    if (w && w.ego) {   // 에고 성장
+      const o2 = this.s.gear[w.uid], before = this.egoStage(w.uid); o2.ego = (o2.ego || 0) + 1;
+      const after = this.egoStage(w.uid);
+      if (after > before) { this.g.iconCache = {}; this.g.hud.say(`${w.name} · ${after}단계로 깨어났다`, 3); this.g.toast('「' + this.D.ego.lines[after - 1] + '」'); }
+      else if (after === 4 && Math.random() < 0.004) this.g.toast('「' + this.D.ego.lines[3] + '」');
+    }
     const o = this.mastery(type), job = this.g.jobs[this.s.job] || {};
     if (o.lv >= this.D.mastery.max) return;
     o.xp += job.weapon === type ? 1.5 : 1;
@@ -101,7 +112,7 @@ export class Gear {
     if (kind !== 'normal') { w[0] *= 0.3; w[1] *= 0.7; }
     let r = Math.random() * w.reduce((a, b) => a + b, 0), ri = 0;
     for (; ri < w.length - 1; ri++) { r -= w[ri]; if (r <= 0) break; }
-    const pool = Object.keys(this.g.items).filter((id) => this.isGear(id) && this.g.items[id].rarity === R[ri] && id !== 'dagger_old' && id !== 'cloth_work');
+    const pool = Object.keys(this.g.items).filter((id) => this.isGear(id) && this.g.items[id].rarity === R[ri] && id !== 'dagger_old' && id !== 'cloth_work' && !this.g.items[id].ego && !this.g.items[id].jobOnly);
     if (!pool.length) return null;
     const id = pool[Math.floor(Math.random() * pool.length)];
     return id;   // 바닥에 떨어뜨리고, 주울 때 give

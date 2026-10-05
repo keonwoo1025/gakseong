@@ -48,516 +48,6 @@
   "desc": "원정 중 다친 파티원에게 건넬 수 있다",
   "cat": "med"
  },
- "sword_iron": {
-  "name": "철검",
-  "slot": "weapon",
-  "type": "sword",
-  "atk": 6,
-  "rarity": "일반",
-  "price": 50000
- },
- "sword_steel": {
-  "name": "강철검",
-  "slot": "weapon",
-  "type": "sword",
-  "atk": 12,
-  "rarity": "고급",
-  "price": 180000
- },
- "sword_ore": {
-  "name": "마정석 합금검",
-  "slot": "weapon",
-  "type": "sword",
-  "atk": 20,
-  "rarity": "희귀",
-  "price": 600000
- },
- "sword_4": {
-  "name": "청강 장검",
-  "slot": "weapon",
-  "type": "sword",
-  "atk": 34,
-  "rarity": "영웅",
-  "drop": true
- },
- "sword_5": {
-  "name": "균열석 장검",
-  "slot": "weapon",
-  "type": "sword",
-  "atk": 51,
-  "rarity": "전설",
-  "drop": true
- },
- "sword_6": {
-  "name": "무명검",
-  "slot": "weapon",
-  "type": "sword",
-  "atk": 72,
-  "rarity": "신화",
-  "drop": true
- },
- "blade_1": {
-  "name": "철도",
-  "slot": "weapon",
-  "type": "blade",
-  "atk": 7,
-  "rarity": "일반",
-  "price": 50000
- },
- "blade_2": {
-  "name": "강철 환도",
-  "slot": "weapon",
-  "type": "blade",
-  "atk": 14,
-  "rarity": "고급",
-  "price": 180000
- },
- "blade_3": {
-  "name": "마정석 합금도",
-  "slot": "weapon",
-  "type": "blade",
-  "atk": 24,
-  "rarity": "희귀",
-  "price": 600000
- },
- "blade_4": {
-  "name": "흑철 대도",
-  "slot": "weapon",
-  "type": "blade",
-  "atk": 39,
-  "rarity": "영웅",
-  "drop": true
- },
- "blade_5": {
-  "name": "균열석 대도",
-  "slot": "weapon",
-  "type": "blade",
-  "atk": 60,
-  "rarity": "전설",
-  "drop": true
- },
- "blade_6": {
-  "name": "월하도",
-  "slot": "weapon",
-  "type": "blade",
-  "atk": 84,
-  "rarity": "신화",
-  "drop": true
- },
- "spear_1": {
-  "name": "쇠창",
-  "slot": "weapon",
-  "type": "spear",
-  "atk": 6,
-  "rarity": "일반",
-  "price": 50000
- },
- "spear_2": {
-  "name": "강철창",
-  "slot": "weapon",
-  "type": "spear",
-  "atk": 12,
-  "rarity": "고급",
-  "price": 180000
- },
- "spear_3": {
-  "name": "마정석 합금창",
-  "slot": "weapon",
-  "type": "spear",
-  "atk": 20,
-  "rarity": "희귀",
-  "price": 600000
- },
- "spear_4": {
-  "name": "장군창",
-  "slot": "weapon",
-  "type": "spear",
-  "atk": 34,
-  "rarity": "영웅",
-  "drop": true
- },
- "spear_5": {
-  "name": "균열석 장창",
-  "slot": "weapon",
-  "type": "spear",
-  "atk": 51,
-  "rarity": "전설",
-  "drop": true
- },
- "spear_6": {
-  "name": "천공창",
-  "slot": "weapon",
-  "type": "spear",
-  "atk": 72,
-  "rarity": "신화",
-  "drop": true
- },
- "bow_1": {
-  "name": "사냥활",
-  "slot": "weapon",
-  "type": "bow",
-  "atk": 5,
-  "rarity": "일반",
-  "price": 50000
- },
- "bow_2": {
-  "name": "복합궁",
-  "slot": "weapon",
-  "type": "bow",
-  "atk": 10,
-  "rarity": "고급",
-  "price": 180000
- },
- "bow_3": {
-  "name": "마정석 장궁",
-  "slot": "weapon",
-  "type": "bow",
-  "atk": 17,
-  "rarity": "희귀",
-  "price": 600000
- },
- "bow_4": {
-  "name": "각궁",
-  "slot": "weapon",
-  "type": "bow",
-  "atk": 28,
-  "rarity": "영웅",
-  "drop": true
- },
- "bow_5": {
-  "name": "균열석 장궁",
-  "slot": "weapon",
-  "type": "bow",
-  "atk": 42,
-  "rarity": "전설",
-  "drop": true
- },
- "bow_6": {
-  "name": "풍신궁",
-  "slot": "weapon",
-  "type": "bow",
-  "atk": 60,
-  "rarity": "신화",
-  "drop": true
- },
- "staff_1": {
-  "name": "나무 지팡이",
-  "slot": "weapon",
-  "type": "staff",
-  "atk": 5,
-  "rarity": "일반",
-  "price": 50000
- },
- "staff_2": {
-  "name": "강철 지팡이",
-  "slot": "weapon",
-  "type": "staff",
-  "atk": 10,
-  "rarity": "고급",
-  "price": 180000
- },
- "staff_3": {
-  "name": "마정석 지팡이",
-  "slot": "weapon",
-  "type": "staff",
-  "atk": 17,
-  "rarity": "희귀",
-  "price": 600000
- },
- "staff_4": {
-  "name": "현자의 지팡이",
-  "slot": "weapon",
-  "type": "staff",
-  "atk": 28,
-  "rarity": "영웅",
-  "drop": true
- },
- "staff_5": {
-  "name": "균열석 지팡이",
-  "slot": "weapon",
-  "type": "staff",
-  "atk": 42,
-  "rarity": "전설",
-  "drop": true
- },
- "staff_6": {
-  "name": "성좌의 지팡이",
-  "slot": "weapon",
-  "type": "staff",
-  "atk": 60,
-  "rarity": "신화",
-  "drop": true
- },
- "dagger_1": {
-  "name": "쇠단검",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 4,
-  "rarity": "일반",
-  "price": 50000
- },
- "dagger_2": {
-  "name": "강철 단검",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 8,
-  "rarity": "고급",
-  "price": 180000
- },
- "dagger_3": {
-  "name": "마정석 단검",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 14,
-  "rarity": "희귀",
-  "price": 600000
- },
- "dagger_4": {
-  "name": "흑요 단검",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 22,
-  "rarity": "영웅",
-  "drop": true
- },
- "dagger_5": {
-  "name": "균열석 단검",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 34,
-  "rarity": "전설",
-  "drop": true
- },
- "dagger_6": {
-  "name": "야명단도",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 48,
-  "rarity": "신화",
-  "drop": true
- },
- "gauntlet_1": {
-  "name": "가죽 건틀릿",
-  "slot": "weapon",
-  "type": "gauntlet",
-  "atk": 5,
-  "rarity": "일반",
-  "price": 50000
- },
- "gauntlet_2": {
-  "name": "강철 건틀릿",
-  "slot": "weapon",
-  "type": "gauntlet",
-  "atk": 10,
-  "rarity": "고급",
-  "price": 180000
- },
- "gauntlet_3": {
-  "name": "마정석 건틀릿",
-  "slot": "weapon",
-  "type": "gauntlet",
-  "atk": 17,
-  "rarity": "희귀",
-  "price": 600000
- },
- "gauntlet_4": {
-  "name": "거인의 건틀릿",
-  "slot": "weapon",
-  "type": "gauntlet",
-  "atk": 28,
-  "rarity": "영웅",
-  "drop": true
- },
- "gauntlet_5": {
-  "name": "균열석 건틀릿",
-  "slot": "weapon",
-  "type": "gauntlet",
-  "atk": 42,
-  "rarity": "전설",
-  "drop": true
- },
- "gauntlet_6": {
-  "name": "산악권갑",
-  "slot": "weapon",
-  "type": "gauntlet",
-  "atk": 60,
-  "rarity": "신화",
-  "drop": true
- },
- "dagger_old": {
-  "name": "낡은 단검",
-  "slot": "weapon",
-  "type": "dagger",
-  "atk": 2,
-  "rarity": "일반",
-  "price": 0,
-  "desc": "짐꾼 사무소에서 받은 단검"
- },
- "cloth_work": {
-  "name": "작업복",
-  "slot": "outfit",
-  "hp": 0,
-  "def": 0,
-  "rarity": "일반",
-  "price": 0,
-  "desc": "짐꾼 사무소에서 받은 작업복"
- },
- "jacket_hunter": {
-  "name": "헌터 재킷",
-  "slot": "outfit",
-  "hp": 30,
-  "def": 2,
-  "rarity": "고급",
-  "price": 80000
- },
- "coat_armored": {
-  "name": "강화 코트",
-  "slot": "outfit",
-  "hp": 80,
-  "def": 5,
-  "rarity": "희귀",
-  "price": 300000
- },
- "outfit_4": {
-  "name": "마정석 섬유 코트",
-  "slot": "outfit",
-  "hp": 150,
-  "def": 9,
-  "rarity": "영웅",
-  "drop": true
- },
- "outfit_5": {
-  "name": "균열석 전투복",
-  "slot": "outfit",
-  "hp": 260,
-  "def": 14,
-  "rarity": "전설",
-  "drop": true
- },
- "outfit_6": {
-  "name": "무명의 외투",
-  "slot": "outfit",
-  "hp": 420,
-  "def": 20,
-  "rarity": "신화",
-  "drop": true
- },
- "mask_1": {
-  "name": "검은 마스크",
-  "slot": "mask",
-  "eva": 0.01,
-  "rarity": "고급",
-  "price": 90000,
-  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다"
- },
- "mask_2": {
-  "name": "헌터 반가면",
-  "slot": "mask",
-  "eva": 0.02,
-  "rarity": "희귀",
-  "price": 350000,
-  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다"
- },
- "mask_3": {
-  "name": "무광 가면",
-  "slot": "mask",
-  "eva": 0.03,
-  "rarity": "영웅",
-  "drop": true,
-  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다"
- },
- "mask_4": {
-  "name": "균열석 가면",
-  "slot": "mask",
-  "eva": 0.05,
-  "rarity": "전설",
-  "drop": true,
-  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다"
- },
- "shoes_1": {
-  "name": "운동화",
-  "slot": "shoes",
-  "move": 0.02,
-  "rarity": "일반",
-  "price": 20000
- },
- "shoes_2": {
-  "name": "헌터 부츠",
-  "slot": "shoes",
-  "move": 0.04,
-  "rarity": "고급",
-  "price": 90000
- },
- "shoes_3": {
-  "name": "마정석 부츠",
-  "slot": "shoes",
-  "move": 0.06,
-  "rarity": "희귀",
-  "price": 350000
- },
- "shoes_4": {
-  "name": "바람의 신발",
-  "slot": "shoes",
-  "move": 0.09,
-  "rarity": "영웅",
-  "drop": true
- },
- "ring_1": {
-  "name": "은반지",
-  "slot": "ring",
-  "atkPct": 0.02,
-  "rarity": "일반",
-  "price": 20000
- },
- "ring_2": {
-  "name": "마정석 반지",
-  "slot": "ring",
-  "atkPct": 0.04,
-  "rarity": "희귀",
-  "price": 350000
- },
- "ring_3": {
-  "name": "영웅의 반지",
-  "slot": "ring",
-  "atkPct": 0.06,
-  "rarity": "영웅",
-  "drop": true
- },
- "ring_4": {
-  "name": "균열석 반지",
-  "slot": "ring",
-  "atkPct": 0.09,
-  "rarity": "전설",
-  "drop": true
- },
- "neck_1": {
-  "name": "가죽 목걸이",
-  "slot": "neck",
-  "hp": 20,
-  "rarity": "일반",
-  "price": 20000
- },
- "neck_2": {
-  "name": "마정석 목걸이",
-  "slot": "neck",
-  "hp": 50,
-  "rarity": "희귀",
-  "price": 350000
- },
- "neck_3": {
-  "name": "수호의 목걸이",
-  "slot": "neck",
-  "hp": 100,
-  "rarity": "영웅",
-  "drop": true
- },
- "neck_4": {
-  "name": "균열석 목걸이",
-  "slot": "neck",
-  "hp": 180,
-  "rarity": "전설",
-  "drop": true
- },
  "coffee": {
   "name": "캔커피",
   "slot": "use",
@@ -644,5 +134,1875 @@
   "rarity": "희귀",
   "cat": "magic",
   "desc": "체력과 MP를 모두 회복"
+ },
+ "sword_1": {
+  "name": "철검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 6,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "sword_2": {
+  "name": "병사의 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 6,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "sword_3": {
+  "name": "강철 장검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 13,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "sword_4": {
+  "name": "기사의 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 11,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "sword_5": {
+  "name": "사냥꾼의 톱날검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 12,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "sword_6": {
+  "name": "마정석 대검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 23,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "sword_7": {
+  "name": "서리 세검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 20,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "sword_8": {
+  "name": "뇌전검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 22,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "sword_9": {
+  "name": "왕실 근위검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 38,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "sword_10": {
+  "name": "용비늘 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 34,
+  "rarity": "영웅",
+  "elem": "rift",
+  "drop": true
+ },
+ "sword_11": {
+  "name": "그림자 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 36,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "sword_12": {
+  "name": "홍염 대검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 58,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "sword_13": {
+  "name": "균열석 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 52,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "sword_14": {
+  "name": "태양검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 55,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "sword_15": {
+  "name": "천상의 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 84,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "sword_16": {
+  "name": "광륜검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 75,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "blade_1": {
+  "name": "철도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 7,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "blade_2": {
+  "name": "벌목도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 7,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "blade_3": {
+  "name": "강철 환도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 15,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "blade_4": {
+  "name": "녹칠 환도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 13,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "blade_5": {
+  "name": "갈고리도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 14,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "blade_6": {
+  "name": "마정석 곡도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 27,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "blade_7": {
+  "name": "서리 월도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 24,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "blade_8": {
+  "name": "폭풍도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 25,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "blade_9": {
+  "name": "흑철 대도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 44,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "blade_10": {
+  "name": "호문 왕도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 39,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "blade_11": {
+  "name": "그림자 초승도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 42,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "blade_12": {
+  "name": "홍염 대도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 67,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "blade_13": {
+  "name": "균열석 대도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 60,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "blade_14": {
+  "name": "봉황도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 64,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "blade_15": {
+  "name": "월하천도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 98,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "blade_16": {
+  "name": "봉마도",
+  "slot": "weapon",
+  "type": "blade",
+  "atk": 88,
+  "rarity": "신화",
+  "elem": "shadow",
+  "drop": true
+ },
+ "spear_1": {
+  "name": "나무창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 6,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "spear_2": {
+  "name": "쇠작살",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 6,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "spear_3": {
+  "name": "강철창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 13,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "spear_4": {
+  "name": "녹색 할버드",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 11,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "spear_5": {
+  "name": "갈고리 글레이브",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 12,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "spear_6": {
+  "name": "마정석 창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 23,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "spear_7": {
+  "name": "서리 장창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 20,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "spear_8": {
+  "name": "뇌전 삼지창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 22,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "spear_9": {
+  "name": "장군창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 38,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "spear_10": {
+  "name": "용두 언월도",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 34,
+  "rarity": "영웅",
+  "elem": "fire",
+  "drop": true
+ },
+ "spear_11": {
+  "name": "흑철 낫",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 36,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "spear_12": {
+  "name": "화염 장창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 58,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "spear_13": {
+  "name": "균열석 창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 52,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "spear_14": {
+  "name": "태양 할버드",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 55,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "spear_15": {
+  "name": "천공창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 84,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "spear_16": {
+  "name": "신성 삼지창",
+  "slot": "weapon",
+  "type": "spear",
+  "atk": 75,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "bow_1": {
+  "name": "나무 활",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 5,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "bow_2": {
+  "name": "사냥 단궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 5,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "bow_3": {
+  "name": "복합궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 11,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "bow_4": {
+  "name": "숲의 장궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 10,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "bow_5": {
+  "name": "사냥꾼 곡궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 10,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "bow_6": {
+  "name": "마정석 장궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 19,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "bow_7": {
+  "name": "얼음 활",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 17,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "bow_8": {
+  "name": "폭풍궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 18,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "bow_9": {
+  "name": "각궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 31,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "bow_10": {
+  "name": "용골궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 28,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "bow_11": {
+  "name": "그림자 활",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 30,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "bow_12": {
+  "name": "봉황궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 48,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "bow_13": {
+  "name": "균열석 장궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 43,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "bow_14": {
+  "name": "태양궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 46,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "bow_15": {
+  "name": "풍신궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 70,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "bow_16": {
+  "name": "성락궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 62,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "staff_1": {
+  "name": "나무 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 5,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "staff_2": {
+  "name": "굽은 가지 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 5,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "staff_3": {
+  "name": "강철 고리 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 11,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "staff_4": {
+  "name": "녹수정 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 10,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "staff_5": {
+  "name": "뼈 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 10,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "staff_6": {
+  "name": "마정석 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 19,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "staff_7": {
+  "name": "서리 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 17,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "staff_8": {
+  "name": "뇌전봉",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 18,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "staff_9": {
+  "name": "현자의 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 31,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "staff_10": {
+  "name": "용조 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 28,
+  "rarity": "영웅",
+  "elem": "fire",
+  "drop": true
+ },
+ "staff_11": {
+  "name": "공허 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 30,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "staff_12": {
+  "name": "화염구 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 48,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "staff_13": {
+  "name": "균열석 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 43,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "staff_14": {
+  "name": "태양 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 46,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "staff_15": {
+  "name": "성좌의 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 70,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "staff_16": {
+  "name": "세계수 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 62,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "dagger_1": {
+  "name": "쇠단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 4,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "dagger_2": {
+  "name": "낡은 사냥칼",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 4,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "dagger_3": {
+  "name": "강철 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 9,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "dagger_4": {
+  "name": "독날 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 8,
+  "rarity": "고급",
+  "elem": "poison",
+  "price": 150000
+ },
+ "dagger_5": {
+  "name": "쿠나이",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 8,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "dagger_6": {
+  "name": "마정석 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 15,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "dagger_7": {
+  "name": "얼음 조각 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 14,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "dagger_8": {
+  "name": "뇌전 송곳",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 14,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "dagger_9": {
+  "name": "흑요 암살검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 25,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "dagger_10": {
+  "name": "사형 크리스",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 22,
+  "rarity": "영웅",
+  "elem": "poison",
+  "drop": true
+ },
+ "dagger_11": {
+  "name": "그림자 송곳니",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 24,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "dagger_12": {
+  "name": "화염 송곳니",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 39,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "dagger_13": {
+  "name": "균열석 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 34,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "dagger_14": {
+  "name": "태양 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 36,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "dagger_15": {
+  "name": "야명단도",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 56,
+  "rarity": "신화",
+  "elem": "shadow",
+  "drop": true
+ },
+ "dagger_16": {
+  "name": "사신의 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 50,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "gauntlet_1": {
+  "name": "가죽 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 5,
+  "rarity": "일반",
+  "price": 40000
+ },
+ "gauntlet_2": {
+  "name": "쇠 손싸개",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 5,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "gauntlet_3": {
+  "name": "강철 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 11,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "gauntlet_4": {
+  "name": "청동 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 10,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "gauntlet_5": {
+  "name": "가시 너클",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 10,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "gauntlet_6": {
+  "name": "마정석 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 19,
+  "rarity": "희귀",
+  "elem": "magic",
+  "drop": true
+ },
+ "gauntlet_7": {
+  "name": "서리 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 17,
+  "rarity": "희귀",
+  "elem": "frost",
+  "drop": true
+ },
+ "gauntlet_8": {
+  "name": "뇌전 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 18,
+  "rarity": "희귀",
+  "elem": "thunder",
+  "drop": true
+ },
+ "gauntlet_9": {
+  "name": "거인의 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 31,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "gauntlet_10": {
+  "name": "용조 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 28,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "gauntlet_11": {
+  "name": "그림자 발톱",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 30,
+  "rarity": "영웅",
+  "elem": "shadow",
+  "drop": true
+ },
+ "gauntlet_12": {
+  "name": "화염 주먹",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 48,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "gauntlet_13": {
+  "name": "균열석 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 43,
+  "rarity": "전설",
+  "elem": "rift",
+  "drop": true
+ },
+ "gauntlet_14": {
+  "name": "태양 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 46,
+  "rarity": "전설",
+  "elem": "fire",
+  "drop": true
+ },
+ "gauntlet_15": {
+  "name": "산왕권갑",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 70,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "gauntlet_16": {
+  "name": "신수 건틀릿",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 62,
+  "rarity": "신화",
+  "elem": "holy",
+  "drop": true
+ },
+ "dagger_old": {
+  "name": "낡은 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 2,
+  "rarity": "일반",
+  "price": 0,
+  "desc": "짐꾼 사무소에서 받은 단검"
+ },
+ "ego_sword": {
+  "name": "눈 뜬 검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 40,
+  "rarity": "신화",
+  "ego": true,
+  "drop": true,
+  "desc": "의지를 가진 무기. 함께 싸울수록 깨어난다"
+ },
+ "ego_dagger": {
+  "name": "뱀의 송곳니",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 30,
+  "rarity": "신화",
+  "ego": true,
+  "drop": true,
+  "desc": "의지를 가진 무기. 함께 싸울수록 깨어난다"
+ },
+ "ego_staff": {
+  "name": "응시하는 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 36,
+  "rarity": "신화",
+  "ego": true,
+  "drop": true,
+  "desc": "의지를 가진 무기. 함께 싸울수록 깨어난다"
+ },
+ "ego_gauntlet": {
+  "name": "아귀의 손",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 36,
+  "rarity": "신화",
+  "ego": true,
+  "drop": true,
+  "desc": "의지를 가진 무기. 함께 싸울수록 깨어난다"
+ },
+ "legend_cheonma": {
+  "name": "천마검",
+  "slot": "weapon",
+  "type": "sword",
+  "atk": 95,
+  "rarity": "신화",
+  "jobOnly": "천마",
+  "elem": "fire",
+  "drop": true,
+  "desc": "천마만 쓸 수 있다"
+ },
+ "legend_earth": {
+  "name": "대지의 권갑",
+  "slot": "weapon",
+  "type": "gauntlet",
+  "atk": 80,
+  "rarity": "신화",
+  "jobOnly": "대지의 군주",
+  "elem": "rift",
+  "drop": true,
+  "desc": "대지의 군주만 쓸 수 있다"
+ },
+ "legend_storm": {
+  "name": "폭풍궁",
+  "slot": "weapon",
+  "type": "bow",
+  "atk": 78,
+  "rarity": "신화",
+  "jobOnly": "폭풍의 사수",
+  "elem": "thunder",
+  "drop": true,
+  "desc": "폭풍의 사수만 쓸 수 있다"
+ },
+ "legend_space": {
+  "name": "공허의 지팡이",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 80,
+  "rarity": "신화",
+  "jobOnly": "공간의 절대자",
+  "elem": "shadow",
+  "drop": true,
+  "desc": "공간의 절대자만 쓸 수 있다"
+ },
+ "legend_holy": {
+  "name": "성휘장",
+  "slot": "weapon",
+  "type": "staff",
+  "atk": 80,
+  "rarity": "신화",
+  "jobOnly": "성휘의 사도",
+  "elem": "holy",
+  "drop": true,
+  "desc": "성휘의 사도만 쓸 수 있다"
+ },
+ "legend_hades": {
+  "name": "명계의 단검",
+  "slot": "weapon",
+  "type": "dagger",
+  "atk": 70,
+  "rarity": "신화",
+  "jobOnly": "명왕",
+  "elem": "poison",
+  "drop": true,
+  "desc": "명왕만 쓸 수 있다"
+ },
+ "relic_cheonma": {
+  "name": "천마의 인장",
+  "slot": "charm",
+  "rarity": "신화",
+  "jobOnly": "천마",
+  "atkPct": 0.12,
+  "hp": 200,
+  "drop": true,
+  "desc": "천마의 유물"
+ },
+ "relic_earth": {
+  "name": "대지의 군주의 왕관 반지",
+  "slot": "charm",
+  "rarity": "신화",
+  "jobOnly": "대지의 군주",
+  "atkPct": 0.12,
+  "hp": 200,
+  "drop": true,
+  "desc": "대지의 군주의 유물"
+ },
+ "relic_storm": {
+  "name": "폭풍의 사수의 깃털",
+  "slot": "charm",
+  "rarity": "신화",
+  "jobOnly": "폭풍의 사수",
+  "atkPct": 0.12,
+  "hp": 200,
+  "drop": true,
+  "desc": "폭풍의 사수의 유물"
+ },
+ "relic_space": {
+  "name": "공간의 절대자의 나침반",
+  "slot": "charm",
+  "rarity": "신화",
+  "jobOnly": "공간의 절대자",
+  "atkPct": 0.12,
+  "hp": 200,
+  "drop": true,
+  "desc": "공간의 절대자의 유물"
+ },
+ "relic_holy": {
+  "name": "성휘의 사도의 성물함",
+  "slot": "charm",
+  "rarity": "신화",
+  "jobOnly": "성휘의 사도",
+  "atkPct": 0.12,
+  "hp": 200,
+  "drop": true,
+  "desc": "성휘의 사도의 유물"
+ },
+ "relic_hades": {
+  "name": "명왕의 등불",
+  "slot": "charm",
+  "rarity": "신화",
+  "jobOnly": "명왕",
+  "atkPct": 0.12,
+  "hp": 200,
+  "drop": true,
+  "desc": "명왕의 유물"
+ },
+ "cloth_work": {
+  "name": "작업복",
+  "slot": "outfit",
+  "hp": 0,
+  "def": 0,
+  "rarity": "일반",
+  "price": 40000,
+  "desc": "짐꾼 사무소에서 받은 작업복"
+ },
+ "outfit_2": {
+  "name": "후드티",
+  "slot": "outfit",
+  "hp": 19,
+  "def": 2,
+  "rarity": "일반",
+  "price": 80000
+ },
+ "outfit_3": {
+  "name": "헌터 재킷",
+  "slot": "outfit",
+  "hp": 38,
+  "def": 3,
+  "rarity": "고급",
+  "price": 450000
+ },
+ "outfit_4": {
+  "name": "전술 조끼",
+  "slot": "outfit",
+  "hp": 34,
+  "def": 3,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "outfit_5": {
+  "name": "야전 재킷",
+  "slot": "outfit",
+  "hp": 36,
+  "def": 3,
+  "rarity": "고급",
+  "price": 300000
+ },
+ "outfit_6": {
+  "name": "마정석 섬유 코트",
+  "slot": "outfit",
+  "hp": 67,
+  "def": 5,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "outfit_7": {
+  "name": "경판금 갑옷",
+  "slot": "outfit",
+  "hp": 61,
+  "def": 5,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "outfit_8": {
+  "name": "설원 망토",
+  "slot": "outfit",
+  "hp": 64,
+  "def": 5,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "outfit_9": {
+  "name": "흑기사 갑옷",
+  "slot": "outfit",
+  "hp": 111,
+  "def": 9,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "outfit_10": {
+  "name": "암살복",
+  "slot": "outfit",
+  "hp": 101,
+  "def": 9,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "outfit_11": {
+  "name": "전투 마법사 로브",
+  "slot": "outfit",
+  "hp": 106,
+  "def": 9,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "outfit_12": {
+  "name": "화염 갑옷",
+  "slot": "outfit",
+  "hp": 170,
+  "def": 14,
+  "rarity": "전설",
+  "drop": true
+ },
+ "outfit_13": {
+  "name": "균열석 전투복",
+  "slot": "outfit",
+  "hp": 155,
+  "def": 14,
+  "rarity": "전설",
+  "drop": true
+ },
+ "outfit_14": {
+  "name": "봉황 망토",
+  "slot": "outfit",
+  "hp": 163,
+  "def": 14,
+  "rarity": "전설",
+  "drop": true
+ },
+ "outfit_15": {
+  "name": "천상의 갑옷",
+  "slot": "outfit",
+  "hp": 248,
+  "def": 20,
+  "rarity": "신화",
+  "drop": true
+ },
+ "outfit_16": {
+  "name": "무명의 외투",
+  "slot": "outfit",
+  "hp": 225,
+  "def": 20,
+  "rarity": "신화",
+  "drop": true
+ },
+ "mask_1": {
+  "name": "검은 천 마스크",
+  "slot": "mask",
+  "eva": 0.01,
+  "rarity": "일반",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "price": 20000
+ },
+ "mask_2": {
+  "name": "흰 마스크",
+  "slot": "mask",
+  "eva": 0.01,
+  "rarity": "일반",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "price": 40000
+ },
+ "mask_3": {
+  "name": "헌터 반가면",
+  "slot": "mask",
+  "eva": 0.019,
+  "rarity": "고급",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "price": 225000
+ },
+ "mask_4": {
+  "name": "고글 두건",
+  "slot": "mask",
+  "eva": 0.019,
+  "rarity": "고급",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "price": 75000
+ },
+ "mask_5": {
+  "name": "여우 가면",
+  "slot": "mask",
+  "eva": 0.019,
+  "rarity": "고급",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "price": 150000
+ },
+ "mask_6": {
+  "name": "마정석 바이저",
+  "slot": "mask",
+  "eva": 0.034,
+  "rarity": "희귀",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_7": {
+  "name": "서리 가면",
+  "slot": "mask",
+  "eva": 0.034,
+  "rarity": "희귀",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_8": {
+  "name": "범 가면",
+  "slot": "mask",
+  "eva": 0.034,
+  "rarity": "희귀",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_9": {
+  "name": "오니 가면",
+  "slot": "mask",
+  "eva": 0.056,
+  "rarity": "영웅",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_10": {
+  "name": "유령 가면",
+  "slot": "mask",
+  "eva": 0.056,
+  "rarity": "영웅",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_11": {
+  "name": "까마귀 가면",
+  "slot": "mask",
+  "eva": 0.056,
+  "rarity": "영웅",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_12": {
+  "name": "화염 귀면",
+  "slot": "mask",
+  "eva": 0.086,
+  "rarity": "전설",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_13": {
+  "name": "균열석 가면",
+  "slot": "mask",
+  "eva": 0.086,
+  "rarity": "전설",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_14": {
+  "name": "황금 사자 가면",
+  "slot": "mask",
+  "eva": 0.086,
+  "rarity": "전설",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_15": {
+  "name": "신성한 가면",
+  "slot": "mask",
+  "eva": 0.125,
+  "rarity": "신화",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "mask_16": {
+  "name": "얼굴 없는 가면",
+  "slot": "mask",
+  "eva": 0.125,
+  "rarity": "신화",
+  "desc": "얼굴을 가린다. 정체를 숨기는 데 쓴다",
+  "drop": true
+ },
+ "shoes_1": {
+  "name": "운동화",
+  "slot": "shoes",
+  "move": 0.02,
+  "rarity": "일반",
+  "price": 20000
+ },
+ "shoes_2": {
+  "name": "헌터 부츠",
+  "slot": "shoes",
+  "move": 0.038,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "shoes_3": {
+  "name": "강철 전투화",
+  "slot": "shoes",
+  "move": 0.038,
+  "rarity": "고급",
+  "price": 75000
+ },
+ "shoes_4": {
+  "name": "마정석 부츠",
+  "slot": "shoes",
+  "move": 0.068,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "shoes_5": {
+  "name": "바람 부츠",
+  "slot": "shoes",
+  "move": 0.068,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "shoes_6": {
+  "name": "그림자 부츠",
+  "slot": "shoes",
+  "move": 0.112,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "shoes_7": {
+  "name": "화염 부츠",
+  "slot": "shoes",
+  "move": 0.172,
+  "rarity": "전설",
+  "drop": true
+ },
+ "shoes_8": {
+  "name": "천상의 날개 신",
+  "slot": "shoes",
+  "move": 0.25,
+  "rarity": "신화",
+  "drop": true
+ },
+ "ring_1": {
+  "name": "은반지",
+  "slot": "ring",
+  "atkPct": 0.02,
+  "rarity": "일반",
+  "price": 20000
+ },
+ "ring_2": {
+  "name": "청동 반지",
+  "slot": "ring",
+  "atkPct": 0.038,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "ring_3": {
+  "name": "사파이어 반지",
+  "slot": "ring",
+  "atkPct": 0.038,
+  "rarity": "고급",
+  "price": 75000
+ },
+ "ring_4": {
+  "name": "서리 반지",
+  "slot": "ring",
+  "atkPct": 0.068,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "ring_5": {
+  "name": "자수정 반지",
+  "slot": "ring",
+  "atkPct": 0.068,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "ring_6": {
+  "name": "용안 반지",
+  "slot": "ring",
+  "atkPct": 0.112,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "ring_7": {
+  "name": "균열석 반지",
+  "slot": "ring",
+  "atkPct": 0.172,
+  "rarity": "전설",
+  "drop": true
+ },
+ "ring_8": {
+  "name": "광륜 반지",
+  "slot": "ring",
+  "atkPct": 0.25,
+  "rarity": "신화",
+  "drop": true
+ },
+ "neck_1": {
+  "name": "송곳니 목걸이",
+  "slot": "neck",
+  "hp": 25,
+  "rarity": "일반",
+  "price": 20000
+ },
+ "neck_2": {
+  "name": "비취 목걸이",
+  "slot": "neck",
+  "hp": 48,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "neck_3": {
+  "name": "마정석 목걸이",
+  "slot": "neck",
+  "hp": 48,
+  "rarity": "고급",
+  "price": 75000
+ },
+ "neck_4": {
+  "name": "서리 결정 목걸이",
+  "slot": "neck",
+  "hp": 85,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "neck_5": {
+  "name": "방패 목걸이",
+  "slot": "neck",
+  "hp": 85,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "neck_6": {
+  "name": "용비늘 목걸이",
+  "slot": "neck",
+  "hp": 140,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "neck_7": {
+  "name": "균열석 목걸이",
+  "slot": "neck",
+  "hp": 215,
+  "rarity": "전설",
+  "drop": true
+ },
+ "neck_8": {
+  "name": "태양 목걸이",
+  "slot": "neck",
+  "hp": 312,
+  "rarity": "신화",
+  "drop": true
+ },
+ "charm_1": {
+  "name": "종이 부적",
+  "slot": "charm",
+  "def": 2,
+  "rarity": "일반",
+  "price": 20000
+ },
+ "charm_2": {
+  "name": "비취 매듭",
+  "slot": "charm",
+  "def": 4,
+  "rarity": "고급",
+  "price": 150000
+ },
+ "charm_3": {
+  "name": "마정석 수호부",
+  "slot": "charm",
+  "def": 4,
+  "rarity": "고급",
+  "price": 75000
+ },
+ "charm_4": {
+  "name": "방울 부적",
+  "slot": "charm",
+  "def": 7,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "charm_5": {
+  "name": "수호 호부",
+  "slot": "charm",
+  "def": 7,
+  "rarity": "희귀",
+  "drop": true
+ },
+ "charm_6": {
+  "name": "범 발톱 부적",
+  "slot": "charm",
+  "def": 11,
+  "rarity": "영웅",
+  "drop": true
+ },
+ "charm_7": {
+  "name": "봉황 깃털",
+  "slot": "charm",
+  "def": 17,
+  "rarity": "전설",
+  "drop": true
+ },
+ "charm_8": {
+  "name": "천상의 부적",
+  "slot": "charm",
+  "def": 25,
+  "rarity": "신화",
+  "drop": true
+ },
+ "bandage": {
+  "name": "붕대",
+  "heal": 30,
+  "price": 1200,
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "med"
+ },
+ "energy": {
+  "name": "에너지 드링크",
+  "mp": 30,
+  "price": 2500,
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "drink"
+ },
+ "onigiri": {
+  "name": "삼각김밥",
+  "heal": 40,
+  "price": 1500,
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "food"
+ },
+ "lunchbox": {
+  "name": "도시락",
+  "heal": 120,
+  "price": 6000,
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "food"
+ },
+ "potion_l": {
+  "name": "대형 회복 물약",
+  "heal": 180,
+  "price": 15000,
+  "slot": "use",
+  "rarity": "고급",
+  "cat": "med"
+ },
+ "mana_potion_l": {
+  "name": "대형 마력 물약",
+  "mp": 150,
+  "price": 14000,
+  "slot": "use",
+  "rarity": "고급",
+  "cat": "med"
+ },
+ "smoke": {
+  "name": "연막탄",
+  "smoke": true,
+  "price": 9000,
+  "desc": "3초 동안 적이 공격하지 못한다",
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "med"
+ },
+ "flash": {
+  "name": "섬광탄",
+  "flash": true,
+  "price": 9000,
+  "desc": "주변 적을 2초 동안 기절시킨다",
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "med"
+ },
+ "scroll": {
+  "name": "마법 두루마리",
+  "blast": true,
+  "price": 20000,
+  "desc": "주변 적에게 큰 피해",
+  "slot": "use",
+  "rarity": "고급",
+  "cat": "med"
+ },
+ "ration": {
+  "name": "전투 식량",
+  "heal": 60,
+  "mp": 20,
+  "price": 4000,
+  "slot": "use",
+  "rarity": "일반",
+  "cat": "food"
+ },
+ "stone_s": {
+  "name": "작은 마정석",
+  "slot": "material",
+  "sell": 800,
+  "rarity": "일반"
+ },
+ "stone_m": {
+  "name": "마정석",
+  "slot": "material",
+  "sell": 2500,
+  "rarity": "고급"
+ },
+ "stone_l": {
+  "name": "큰 마정석",
+  "slot": "material",
+  "sell": 8000,
+  "rarity": "희귀"
+ },
+ "stone_r": {
+  "name": "붉은 마정석",
+  "slot": "material",
+  "sell": 6000,
+  "rarity": "고급"
+ },
+ "stone_p": {
+  "name": "보라 마정석",
+  "slot": "material",
+  "sell": 9000,
+  "rarity": "희귀"
+ },
+ "stone_g": {
+  "name": "황금 마정석",
+  "slot": "material",
+  "sell": 30000,
+  "rarity": "영웅"
+ },
+ "slime_jelly": {
+  "name": "슬라임 젤리",
+  "slot": "material",
+  "sell": 300,
+  "rarity": "일반"
+ },
+ "wolf_fang": {
+  "name": "늑대 송곳니",
+  "slot": "material",
+  "sell": 600,
+  "rarity": "일반"
+ },
+ "wolf_pelt": {
+  "name": "늑대 가죽",
+  "slot": "material",
+  "sell": 900,
+  "rarity": "일반"
+ },
+ "mush_cap": {
+  "name": "버섯 갓",
+  "slot": "material",
+  "sell": 300,
+  "rarity": "일반"
+ },
+ "bee_sting": {
+  "name": "벌침",
+  "slot": "material",
+  "sell": 500,
+  "rarity": "일반"
+ },
+ "toad_skin": {
+  "name": "두꺼비 가죽",
+  "slot": "material",
+  "sell": 600,
+  "rarity": "일반"
+ },
+ "bat_wing": {
+  "name": "박쥐 날개",
+  "slot": "material",
+  "sell": 500,
+  "rarity": "일반"
+ },
+ "spider_silk": {
+  "name": "거미줄 뭉치",
+  "slot": "material",
+  "sell": 700,
+  "rarity": "일반"
+ },
+ "treant_bark": {
+  "name": "고목 껍질",
+  "slot": "material",
+  "sell": 1200,
+  "rarity": "일반"
+ },
+ "stag_antler": {
+  "name": "사슴뿔",
+  "slot": "material",
+  "sell": 4000,
+  "rarity": "고급"
+ },
+ "bug_shell": {
+  "name": "갑충 껍데기",
+  "slot": "material",
+  "sell": 800,
+  "rarity": "일반"
+ },
+ "rift_frag": {
+  "name": "균열 핵 조각",
+  "slot": "material",
+  "sell": 15000,
+  "rarity": "희귀"
+ },
+ "boss_core": {
+  "name": "보스 핵",
+  "slot": "material",
+  "sell": 40000,
+  "rarity": "영웅"
+ },
+ "monster_blood": {
+  "name": "몬스터 혈액",
+  "slot": "material",
+  "sell": 1500,
+  "rarity": "일반"
+ },
+ "bone_frag": {
+  "name": "뼛조각",
+  "slot": "material",
+  "sell": 300,
+  "rarity": "일반"
+ },
+ "magic_dust": {
+  "name": "마력 가루",
+  "slot": "material",
+  "sell": 2000,
+  "rarity": "고급"
+ },
+ "iron_ore": {
+  "name": "철광석",
+  "slot": "material",
+  "sell": 700,
+  "rarity": "일반"
+ },
+ "rift_ore": {
+  "name": "균열석 광석",
+  "slot": "material",
+  "sell": 12000,
+  "rarity": "희귀"
+ },
+ "elite_badge": {
+  "name": "정예 휘장",
+  "slot": "material",
+  "sell": 5000,
+  "rarity": "고급"
+ },
+ "license": {
+  "name": "헌터 자격증",
+  "slot": "quest",
+  "rarity": "일반"
+ },
+ "dungeon_key": {
+  "name": "던전 열쇠",
+  "slot": "quest",
+  "rarity": "일반"
+ },
+ "map_scroll": {
+  "name": "지도 두루마리",
+  "slot": "quest",
+  "rarity": "일반"
  }
 }

@@ -53,7 +53,7 @@ export class Player extends Character {
     const g = this.g, P = (k) => g.sk.P(k);
     g.combatT = 0;
     if (!o.skill && (e.st === 'atk' && !e.hitDone || (e.st === 'wind' && e.stt > e.windT - 0.12))) { g.parry(e); }
-    if (!(o.noMiss || P('noMiss')) && !g.rollHit(e)) { g.fx.num(e.x, e.y - 70, 'MISS', 'miss'); return false; }
+    if (!(o.noMiss || P('noMiss')) && !g.rollHit(e)) { g.fx.num(e.x, e.y - 70, 'MISS', 'miss'); g.fx.sfx('miss', e.x, e.y - 50, { s: 0.8, fps: 20 }); return false; }
     let m = mult;
     if (o.skill) m *= 1 + P('skillDmg');
     if (o.ignoreDef) m *= 1.15;
@@ -62,6 +62,7 @@ export class Player extends Character {
     let crit = 0.05 + P('crit') + (o.critBonus || 0) + g.gear.opt('crit') + (wt === 'sword' ? 0.1 : 0);
     if (!o.skill && wt === 'dagger' && (this.x - e.x) * (e.face || 1) < 0) { m *= 1.5; g.fx.num(e.x, e.y - 100, '배후', 'miss'); }
     if (e.d.boss) m *= 1 + g.gear.opt('boss');
+    const wel = (g.gear.equipped('weapon') || {}).elem; if (wel === 'shadow') crit += 0.1; if (wel === 'rift') m *= 1.15;
     m *= g.buffK('atk');
     if (e.hp < e.d.hp * 0.3) { crit += P('execute'); if (o.executeB) m *= 1 + o.executeB; }
     const isCrit = Math.random() < crit;
@@ -70,6 +71,18 @@ export class Player extends Character {
     e.lastAlly = false;
     g.enemies.damage(e, dmg, kx, ky, isCrit ? 2 : kind, flinch);
     g.sk.onHit(e);
+    // 속성 효과 (희귀 이상 무기)
+    const el = (g.gear.equipped('weapon') || {}).elem;
+    if (el && !o.skill && e.alive) {
+      g.fx.sfx('el_' + el, e.x, e.y - 50, { s: 0.75, fps: 22 });
+      if (el === 'rift') g.fx.sfx('armorbreak', e.x, e.y - 90, { s: 0.6, fps: 20 });
+      if (el === 'fire') e.burnFx = true; else if (el === 'poison') e.burnFx = false;
+      if (el === 'frost') { e.slowT = 1.5; if (!e.frost) g.fx.num(e.x, e.y - 100, '둔화', 'miss'); e.frost = 1.5; }
+      if (el === 'fire' || el === 'poison') { e.bleed = { t: 3, dps: Math.max(1, dmg * 0.2), acc: 0 }; }
+      if (el === 'magic' && g.state) g.state.mp = Math.min(g.maxMp(), (g.state.mp || 0) + 1);
+      if (el === 'holy' && g.state) g.state.hp = Math.min(g.maxHp(), g.state.hp + dmg * 0.03);
+      if (el === 'thunder' && Math.random() < 0.4) { const o2 = g.enemies.list.find((q) => q !== e && q.alive && Math.hypot(q.x - e.x, q.y - e.y) < 220); if (o2) { g.fx.beam(e.x, e.y - 50, Math.atan2(o2.y - e.y, o2.x - e.x), Math.hypot(o2.x - e.x, o2.y - e.y), 4, '#bfe8ff'); g.enemies.damage(o2, Math.round(dmg * 0.5), 0, 0, 0, 0.1); } }
+    }
     // 무기 종류별 효과
     if (!o.skill && !o.splash) {
       if (wt === 'blade' && e.alive) { if (!e.bleed) g.fx.num(e.x, e.y - 100, '출혈', 'miss'); e.bleed = { t: 3, dps: Math.max(1, dmg * 0.25), acc: 0 }; }
@@ -106,7 +119,8 @@ export class Player extends Character {
     this.state = 'dodge'; this.t = 0; this.dx = dx; this.dy = dy; this.inv = Math.max(this.inv, d.inv);
     this.cds.dodge = d.cd; this.dodgeHit = new Set();
     this.g.sound.sfx('dodge');
-    this.g.fx.sfx('dust', this.x, this.y + 4, { s: 1.1, fps: 16, ground: true });
+    this.g.fx.sfx('dust', this.x, this.y - 10, { s: 1.0, fps: 16, ground: true });
+    const jd = (this.g.skills[this.g.state && this.g.state.job] || {}).dodge; if (jd && jd.fx) this.g.fx.sfx(jd.fx, this.x, this.y - 50, { s: 1.2, fps: 16 });
     this.g.fx.num(this.x, this.y - 130, d.name, 'dodge');
   }
 
@@ -175,9 +189,18 @@ export class Player extends Character {
           const tg = this.nearest(st.r * 1.9 + 30);
           if (tg && ((tg.x - this.x) * vv[0] + (tg.y - this.y) * vv[1]) > 0) { tx = tg.x; ty = tg.y; }
           const ang = Math.atan2(ty - this.y, tx - this.x), len = Math.hypot(tx - this.x, ty - this.y);
-          g.fx.beam(this.x + vv[0] * 30, this.y - 55 + vv[1] * 20, ang, len, st.ranged === 'orb' ? 10 : 4, st.col || '#fff');
-          g.fx.sfx(g.A.fx2 && g.A.fx2[st.ranged] ? st.ranged : 'spark', tx, ty - 50, { s: st.fxs, fps: 22 });
-        } else g.fx.sfx(wset, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
+          // 화살·마력탄이 날아가 맞으면 터진다
+          const orb = st.ranged === 'orb';
+          if (g.fx.frames(orb ? 'bolt' : 'arrow_fly')) g.fx.proj(orb ? 'bolt' : 'arrow_fly', this.x + vv[0] * 30, this.y - 55 + vv[1] * 20, tx, ty - 50, 1500, { s: orb ? 0.7 : 0.8, then: orb ? 'el_magic' : 'arrow_hit', thenS: 0.8 });
+          else g.fx.beam(this.x + vv[0] * 30, this.y - 55 + vv[1] * 20, ang, len, orb ? 10 : 4, st.col || '#fff');
+        } else {
+          // 무기 종류별 평타 이펙트 (천마는 전용 이펙트 유지)
+          const AT = { sword: 'atk_sword', blade: 'atk_blade', spear: 'atk_spear', dagger: 'atk_dagger', gauntlet: 'atk_punch', fist: 'atk_punch' }[st.wtype];
+          const useNew = AT && g.fx.frames(AT) && !(cm.startsWith('cm_') && st.wtype === 'sword');
+          const dirA = Math.atan2(vv[1], vv[0]), flipN = (this.stage % 2) === 1;
+          if (useNew) g.fx.sfx(AT, this.x + vv[0] * 60, this.y + vv[1] * 40 - 55, { s: st.fxs * (st.wtype === 'spear' ? 1.2 : 0.95), fps: 26, rot: dirA, flip: false, a: 1, sy: flipN ? -1 : 1 });
+          else g.fx.sfx(wset, this.x + vv[0] * 55, this.y + vv[1] * 40 - 50, { s: st.fxs, fps: 20, rot, flip });
+        }
         if (st.ring) g.fx.sfx('ring', this.x + vv[0] * 60, this.y + vv[1] * 45, { s: 2.8, fps: 16, ground: true });
         let any = false;
         for (const e of g.enemies.list) {
@@ -309,16 +332,32 @@ export class Player extends Character {
   layers(v, body) {
     const g = this.g, ctx = v.ctx, H = 130;
     const w = g.gear.equipped('weapon'), m = g.gear.equipped('mask');
+    // 코드 모션: 무기 종류별로 몸 기울이기·내딛기·반동, 무기 궤적. 구르기는 몸을 굴린다
     this.swing = null;
+    const base = { D: Math.PI / 2, U: -Math.PI / 2, R: 0, L: Math.PI }[this.dir], dv = DV[this.dir];
+    let ox = 0, oy = 0, rot = 0, sq = 1;
     if (this.state === 'attack' || this.state === 'dash') {
-      const base = { D: Math.PI / 2, U: -Math.PI / 2, R: 0, L: Math.PI }[this.dir];
-      const st = this.combo[this.stage] || {}, k = Math.min(1, this.t * (st.fps || 16) / 3);
-      this.swing = st.thrust || st.ranged ? base - Math.PI / 2 : base - Math.PI / 2 + (this.stage % 2 ? 1 : -1) * (1.6 - 3.2 * k) * 0.6;
+      const st = this.combo[this.stage] || {}, k = Math.min(1, this.t * (st.fps || 16) / 3), wt = st.wtype || 'sword', pk = Math.sin(k * Math.PI);
+      const side = this.stage % 2 ? 1 : -1;
+      if (wt === 'spear') { this.swing = base - Math.PI / 2; ox = dv[0] * 18 * pk; oy = dv[1] * 12 * pk; }
+      else if (wt === 'bow') { this.swing = base; const b = k < 0.6 ? -k / 0.6 : (k - 0.6) / 0.4 * 2 - 1; ox = dv[0] * 5 * b; oy = dv[1] * 4 * b; }
+      else if (wt === 'staff') { this.swing = k < 0.45 ? base - Math.PI / 2 - 1.3 * (k / 0.45) : base - Math.PI / 2 - 1.3 + 1.3 * Math.min(1, (k - 0.45) / 0.3); ox = dv[0] * 6 * pk; oy = -6 * pk; }
+      else if (wt === 'gauntlet' || wt === 'fist') { ox = dv[0] * 14 * pk; oy = dv[1] * 10 * pk; rot = (dv[0] || 0) * 0.08 * pk; }
+      else { this.swing = base - Math.PI / 2 + side * (1.6 - 3.2 * k) * (wt === 'dagger' ? 0.45 : 0.6); ox = dv[0] * 9 * pk; oy = dv[1] * 6 * pk; rot = (dv[0] || side * 0.5) * 0.1 * pk; }
+      if (this.state === 'dash') { ox *= 1.6; oy *= 1.6; }
+    } else if (this.state === 'dodge') {
+      const k = Math.min(1, this.t / ((this.dg && this.dg.time) || 0.35));
+      rot = (this.dx >= 0 ? 1 : -1) * k * Math.PI * 2; sq = 0.86 + 0.14 * Math.abs(Math.cos(k * Math.PI)); oy = -10 * Math.sin(k * Math.PI);
     }
-    drawWeapon(g, ctx, this, w, H, true);
+    const cx = this.x, cy = this.y - 60;
+    ctx.save();
+    ctx.translate(ox, oy);
+    if (rot || sq !== 1) { ctx.translate(cx, cy); ctx.rotate(rot); ctx.scale(1, sq); ctx.translate(-cx, -cy); }
+    if (this.state !== 'dodge') drawWeapon(g, ctx, this, w, H, true);
     body();
     drawMask(g, ctx, this, m, H);
-    drawWeapon(g, ctx, this, w, H, false);
+    if (this.state !== 'dodge') drawWeapon(g, ctx, this, w, H, false);
+    ctx.restore();
   }
 
   drawSwords() {}
